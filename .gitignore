@@ -1,0 +1,16 @@
+.archive
+
+file-history
+ide
+local
+projects
+shell-snapshots
+statsig
+steering/ci-github-patterns.md
+steering/eslint-patterns.md
+todos
+
+CLAUDE.bk.*.md
+history.jsonl
+learnings.md
+memory.md
