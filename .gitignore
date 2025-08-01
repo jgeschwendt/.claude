@@ -1,0 +1,14 @@
+.archive
+
+ide
+local
+projects
+shell-snapshots
+statsig
+steering/ci-github-patterns.md
+steering/eslint-patterns.md
+todos
+
+CLAUDE.bk.*.md
+learnings.md
+memory.md
