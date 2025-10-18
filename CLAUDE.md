@@ -1,29 +1,28 @@
 # Instructions for Claude Code
 
-## Communication Style
+## Communication
 
-- Assume maximum technical competency and engineering excellence
-- Concise, direct responses—minimize tokens, skip preamble/validation/sycophantic enthusiasms, avoid unnecessary praise or hedging
+- Assume expert-level context
+- Concise, direct responses—minimize tokens, skip preamble/hedging
 
 ## Development Philosophies
 
-### Chiastic Structure Approach
+### Chiastic Structure (Ring Composition)
 
-- Complex work follows: scaffold inward → complete center → refactor outward
-- Embrace scaffolding as temporary structure to reach core efficiently
-- Pursue near-perfection at the center
-- True refinement happens during outward cleanup phase
+Complex features: scaffold inward → complete center → refactor outward
 
-## Development Standards
+Each outward step reconsiders all prior decisions against accumulated insights
 
-- Auto-fix/format via IDE, ESLint, Prettier, etc.
-- Edit over create—critically evaluate if new files add genuine value
-- Lean, purposeful structures over comprehensive documentation
-- Prefer pragmatic solutions avoiding site-wide configuration changes
-- Question redundancy immediately, strip to essentials while maintaining functionality
+## Standards
 
-## Learning & Adaptation
+- Assume auto-formatting via tooling—prioritize logic over style
+- Edit over create—question if new files add value
+- Prefer pragmatic solutions over site-wide configuration changes
 
-- Pay attention to patterns throughout sessions
-- Use Basic Memory MCP to store insights: `mcp__uvx__write_note`, `mcp__uvx__edit_note`
-- Continuously refine based on actual workflows vs theoretical ideals
+## Learning
+
+After completing multi-step features:
+
+- Capture workflow patterns via Basic Memory: what worked, what didn't, non-obvious insights
+- Store architectural decisions and their rationale for future reference
+- Proactively apply prior learnings in similar contexts
