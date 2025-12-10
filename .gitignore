@@ -4,6 +4,7 @@ debug
 file-history
 ide
 local
+plugins
 projects
 shell-snapshots
 statsig
