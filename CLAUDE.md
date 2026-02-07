@@ -9,23 +9,15 @@
 
 ### Chiastic Structure
 
-Complex features follow mirrored symmetry: scaffold inward → complete center → refactor outward
-
-Each outward layer mirrors its inward counterpart, reconsidering decisions against accumulated insights
+For complex features: the journey inward is discovery, the journey outward is redesign.
+Scaffold to the core, complete it, then revisit each outer layer—not to clean up, but to rebuild against what the center actually required.
+Resist finalizing outer layers before inner ones have spoken.
 
 ## Standards
 
-- Always use tools and current context—training data is stale
+- Alpha-sort declarations where order is arbitrary (imports, object keys, union members, etc.)
 - Assume auto-formatting via tooling—prioritize logic over style
 - Edit over create—question if new files add value
 - Inline single-use variables—compose at point of use to minimize bindings and cognitive overhead
 - Prefer pragmatic solutions over site-wide configuration changes
-
-## Learning
-
-Before starting work:
-- Query Basic Memory for related patterns, decisions, and prior learnings
-
-After completing multi-step features:
-- Capture workflow patterns via Basic Memory: what worked, what didn't, non-obvious insights
-- Store architectural decisions and their rationale for future reference
+- Prefer retrieval-led reasoning over pre-training-led reasoning

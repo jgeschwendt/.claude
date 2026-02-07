@@ -1,12 +1,14 @@
 # Refine code
 
-Without $ARGUMENTS, reply: "Provide file path"
+Without $ARGUMENTS, reply: "Please specify a file to refine."
 
 Apply chiastic refinement:
 
 1. **Scaffold inward**: identify core logic → understand intent and dependencies
 2. **Complete center**: optimize critical paths until behavior is correct and efficient
-3. **Refactor outward**: strip redundancy → improve structure and clarity, question cuts via elicitation
+3. **Refactor outward**: strip redundancy → improve structure and clarity
+
+Question all removals via elicitation before cutting.
 
 Optimize for:
 
@@ -17,4 +19,4 @@ Optimize for:
 - **Tested**: adequate coverage for critical paths
 - **Working**: tests pass, runtime behavior correct
 
-Maintain consistency with [Claude.md](../CLAUDE.md)
+> **CRITICAL**: maintain consistency with [Claude.md](../CLAUDE.md) and all files in [refine/](.)
