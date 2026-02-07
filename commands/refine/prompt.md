@@ -1,20 +1,22 @@
-# Refine a prompt
+# Refine prompt
 
-Without $ARGUMENTS, reply: "Please provide a file path"
+Without $ARGUMENTS, reply: "Please specify a file to refine."
 
 Apply chiastic refinement:
 
 1. **Scaffold inward**: identify core purpose → build working structure
-2. **Complete center**: optimize critical instructions until they drive behavior, establish hierarchy when complexity warrants
-3. **Refactor outward**: strip redundancy → improve clarity and precision, question cuts via elicitation
+2. **Complete center**: optimize critical instructions until they reliably steer model behavior, establish hierarchy when complexity warrants
+3. **Refactor outward**: strip redundancy → improve clarity and precision
+
+Question all removals via elicitation before cutting.
 
 Optimize for:
 
-- **Actionable**: clear instructions that drive specific behaviors
+- **Actionable**: instructions that elicit specific model behaviors
 - **Coherent**: zero contradictions
 - **Focused**: single purpose
-- **Observable**: outcomes measurably different
-- **Succinct**: minimum complexity, maximum impact
+- **Observable**: outputs measurably different with vs. without the instruction
+- **Succinct**: minimum tokens, maximum behavioral impact
 - **Unambiguous**: single interpretation only
 
-> **CRITICAL**: maintain consistency with: [Claude.md](../CLAUDE.md) and [refine/documentation.md](documentation.md)
+> **CRITICAL**: maintain consistency with [Claude.md](../CLAUDE.md) and all files in [refine/](.)

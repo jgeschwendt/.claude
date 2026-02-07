@@ -1,11 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true,
-    "document-skills@anthropic-agent-skills": true
+    "example-skills@anthropic-agent-skills": true
   },
-  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
+  },
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.grove/code/jgeschwendt/statusline/.trunk/target/release/statusline",
+    "padding": 0
   }
 }

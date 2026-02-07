@@ -1,20 +1,23 @@
 # Refine documentation
 
-Without $ARGUMENTS, reply: "Please provide a file path"
+Without $ARGUMENTS, reply: "Please specify a file to refine."
 
 Apply chiastic refinement:
 
 1. **Scaffold inward**: identify core purpose → build working structure
-2. **Complete center**: optimize critical information until it drives understanding, establish hierarchy when complexity warrants
-3. **Refactor outward**: strip redundancy → improve clarity and precision, question cuts via elicitation
+2. **Complete center**: optimize critical information until it drives reader comprehension, establish hierarchy when complexity warrants
+3. **Refactor outward**: strip redundancy → improve clarity and precision
+
+Question all removals via elicitation before cutting.
 
 Optimize for:
 
-- **Actionable**: clear guidance that drives specific behaviors
+- **Actionable**: clear guidance that enables the reader to act
 - **Coherent**: zero contradictions
 - **Focused**: single purpose
-- **Succinct**: minimum complexity, maximum impact
+- **Navigable**: structure supports scanning and discovery
+- **Observable**: reader outcomes measurably improved
+- **Succinct**: minimum complexity, maximum clarity
 - **Unambiguous**: single interpretation only
-- **Observable**: outcomes measurably different
 
-> **CRITICAL**: maintain consistency with: [Claude.md](../CLAUDE.md) and [refine/prompt.md](prompt.md)
+> **CRITICAL**: maintain consistency with [Claude.md](../CLAUDE.md) and all files in [refine/](.)
