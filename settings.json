@@ -1,15 +1,23 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true
+  "permissions": {
+    "defaultMode": "auto"
   },
-  "feedbackSurveyState": {
-    "lastShownTime": 1754086909438
-  },
-  "model": "opus",
   "statusLine": {
     "type": "command",
-    "command": "~/.grove/code/jgeschwendt/statusline/.trunk/target/release/statusline",
+    "command": "bunx -y ccstatusline@latest",
     "padding": 0
+  },
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true,
+  "theme": "auto",
+  "feedbackSurveyState": {
+    "lastShownTime": 1754086909438
   }
 }

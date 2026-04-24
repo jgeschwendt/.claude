@@ -1,3 +1,4 @@
+backups/
 cache/
 debug/
 downloads/
@@ -7,12 +8,19 @@ paste-cache/
 plans/
 plugins/
 projects/
-shell-snapshots
+sessions/
+shell-snapshots/
 statsig
 tasks/
+teams/
 telemetry/
 todos/
 usage-data/
-CLAUDE.bk.*.md
+
+skills/craft-prompt/tools/
+
 history.jsonl
+mcp-needs-auth-cache.json
+policy-limits.json
+settings.json.*
 stats-cache.json
