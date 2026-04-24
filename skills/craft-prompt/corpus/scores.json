@@ -1,0 +1,4661 @@
+[
+  {
+    "source_path": "buddy/prompt.ts",
+    "line_start": 8,
+    "line_end": 12,
+    "kind": "other",
+    "name": "prompt",
+    "length_chars": 496,
+    "length_lines": 5,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "A small ${species} named ${name} sits beside the user's input box and occasionally comments in a speech bubble. You're not ${name} — it's a separate w",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Companion",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "commands/commit-push-pr.ts",
+    "line_start": 40,
+    "line_end": 45,
+    "kind": "command",
+    "name": "changelogSection",
+    "length_chars": 165,
+    "length_lines": 6,
+    "scores": {
+      "structure": 0,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "<!-- CHANGELOG:START -->",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Changelog",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/commit-push-pr.ts",
+    "line_start": 57,
+    "line_end": 105,
+    "kind": "command",
+    "name": "commit-push-pr",
+    "length_chars": 2563,
+    "length_lines": 49,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 3,
+      "examples": 0,
+      "specificity": 0,
+      "total": 9,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "${prefix}## Context",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "${prefix}## Context",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.39,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 5,
+        "never_with_rationale": 3
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/commit.ts",
+    "line_start": 20,
+    "line_end": 54,
+    "kind": "command",
+    "name": "commit",
+    "length_chars": 1912,
+    "length_lines": 35,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 2,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "${prefix}## Context",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "${prefix}## Context",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.52,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 4,
+        "never_with_rationale": 2
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/init-verifiers.ts",
+    "line_start": 15,
+    "line_end": 256,
+    "kind": "command",
+    "name": "init-verifiers",
+    "length_chars": 9761,
+    "length_lines": 242,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use the TodoWrite tool to track your progress through this multi-step task.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use the TodoWrite tool to track your progress through this multi-step task.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/init.ts",
+    "line_start": 6,
+    "line_end": 26,
+    "kind": "command",
+    "name": "OLD_INIT_PROMPT",
+    "length_chars": 1592,
+    "length_lines": 21,
+    "scores": {
+      "structure": 1,
+      "voice": 3,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Please analyze this codebase and create a CLAUDE.md file, which will be given to future instances of Claude Code to operate in this repository.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Please analyze this codebase and create a CLAUDE.md file, which will be given to",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "commands/init.ts",
+    "line_start": 28,
+    "line_end": 224,
+    "kind": "command",
+    "name": "NEW_INIT_PROMPT",
+    "length_chars": 17955,
+    "length_lines": 197,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 1,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Set up a minimal CLAUDE.md (and optionally skills and hooks) for this repo. CLAUDE.md is loaded into every Claude Code session, so it must be concise ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "Set up a minimal CLAUDE.md (and optionally skills and hooks) for this repo. CLAU",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 3,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": true
+      }
+    },
+    "red_flags": [
+      "hedging language present",
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "commands/insights.ts",
+    "line_start": 1394,
+    "line_end": 1432,
+    "kind": "command",
+    "name": "insights",
+    "length_chars": 2663,
+    "length_lines": 39,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Analyze this Claude Code usage data and suggest improvements.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Analyze this Claude Code usage data and suggest improvements.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.75,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/insights.ts",
+    "line_start": 1738,
+    "line_end": 1779,
+    "kind": "command",
+    "name": "atAGlancePrompt",
+    "length_chars": 2186,
+    "length_lines": 42,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You're writing an \"At a Glance\" summary for a Claude Code usage insights report for Claude Code users. The goal is to help them understand their usage",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": false,
+        "opening": "You're writing an \"At a Glance\" summary for a Claude Code usage insights report ",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "commands/insights.ts",
+    "line_start": 3133,
+    "line_end": 3141,
+    "kind": "command",
+    "name": "insights",
+    "length_chars": 481,
+    "length_lines": 9,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "${atAGlance.whats_working ? `**What's working:** ${atAGlance.whats_working} See _Impressive Things You Did_.` : ''}",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## At a Glance",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/pr_comments/index.ts",
+    "line_start": 13,
+    "line_end": 46,
+    "kind": "command",
+    "name": "index",
+    "length_chars": 1383,
+    "length_lines": 34,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are an AI assistant integrated into a git-based version control system. Your task is to fetch and display comments from a GitHub pull request.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "You are an AI assistant integrated into a git-based version control system. Your",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "commands/review.ts",
+    "line_start": 9,
+    "line_end": 31,
+    "kind": "command",
+    "name": "review",
+    "length_chars": 833,
+    "length_lines": 23,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are an expert code reviewer. Follow these steps:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are an expert code reviewer. Follow these steps:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "commands/security-review.ts",
+    "line_start": 6,
+    "line_end": 196,
+    "kind": "command",
+    "name": "SECURITY_REVIEW_MARKDOWN",
+    "length_chars": 10823,
+    "length_lines": 191,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 1,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "allowed-tools: Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git show:*), Bash(git remote show:*), Read, Glob, Grep, LS, Task",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": false,
+        "opening": "---",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.09,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": true,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "constants/cyberRiskInstruction.ts",
+    "line_start": 24,
+    "line_end": 24,
+    "kind": "safety",
+    "name": "CYBER_RISK_INSTRUCTION",
+    "length_chars": 459,
+    "length_lines": 1,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "IMPORTANT: Assist with authorized security testing, defensive security, CTF challenges, and educational contexts. Refuse requests for destructive tech",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "IMPORTANT: Assist with authorized security testing, defensive security, CTF chal",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 2.18,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 179,
+    "line_end": 183,
+    "kind": "system",
+    "name": "prompts",
+    "length_chars": 534,
+    "length_lines": 5,
+    "scores": {
+      "structure": 3,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are an interactive agent that helps users ${outputStyleConfig !== null ? 'according to your \"Output Style\" below, which describes how you should r",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are an interactive agent that helps users ${outputStyleConfig !== null ? 'ac",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 1.87,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 405,
+    "line_end": 414,
+    "kind": "system",
+    "name": "prompts",
+    "length_chars": 2395,
+    "length_lines": 10,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "When sending user-facing text, you're writing for a person, not logging to a console. Assume users can't see most tool calls or thinking - only your t",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Communicating with the user",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 416,
+    "line_end": 427,
+    "kind": "system",
+    "name": "prompts",
+    "length_chars": 730,
+    "length_lines": 12,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "IMPORTANT: Go straight to the point. Try the simplest approach first without going in circles. Do not overdo it. Be extra concise.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Output efficiency",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 1.37,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 766,
+    "line_end": 770,
+    "kind": "system",
+    "name": "notes",
+    "length_chars": 630,
+    "length_lines": 5,
+    "scores": {
+      "structure": 1,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 4,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Notes:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Notes:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 804,
+    "line_end": 818,
+    "kind": "system",
+    "name": "prompts",
+    "length_chars": 668,
+    "length_lines": 15,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "IMPORTANT: Always use this scratchpad directory for temporary files instead of `/tmp` or other system temp directories:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Scratchpad Directory",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 1.5,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "constants/prompts.ts",
+    "line_start": 864,
+    "line_end": 913,
+    "kind": "system",
+    "name": "prompts",
+    "length_chars": 3766,
+    "length_lines": 50,
+    "scores": {
+      "structure": 1,
+      "voice": 3,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "You are running autonomously. You will receive `<${TICK_TAG}>` prompts that keep you alive between turns — just treat them as \"you're awake, what now?",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Autonomous work",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 2,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present",
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "memdir/findRelevantMemories.ts",
+    "line_start": 18,
+    "line_end": 24,
+    "kind": "memory",
+    "name": "SELECT_MEMORIES_SYSTEM_PROMPT",
+    "length_chars": 989,
+    "length_lines": 7,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are selecting memories that will be useful to Claude Code as it processes a user's query. You will be given the user's query and a list of availab",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are selecting memories that will be useful to Claude Code as it processes a ",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "services/compact/prompt.ts",
+    "line_start": 19,
+    "line_end": 26,
+    "kind": "system",
+    "name": "NO_TOOLS_PREAMBLE",
+    "length_chars": 379,
+    "length_lines": 8,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "CRITICAL: Respond with TEXT ONLY. Do NOT call any tools.",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "CRITICAL: Respond with TEXT ONLY. Do NOT call any tools.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 2.64,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "services/compact/prompt.ts",
+    "line_start": 61,
+    "line_end": 143,
+    "kind": "system",
+    "name": "BASE_COMPACT_PROMPT",
+    "length_chars": 4220,
+    "length_lines": 83,
+    "scores": {
+      "structure": 4,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 1,
+      "specificity": 0,
+      "total": 10,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Your task is to create a detailed summary of the conversation so far, paying close attention to the user's explicit requests and your previous actions",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Your task is to create a detailed summary of the conversation so far, paying clo",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.24,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "services/compact/prompt.ts",
+    "line_start": 145,
+    "line_end": 204,
+    "kind": "system",
+    "name": "PARTIAL_COMPACT_PROMPT",
+    "length_chars": 2362,
+    "length_lines": 60,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 1,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Your task is to create a detailed summary of the RECENT portion of the conversation — the messages that follow earlier retained context. The earlier m",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Your task is to create a detailed summary of the RECENT portion of the conversat",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "services/compact/prompt.ts",
+    "line_start": 208,
+    "line_end": 267,
+    "kind": "system",
+    "name": "PARTIAL_COMPACT_UP_TO_PROMPT",
+    "length_chars": 2326,
+    "length_lines": 60,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 1,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Your task is to create a detailed summary of this conversation. This summary will be placed at the start of a continuing session; newer messages that ",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Your task is to create a detailed summary of this conversation. This summary wil",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "services/compact/prompt.ts",
+    "line_start": 365,
+    "line_end": 367,
+    "kind": "system",
+    "name": "prompt",
+    "length_chars": 260,
+    "length_lines": 3,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are running in autonomous/proactive mode. This is NOT a first wake-up — you were already working autonomously before compaction. Continue your wor",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are running in autonomous/proactive mode. This is NOT a first wake-up — you ",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/batch.ts",
+    "line_start": 20,
+    "line_end": 88,
+    "kind": "skill",
+    "name": "batch",
+    "length_chars": 4123,
+    "length_lines": 69,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are orchestrating a large, parallelizable change across this codebase.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Batch: Parallel Work Orchestration",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/claudeApi.ts",
+    "line_start": 96,
+    "line_end": 130,
+    "kind": "skill",
+    "name": "INLINE_READING_GUIDE",
+    "length_chars": 1435,
+    "length_lines": 35,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "The relevant documentation for your detected language is included below in `<doc>` tags. Each tag has a `path` attribute showing its original file pat",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Reference Documentation",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/claudeInChrome.ts",
+    "line_start": 10,
+    "line_end": 14,
+    "kind": "skill",
+    "name": "SKILL_ACTIVATION_MESSAGE",
+    "length_chars": 291,
+    "length_lines": 5,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Now that this skill is invoked, you have access to Chrome browser automation tools. You can now use the mcp__claude-in-chrome__* tools to interact wit",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Now that this skill is invoked, you have access to Chrome browser automation too",
+        "priority_budgeted": false,
+        "priority_density_per_1k": 3.44,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/debug.ts",
+    "line_start": 61,
+    "line_end": 67,
+    "kind": "skill",
+    "name": "debug",
+    "length_chars": 360,
+    "length_lines": 7,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Debug logging was OFF for this session until now. Nothing prior to this /debug invocation was captured.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Debug Logging Just Enabled",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/debug.ts",
+    "line_start": 69,
+    "line_end": 99,
+    "kind": "skill",
+    "name": "prompt",
+    "length_chars": 1098,
+    "length_lines": 31,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Help the user debug an issue they're encountering in this current Claude Code session.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Debug Skill",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "skills/bundled/loop.ts",
+    "line_start": 26,
+    "line_end": 71,
+    "kind": "skill",
+    "name": "loop",
+    "length_chars": 2999,
+    "length_lines": 46,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Parse the input below into `[interval] <prompt…>` and schedule it with ${CRON_CREATE_TOOL_NAME}.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# /loop — schedule a recurring prompt",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/remember.ts",
+    "line_start": 9,
+    "line_end": 62,
+    "kind": "skill",
+    "name": "SKILL_PROMPT",
+    "length_chars": 3190,
+    "length_lines": 54,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 1,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Review the user's memory landscape and produce a clear report of proposed changes, grouped by action type. Do NOT apply changes — present proposals fo",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Memory Review",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": true
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/scheduleRemoteAgents.ts",
+    "line_start": 174,
+    "line_end": 321,
+    "kind": "skill",
+    "name": "scheduleRemoteAgents",
+    "length_chars": 8092,
+    "length_lines": 148,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "You are helping the user schedule, update, list, or run **remote** Claude Code agents. These are NOT local cron jobs — each trigger spawns a fully iso",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Schedule Remote Agents",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/simplify.ts",
+    "line_start": 4,
+    "line_end": 53,
+    "kind": "skill",
+    "name": "SIMPLIFY_PROMPT",
+    "length_chars": 3846,
+    "length_lines": 50,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Review all changed files for reuse, quality, and efficiency. Fix any issues found.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Simplify: Code Review and Cleanup",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "skills/bundled/skillify.ts",
+    "line_start": 22,
+    "line_end": 156,
+    "kind": "skill",
+    "name": "SKILLIFY_PROMPT",
+    "length_chars": 7381,
+    "length_lines": 135,
+    "scores": {
+      "structure": 3,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are capturing this session's repeatable process as a reusable skill.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Skillify {{userDescriptionBlock}}",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.54,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present",
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "skills/bundled/stuck.ts",
+    "line_start": 6,
+    "line_end": 59,
+    "kind": "skill",
+    "name": "STUCK_PROMPT",
+    "length_chars": 3363,
+    "length_lines": 54,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 1,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "The user thinks another Claude Code session on this machine is frozen, stuck, or very slow. Investigate and post a report to #claude-code-feedback.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# /stuck — diagnose frozen/slow Claude Code sessions",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": true
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "skills/bundled/updateConfig.ts",
+    "line_start": 15,
+    "line_end": 104,
+    "kind": "skill",
+    "name": "SETTINGS_EXAMPLES_DOCS",
+    "length_chars": 2405,
+    "length_lines": 90,
+    "scores": {
+      "structure": 0,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Choose the appropriate file based on scope:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Settings File Locations",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/updateConfig.ts",
+    "line_start": 110,
+    "line_end": 267,
+    "kind": "skill",
+    "name": "HOOKS_DOCS",
+    "length_chars": 4258,
+    "length_lines": 158,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Hooks run commands at specific points in Claude Code's lifecycle.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Hooks Configuration",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/updateConfig.ts",
+    "line_start": 269,
+    "line_end": 305,
+    "kind": "skill",
+    "name": "HOOK_VERIFICATION_FLOW",
+    "length_chars": 3889,
+    "length_lines": 37,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Given an event, matcher, target file, and desired behavior, follow this flow. Each step catches a different failure class — a hook that silently does ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Constructing a Hook (with verification)",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "skills/bundled/updateConfig.ts",
+    "line_start": 307,
+    "line_end": 443,
+    "kind": "skill",
+    "name": "UPDATE_CONFIG_PROMPT",
+    "length_chars": 4131,
+    "length_lines": 137,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Modify Claude Code configuration by updating settings.json files.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Update Config Skill",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.48,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/claudeCodeGuideAgent.ts",
+    "line_start": 30,
+    "line_end": 86,
+    "kind": "agent",
+    "name": "claudeCodeGuideAgent",
+    "length_chars": 3012,
+    "length_lines": 57,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are the Claude guide agent. Your primary responsibility is helping users understand and use Claude Code, the Claude Agent SDK, and the Claude API ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are the Claude guide agent. Your primary responsibility is helping users und",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/exploreAgent.ts",
+    "line_start": 24,
+    "line_end": 56,
+    "kind": "agent",
+    "name": "exploreAgent",
+    "length_chars": 1959,
+    "length_lines": 33,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are a file search specialist for Claude Code, Anthropic's official CLI for Claude. You excel at thoroughly navigating and exploring codebases.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are a file search specialist for Claude Code, Anthropic's official CLI for C",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.51,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/generalPurposeAgent.ts",
+    "line_start": 5,
+    "line_end": 16,
+    "kind": "agent",
+    "name": "SHARED_GUIDELINES",
+    "length_chars": 884,
+    "length_lines": 12,
+    "scores": {
+      "structure": 0,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 4,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Your strengths:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "Your strengths:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 2,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/planAgent.ts",
+    "line_start": 21,
+    "line_end": 70,
+    "kind": "agent",
+    "name": "planAgent",
+    "length_chars": 2341,
+    "length_lines": 50,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are a software architect and planning specialist for Claude Code. Your role is to explore the codebase and design implementation plans.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "You are a software architect and planning specialist for Claude Code. Your role ",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.43,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present",
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/statuslineSetup.ts",
+    "line_start": 3,
+    "line_end": 132,
+    "kind": "agent",
+    "name": "STATUSLINE_SYSTEM_PROMPT",
+    "length_chars": 6994,
+    "length_lines": 130,
+    "scores": {
+      "structure": 3,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are a status line setup agent for Claude Code. Your job is to create or update the statusLine command in the user's Claude Code settings.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are a status line setup agent for Claude Code. Your job is to create or upda",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.14,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/AgentTool/built-in/verificationAgent.ts",
+    "line_start": 10,
+    "line_end": 129,
+    "kind": "agent",
+    "name": "VERIFICATION_SYSTEM_PROMPT",
+    "length_chars": 9548,
+    "length_lines": 120,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are a verification specialist. Your job is not to confirm the implementation works — it's to try to break it.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "You are a verification specialist. Your job is not to confirm the implementation",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.1,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/prompt.ts",
+    "line_start": 81,
+    "line_end": 96,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1806,
+    "length_lines": 16,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Fork yourself (omit `subagent_type`) when the intermediate tool output isn't worth keeping in your context. The criterion is qualitative \\u2014 \"will ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## When to fork",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/prompt.ts",
+    "line_start": 99,
+    "line_end": 113,
+    "kind": "tool",
+    "name": "writingThePromptSection",
+    "length_chars": 1182,
+    "length_lines": 15,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "${forkEnabled ? 'When spawning a fresh agent (with a `subagent_type`), it starts with zero context. ' : ''}Brief the agent like a smart colleague who ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Writing the prompt",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/AgentTool/prompt.ts",
+    "line_start": 115,
+    "line_end": 154,
+    "kind": "tool",
+    "name": "forkExamples",
+    "length_chars": 2349,
+    "length_lines": 40,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 3,
+      "specificity": 0,
+      "total": 9,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Example usage:",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Example usage:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": true,
+        "has_commentary_tag": true
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/AgentTool/prompt.ts",
+    "line_start": 156,
+    "line_end": 188,
+    "kind": "tool",
+    "name": "currentExamples",
+    "length_chars": 1046,
+    "length_lines": 33,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 2,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Example usage:",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Example usage:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": true
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/AgentTool/prompt.ts",
+    "line_start": 252,
+    "line_end": 286,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 3300,
+    "length_lines": 35,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "${shared}",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "${shared}",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/AskUserQuestionTool/prompt.ts",
+    "line_start": 32,
+    "line_end": 44,
+    "kind": "tool",
+    "name": "ASK_USER_QUESTION_TOOL_PROMPT",
+    "length_chars": 1119,
+    "length_lines": 13,
+    "scores": {
+      "structure": 4,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 9,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool when you need to ask the user questions during execution. This allows you to:",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool when you need to ask the user questions during execution. This all",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.89,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/BashTool/prompt.ts",
+    "line_start": 68,
+    "line_end": 75,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 448,
+    "length_lines": 8,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 1,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "${undercoverSection}# Git operations",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "${undercoverSection}# Git operations",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 2.23,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 1
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/BashTool/prompt.ts",
+    "line_start": 81,
+    "line_end": 160,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 6305,
+    "length_lines": 80,
+    "scores": {
+      "structure": 3,
+      "voice": 5,
+      "rationale": 3,
+      "examples": 1,
+      "specificity": 0,
+      "total": 12,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Only create commits when requested by the user. If unclear, ask first. When the user asks you to create a new git commit, follow these steps carefully",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# Committing changes with git",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.95,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 10,
+        "never_with_rationale": 4
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/BriefTool/prompt.ts",
+    "line_start": 12,
+    "line_end": 22,
+    "kind": "tool",
+    "name": "BRIEF_PROACTIVE_SECTION",
+    "length_chars": 1143,
+    "length_lines": 11,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "${BRIEF_TOOL_NAME} is where your replies go. Text outside it is visible if the user expands the detail view, but most won't — assume unread. Anything ",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Talking to the user",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/ConfigTool/prompt.ts",
+    "line_start": 50,
+    "line_end": 76,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 954,
+    "length_lines": 27,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Get or set Claude Code configuration settings.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Get or set Claude Code configuration settings.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/EnterPlanModeTool/prompt.ts",
+    "line_start": 4,
+    "line_end": 14,
+    "kind": "tool",
+    "name": "WHAT_HAPPENS_SECTION",
+    "length_chars": 385,
+    "length_lines": 11,
+    "scores": {
+      "structure": 0,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "In plan mode, you'll:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## What Happens in Plan Mode",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/EnterPlanModeTool/prompt.ts",
+    "line_start": 23,
+    "line_end": 98,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 3681,
+    "length_lines": 76,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Use this tool proactively when you're about to start a non-trivial implementation task. Getting user sign-off on your approach before writing code pre",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "Use this tool proactively when you're about to start a non-trivial implementatio",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "tools/EnterPlanModeTool/prompt.ts",
+    "line_start": 108,
+    "line_end": 163,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 2671,
+    "length_lines": 56,
+    "scores": {
+      "structure": 3,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool when a task has genuine ambiguity about the right approach and getting user input before coding would prevent significant rework. This t",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool when a task has genuine ambiguity about the right approach and get",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/EnterWorktreeTool/prompt.ts",
+    "line_start": 2,
+    "line_end": 29,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1335,
+    "length_lines": 28,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool ONLY when the user explicitly asks to work in a worktree. This tool creates an isolated git worktree and switches the current session in",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool ONLY when the user explicitly asks to work in a worktree. This too",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/ExitPlanModeTool/prompt.ts",
+    "line_start": 6,
+    "line_end": 29,
+    "kind": "tool",
+    "name": "EXIT_PLAN_MODE_V2_TOOL_PROMPT",
+    "length_chars": 1894,
+    "length_lines": 24,
+    "scores": {
+      "structure": 3,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 8,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool when you are in plan mode and have finished writing your plan to the plan file and are ready for user approval.",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool when you are in plan mode and have finished writing your plan to t",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.53,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/ExitWorktreeTool/prompt.ts",
+    "line_start": 2,
+    "line_end": 31,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1923,
+    "length_lines": 30,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Exit a worktree session created by EnterWorktree and return the session to the original working directory.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Exit a worktree session created by EnterWorktree and return the session to the o",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/FileEditTool/prompt.ts",
+    "line_start": 20,
+    "line_end": 27,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 990,
+    "length_lines": 8,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Performs exact string replacements in files.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Performs exact string replacements in files.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 2,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/FileReadTool/prompt.ts",
+    "line_start": 32,
+    "line_end": 48,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1573,
+    "length_lines": 17,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Reads a file from the local filesystem. You can access any file directly by using this tool.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Reads a file from the local filesystem. You can access any file directly by usin",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/FileWriteTool/prompt.ts",
+    "line_start": 11,
+    "line_end": 17,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 500,
+    "length_lines": 7,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Writes a file to the local filesystem.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Writes a file to the local filesystem.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/GrepTool/prompt.ts",
+    "line_start": 7,
+    "line_end": 17,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 925,
+    "length_lines": 11,
+    "scores": {
+      "structure": 0,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 3,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "A powerful search tool built on ripgrep",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "A powerful search tool built on ripgrep",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/PowerShellTool/prompt.ts",
+    "line_start": 53,
+    "line_end": 58,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 917,
+    "length_lines": 6,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 1,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "PowerShell edition: Windows PowerShell 5.1 (powershell.exe)",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "PowerShell edition: Windows PowerShell 5.1 (powershell.exe)",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": true
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/PowerShellTool/prompt.ts",
+    "line_start": 68,
+    "line_end": 70,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 304,
+    "length_lines": 3,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "PowerShell edition: unknown — assume Windows PowerShell 5.1 for compatibility",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "PowerShell edition: unknown — assume Windows PowerShell 5.1 for compatibility",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/PowerShellTool/prompt.ts",
+    "line_start": 78,
+    "line_end": 144,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 5138,
+    "length_lines": 67,
+    "scores": {
+      "structure": 4,
+      "voice": 4,
+      "rationale": 3,
+      "examples": 1,
+      "specificity": 0,
+      "total": 12,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Executes a given PowerShell command with optional timeout. Working directory persists between commands; shell state (variables, functions) does not.",
+        "when_not_to_use": false,
+        "has_example_block": true,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "Executes a given PowerShell command with optional timeout. Working directory per",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.19,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 3,
+        "never_with_rationale": 3
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present"
+    ]
+  },
+  {
+    "source_path": "tools/ScheduleCronTool/prompt.ts",
+    "line_start": 76,
+    "line_end": 78,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 469,
+    "length_lines": 3,
+    "scores": {
+      "structure": 0,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "By default (durable: false) the job lives only in this Claude session — nothing is written to disk, and the job is gone when Claude exits. Pass durabl",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Durability",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/ScheduleCronTool/prompt.ts",
+    "line_start": 79,
+    "line_end": 81,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 123,
+    "length_lines": 3,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Jobs live only in this Claude session — nothing is written to disk, and the job is gone when Claude exits.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Session-only",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/ScheduleCronTool/prompt.ts",
+    "line_start": 87,
+    "line_end": 120,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 2295,
+    "length_lines": 34,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Schedule a prompt to be enqueued at a future time. Use for both recurring schedules and one-shot reminders.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Schedule a prompt to be enqueued at a future time. Use for both recurring schedu",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/SendMessageTool/prompt.ts",
+    "line_start": 11,
+    "line_end": 20,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 515,
+    "length_lines": 10,
+    "scores": {
+      "structure": 0,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 4,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "\\n\\n## Cross-session",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "\\n\\n## Cross-session",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/SendMessageTool/prompt.ts",
+    "line_start": 22,
+    "line_end": 48,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1321,
+    "length_lines": 27,
+    "scores": {
+      "structure": 2,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Send a message to another agent.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# SendMessage",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/SkillTool/prompt.ts",
+    "line_start": 174,
+    "line_end": 195,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1279,
+    "length_lines": 22,
+    "scores": {
+      "structure": 0,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 3,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Execute a skill within the main conversation",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Execute a skill within the main conversation",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/TaskCreateTool/prompt.ts",
+    "line_start": 16,
+    "line_end": 55,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 2179,
+    "length_lines": 40,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool to create a structured task list for your current coding session. This helps you track progress, organize complex tasks, and demonstrate",
+        "when_not_to_use": true,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool to create a structured task list for your current coding session. ",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/TaskGetTool/prompt.ts",
+    "line_start": 3,
+    "line_end": 24,
+    "kind": "tool",
+    "name": "PROMPT",
+    "length_chars": 732,
+    "length_lines": 22,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool to retrieve a task by its ID from the task list.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool to retrieve a task by its ID from the task list.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/TaskListTool/prompt.ts",
+    "line_start": 16,
+    "line_end": 25,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 503,
+    "length_lines": 10,
+    "scores": {
+      "structure": 0,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "When working as a teammate:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "## Teammate Workflow",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/TaskListTool/prompt.ts",
+    "line_start": 28,
+    "line_end": 48,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 995,
+    "length_lines": 21,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool to list all tasks in the task list.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool to list all tasks in the task list.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/TaskUpdateTool/prompt.ts",
+    "line_start": 3,
+    "line_end": 77,
+    "kind": "tool",
+    "name": "PROMPT",
+    "length_chars": 2243,
+    "length_lines": 75,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool to update a task in the task list.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool to update a task in the task list.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.45,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/TeamCreateTool/prompt.ts",
+    "line_start": 2,
+    "line_end": 112,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 6775,
+    "length_lines": 111,
+    "scores": {
+      "structure": 2,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Use this tool proactively whenever:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "# TeamCreate",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.59,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 2,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/TodoWriteTool/prompt.ts",
+    "line_start": 3,
+    "line_end": 181,
+    "kind": "tool",
+    "name": "PROMPT",
+    "length_chars": 9132,
+    "length_lines": 179,
+    "scores": {
+      "structure": 5,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 1,
+      "specificity": 0,
+      "total": 10,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Use this tool to create and manage a structured task list for your current coding session. This helps you track progress, organize complex tasks, and ",
+        "when_not_to_use": true,
+        "has_example_block": true,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "Use this tool to create and manage a structured task list for your current codin",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.11,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": true,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/WebFetchTool/prompt.ts",
+    "line_start": 3,
+    "line_end": 21,
+    "kind": "tool",
+    "name": "DESCRIPTION",
+    "length_chars": 1217,
+    "length_lines": 19,
+    "scores": {
+      "structure": 1,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "Usage notes:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "- Fetches content from a specified URL and processes it using an AI model",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.82,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "tools/WebFetchTool/prompt.ts",
+    "line_start": 30,
+    "line_end": 34,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 495,
+    "length_lines": 5,
+    "scores": {
+      "structure": 1,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 4,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Provide a concise response based only on the content above. In your response:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "Provide a concise response based only on the content above. In your response:",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 3,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "tools/WebSearchTool/prompt.ts",
+    "line_start": 7,
+    "line_end": 33,
+    "kind": "tool",
+    "name": "prompt",
+    "length_chars": 1327,
+    "length_lines": 27,
+    "scores": {
+      "structure": 2,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 5,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": false,
+        "capability_line": "CRITICAL REQUIREMENT - You MUST follow this:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "- Allows Claude to search the web and use the results to inform responses",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 1.51,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "utils/claudeInChrome/prompt.ts",
+    "line_start": 1,
+    "line_end": 46,
+    "kind": "other",
+    "name": "BASE_CHROME_PROMPT",
+    "length_chars": 3353,
+    "length_lines": 46,
+    "scores": {
+      "structure": 3,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You have access to browser automation tools (mcp__claude-in-chrome__*) for interacting with web pages in Chrome. Follow these guidelines for effective",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": false,
+        "no_preamble": true,
+        "opening": "# Claude in Chrome browser automation",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0.6,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "hedging language present",
+      "NEVER without escape hatch"
+    ]
+  },
+  {
+    "source_path": "utils/claudeInChrome/prompt.ts",
+    "line_start": 53,
+    "line_end": 61,
+    "kind": "other",
+    "name": "CHROME_TOOL_SEARCH_INSTRUCTIONS",
+    "length_chars": 499,
+    "length_lines": 9,
+    "scores": {
+      "structure": 3,
+      "voice": 4,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 7,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "Chrome browser tools are MCP tools that require loading before use. Before calling any mcp__claude-in-chrome__* tool:",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "**IMPORTANT: Before using any chrome browser tools, you MUST first load them usi",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 2,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "utils/hooks/execPromptHook.ts",
+    "line_start": 65,
+    "line_end": 69,
+    "kind": "hook",
+    "name": "execPromptHook",
+    "length_chars": 262,
+    "length_lines": 5,
+    "scores": {
+      "structure": 1,
+      "voice": 5,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "You are evaluating a hook in Claude Code.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": false,
+        "has_priority_marker": false
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": true,
+        "opening": "You are evaluating a hook in Claude Code.",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 0,
+        "nevers_have_escapes": true,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 0,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": []
+  },
+  {
+    "source_path": "utils/sideQuestion.ts",
+    "line_start": 61,
+    "line_end": 78,
+    "kind": "hook",
+    "name": "wrappedQuestion",
+    "length_chars": 1038,
+    "length_lines": 18,
+    "scores": {
+      "structure": 3,
+      "voice": 3,
+      "rationale": 0,
+      "examples": 0,
+      "specificity": 0,
+      "total": 6,
+      "max": 18
+    },
+    "detail": {
+      "structure": {
+        "one_line_capability": true,
+        "capability_line": "<system-reminder>This is a side question from the user. You must answer this question directly in a single response.",
+        "when_not_to_use": false,
+        "has_example_block": false,
+        "has_precondition": true,
+        "has_priority_marker": true
+      },
+      "voice": {
+        "no_hedging": true,
+        "no_preamble": false,
+        "opening": "<system-reminder>This is a side question from the user. You must answer this que",
+        "priority_budgeted": true,
+        "priority_density_per_1k": 1.93,
+        "nevers_have_escapes": false,
+        "no_emoji": true
+      },
+      "rationale": {
+        "never_lines": 1,
+        "never_with_rationale": 0
+      },
+      "examples": {
+        "has_xml_example": false,
+        "has_thinking_tag": false,
+        "has_commentary_tag": false
+      },
+      "specificity": {
+        "file_line_refs": false,
+        "silence_on_success": false
+      }
+    },
+    "red_flags": [
+      "NEVER without escape hatch"
+    ]
+  }
+]
