@@ -19,4 +19,4 @@ Optimize for:
 - **Tested**: adequate coverage for critical paths
 - **Working**: tests pass, runtime behavior correct
 
-> **CRITICAL**: maintain consistency with [Claude.md](../CLAUDE.md) and all files in [refine/](.)
+> **CRITICAL**: maintain consistency with [CLAUDE.md](../../CLAUDE.md) and all files in [refine/](.)

@@ -1,13 +1,16 @@
 backups/
 cache/
+/daemon*
 debug/
 downloads/
 file-history/
 ide/
+jobs/
 paste-cache/
 plans/
 plugins/
 projects/
+session-env/
 sessions/
 shell-snapshots/
 statsig
@@ -19,8 +22,11 @@ usage-data/
 
 skills/craft-prompt/tools/
 
+.last-cleanup
+.last-update-result.json
 history.jsonl
 mcp-needs-auth-cache.json
 policy-limits.json
+remote-settings.json
 settings.json.*
 stats-cache.json
