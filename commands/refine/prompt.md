@@ -19,4 +19,4 @@ Optimize for:
 - **Succinct**: minimum tokens, maximum behavioral impact
 - **Unambiguous**: single interpretation only
 
-> **CRITICAL**: maintain consistency with [Claude.md](../CLAUDE.md) and all files in [refine/](.)
+> **CRITICAL**: maintain consistency with [CLAUDE.md](../../CLAUDE.md) and all files in [refine/](.)

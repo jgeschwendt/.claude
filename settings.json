@@ -9,14 +9,29 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "vercel@claude-plugins-official": true
   },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in \"$HOME\"/.claude/*) bunx oxfmt \"$f\";; esac; } 2>/dev/null || true",
+            "statusMessage": "Formatting with oxfmt"
+          }
+        ]
+      }
+    ]
+  },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
+  "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
   }
