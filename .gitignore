@@ -30,3 +30,5 @@ policy-limits.json
 remote-settings.json
 settings.json.*
 stats-cache.json
+
+*.log
