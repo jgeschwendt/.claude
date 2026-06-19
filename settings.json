@@ -5,7 +5,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bunx -y ccstatusline@latest",
+    "command": "~/.claude/statusline.js",
     "padding": 0
   },
   "enabledPlugins": {
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in \"$HOME\"/.claude/*) bunx oxfmt \"$f\";; esac; } 2>/dev/null || true",
+            "command": "~/.claude/hooks/format.js",
             "statusMessage": "Formatting with oxfmt"
           }
         ]
