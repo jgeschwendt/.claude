@@ -1,10 +1,19 @@
+.archive/
+.vscode/
+
+@handoffs/
+@log/
+@memory/
+@routines/
+
 backups/
 cache/
-/daemon*
+chrome/
 debug/
 downloads/
 file-history/
 ide/
+image-cache/
 jobs/
 paste-cache/
 plans/
@@ -20,10 +29,11 @@ telemetry/
 todos/
 usage-data/
 
-skills/craft-prompt/tools/
+daemon*
 
 .last-cleanup
 .last-update-result.json
+gh-pr-status-cache.json
 history.jsonl
 mcp-needs-auth-cache.json
 policy-limits.json
@@ -32,3 +42,41 @@ settings.json.*
 stats-cache.json
 
 *.log
+
+# macOS
+.DS_Store
+
+# Elixir language servers
+.elixir_ls/
+.lexical/
+
+# ── elixir umbrella ──
+# The directory Mix will write compiled artifacts to.
+/_build/
+
+# If you run "mix test --cover", coverage assets end up here.
+/cover/
+
+# The directory Mix downloads your dependencies sources to.
+/deps/
+
+# Where 3rd-party dependencies like ExDoc output generated docs.
+/doc/
+
+# Ignore .fetch files in case you like to edit your project deps locally.
+/.fetch
+
+# If the VM crashes, it generates a dump, let's ignore it too.
+erl_crash.dump
+
+# Also ignore archive artifacts (built via "mix archive.build").
+*.ez
+# Temporary files, for example, from tests.
+/tmp/
+
+# web assets (built) + npm
+/@apps/web/assets/node_modules/
+/@apps/web/priv/static/assets/*
+!/@apps/web/priv/static/assets/fonts/
+/@apps/web/priv/static/cache_manifest.json
+npm-debug.log
