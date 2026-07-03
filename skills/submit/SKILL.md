@@ -94,7 +94,7 @@ When it returns, read results and classify each failed check:
 
 If the repo has no checks configured, skip to step 7. After each fix-push, **re-sync title/body** (step 3) — the diff changed, so the description may no longer match. This is the step that's almost always missed; treat it as part of the push, not a follow-up.
 
-**Auto-learn:** used a fix pattern or check class not in the table? Append it to `LEARNINGS.md` (→ ## Learning) the moment you apply it — don't defer to end-of-run.
+**Auto-learn:** used a fix pattern or check class not in the table? Encode it into the table the moment you apply it (→ ## Learning) — don't defer to end-of-run.
 
 **Success:** every required check is green (or the only reds are Advisory / Pre-existing, each named in the summary).
 
@@ -106,7 +106,7 @@ gh pr view <n> --json reviewDecision,reviews,comments,latestReviews
 
 Surface human review feedback as a short table (file:line · ask · proposed action). For each: fix → amend → force-push → re-sync (step 3 + 6), or reply with a one-paragraph rationale citing the load-bearing constraint. Reply to human threads; never resolve them — the reviewer does that.
 
-**Auto-learn:** a review move not covered here → append it to `LEARNINGS.md` as you make it.
+**Auto-learn:** a review move not covered here → encode it into this step as you make it.
 
 **Success:** every requested change is addressed or has a reasoned reply; `reviewDecision` is `APPROVED` or the only block is `REVIEW_REQUIRED` (the human gate).
 
@@ -124,17 +124,7 @@ If `--draft`, omit the Review line and read status `Draft`.
 
 ## Learning
 
-Capture is continuous — not a closing step. The moment a run goes off the documented playbook, append one line to `${CLAUDE_SKILL_DIR}/LEARNINGS.md`, backed by a concrete artifact (PR #, SHA, check name, reviewer handle). No end-of-run review ritual: if nothing went off-playbook, nothing is captured — so there's no "did I remember to reflect?" honesty gap to guard.
-
-Triggers — capture the moment you notice: a CI fix pattern or check class not in step 6 · a review move not in step 7 · a step that was wrong or out of order · an uncovered edge case.
-
-`- [ ] (YYYY-MM-DD · <artifact>) → <dest>: <one-line change>`
-
-`<dest>`: **this SKILL.md** (a general defect in these steps) · **the repo** (a repo-specific fact → that repo's `.claude/`) · **user memory** (your personal style).
-
-- **Capture always** — inline, even in an unattended run; it never blocks the loop.
-- **Net-zero** — overlaps an existing trigger or table row → merge into that line, don't add.
-- **Promote (interactive runs)** — at the start of an interactive `/submit`, drain pending entries: re-verify each still holds (present? contradiction? genuinely general, not repo-specific in disguise?), apply to its `<dest>` stamped `(since <date> · <artifact>)`, then check it off. An entry that recurs 3× promotes as a blocking edit.
+No capture queue. The moment a run goes off the documented playbook, encode the fix directly into its destination (Golden Rule, CLAUDE.md), backed by a concrete artifact (PR #, SHA, check name, reviewer handle): a general defect in these steps → this SKILL.md · a repo-specific fact → that repo's `.claude/` · the user's personal style → user memory (`/dissolve` at session end). Stamp the edit `(since <date> · <artifact>)`. Net-zero — an overlap with an existing trigger or table row merges into that line, never adds one.
 
 ## Rules
 
