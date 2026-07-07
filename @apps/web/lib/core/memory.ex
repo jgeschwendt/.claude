@@ -202,7 +202,11 @@ defmodule Core.Memory do
               b
 
             true ->
-              %{b | memories: b.memories ++ [parse_memory(File.read!(Path.join(dir, name)), name, id)]}
+              %{
+                b
+                | memories:
+                    b.memories ++ [parse_memory(File.read!(Path.join(dir, name)), name, id)]
+              }
           end
         end)
 

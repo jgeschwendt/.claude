@@ -45,14 +45,27 @@ defmodule Core.Routines do
         %{
           "name" => "Daily dream",
           "prompt" => Core.UserLog.dream_prompt(),
-          "schedule" => %{"hour" => 23, "minute" => 30, "type" => "daily"},
+          "schedule" => %{"expr" => "30 23 * * *", "type" => "cron"},
           "slug" => "daily-dream"
         }
       ]
   end
 
   @units %{"d" => 86_400, "h" => 3600, "m" => 60, "s" => 1}
-  @weekdays ~w(sun mon tue wed thu fri sat)
+
+  # Cron field name aliases (standard): weekday sun–sat (Sunday = 0; launchd also
+  # reads 7 as Sunday) and month jan–dec (January = 1).
+  @dow_names for {n, i} <- Enum.with_index(~w(sun mon tue wed thu fri sat)), into: %{}, do: {n, i}
+  @month_names for {n, i} <-
+                     Enum.with_index(~w(jan feb mar apr may jun jul aug sep oct nov dec)),
+                   into: %{},
+                   do: {n, i + 1}
+
+  # Upper bound on StartCalendarInterval dicts one cron expr may expand to, so an expr
+  # that enumerates many constrained fields (e.g. `0-59 0-23 * * *` → 60×24) fails loudly
+  # instead of emitting thousands of launchd entries. Wildcard fields are omitted, not
+  # enumerated, so `* 9-17 * * 1-5` is only 45 dicts (fires every minute in-window).
+  @cron_max_dicts 500
 
   # ── definitions store ─────────────────────────────────────
   def list do
@@ -174,29 +187,10 @@ defmodule Core.Routines do
     end
   end
 
-  def humanize_schedule(%{"type" => "daily", "hour" => h, "minute" => m} = s) do
-    prefix = if days = weekdays_of(s), do: day_phrase(days), else: "daily"
-    "#{prefix} at #{pad(h)}:#{pad(m)}"
-  end
+  # Cron is the canonical calendar form — humanize round-trips the stored expr.
+  def humanize_schedule(%{"type" => "cron", "expr" => expr}), do: expr
 
   def humanize_schedule(_), do: "—"
-
-  defp weekdays_of(%{"weekdays" => list}) when is_list(list), do: list
-  defp weekdays_of(%{"weekday" => w}) when is_integer(w), do: [w]
-  defp weekdays_of(_), do: nil
-
-  defp day_phrase(days) do
-    ds = days |> Enum.uniq() |> Enum.sort_by(&week_index/1)
-    idx = Enum.map(ds, &week_index/1)
-    consecutive? = idx == Enum.to_list(List.first(idx)..List.last(idx))
-
-    if length(ds) > 2 and consecutive?,
-      do: "#{Enum.at(@weekdays, List.first(ds))}-#{Enum.at(@weekdays, List.last(ds))}",
-      else: Enum.map_join(ds, ",", &Enum.at(@weekdays, &1))
-  end
-
-  # display ordering: Monday = 0 … Sunday = 6 (launchd stores Sunday = 0)
-  defp week_index(d), do: rem(d + 6, 7)
 
   # ── status helpers ────────────────────────────────────────
   def label(slug), do: "com.claude.routines.#{slug}"
@@ -249,8 +243,11 @@ defmodule Core.Routines do
   @doc """
   Parse a schedule string into a schedule map, or return `{:error, message}`:
 
-      every 6h · every 30m · every 90s · every 1d   → interval
-      daily at 09:00 · 23:00 · mon at 14:30          → calendar
+      every 6h · every 30m · every 90s · every 1d          → interval (StartInterval)
+      0 9 * * * · 0 9-17 * * 1-5 · */30 9-17 * * mon-fri    → cron (StartCalendarInterval)
+
+  Anything not starting with `every` is treated as a 5-field cron expression
+  (minute hour day-of-month month day-of-week).
   """
   def parse_schedule_string(str) do
     s = str |> to_string() |> String.trim() |> String.downcase()
@@ -258,7 +255,7 @@ defmodule Core.Routines do
     cond do
       s == "" -> {:error, "schedule is required"}
       String.starts_with?(s, "every") -> parse_every(s)
-      true -> parse_calendar(s)
+      true -> parse_cron(s)
     end
   end
 
@@ -272,84 +269,134 @@ defmodule Core.Routines do
     end
   end
 
-  defp parse_calendar(s0) do
-    # tighten "mon , wed" / "mon - fri" into "mon,wed" / "mon-fri" so the dayspec is one token
-    s =
-      s0
-      |> String.replace(~r/\s*([,-])\s*/, "\\1")
-      |> String.replace(~r/\bat\b/, " ")
-      |> String.replace(~r/\s+/, " ")
-      |> String.trim()
-
-    {wd_token, time_token} =
-      case String.split(s, " ") do
-        [t] -> {nil, t}
-        [w, t] -> {w, t}
-        _ -> {:invalid, :invalid}
-      end
-
-    with true <- wd_token != :invalid,
-         {:ok, {h, m}} <- parse_time(time_token),
-         {:ok, days} <- parse_weekdays(wd_token) do
-      daily = %{"hour" => h, "minute" => m, "type" => "daily"}
-      if days, do: Map.put(daily, "weekdays", days), else: daily
-    else
-      _ -> {:error, "try: daily at 09:00 · mon at 14:30 · mon-fri at 09:00 · sat,sun at 10:00"}
+  # ── cron → launchd StartCalendarInterval ──────────────────
+  # A standard 5-field cron expr (minute hour day-of-month month day-of-week) compiles
+  # to launchd by expanding only the CONSTRAINED fields into the cartesian product of
+  # `<dict>`s; `*` fields are omitted, which launchd reads as "every" — exactly cron's
+  # semantics (`man launchd.plist`: "Missing arguments are considered to be wildcard").
+  defp parse_cron(s) do
+    case cron_intervals(s) do
+      {:ok, _dicts} -> %{"expr" => s |> String.split() |> Enum.join(" "), "type" => "cron"}
+      :error -> {:error, "cron: min hour day month weekday — e.g. 0 9 * * * · 0 9-17 * * 1-5"}
     end
   end
 
-  defp parse_time(t) do
-    with [hh, mm] <- String.split(t, ":"),
-         {h, ""} <- Integer.parse(hh),
-         {m, ""} <- Integer.parse(mm),
-         true <- h in 0..23 and m in 0..59 do
-      {:ok, {h, m}}
+  @doc """
+  Compile a 5-field cron expression into launchd `StartCalendarInterval` entries — a
+  list of maps keyed by `"Minute"/"Hour"/"Day"/"Month"/"Weekday"` carrying only the
+  constrained fields (wildcards omitted). Returns `{:ok, dicts}` or `:error`.
+  """
+  def cron_intervals(expr) do
+    with [mn, hr, dom, mon, dow] <- String.split(expr, ~r/\s+/, trim: true),
+         {:ok, minutes} <- cron_field(mn, 0, 59, %{}),
+         {:ok, hours} <- cron_field(hr, 0, 23, %{}),
+         {:ok, days} <- cron_field(dom, 1, 31, %{}),
+         {:ok, months} <- cron_field(mon, 1, 12, @month_names),
+         {:ok, weekdays} <- cron_field(dow, 0, 7, @dow_names) do
+      constrained =
+        [
+          {"Minute", minutes},
+          {"Hour", hours},
+          {"Day", days},
+          {"Month", months},
+          {"Weekday", dedup_dow(weekdays)}
+        ]
+        |> Enum.reject(fn {_k, v} -> v == :wild end)
+
+      count = constrained |> Enum.map(fn {_k, v} -> length(v) end) |> Enum.product()
+      if count > @cron_max_dicts, do: :error, else: {:ok, cron_cartesian(constrained)}
     else
       _ -> :error
     end
   end
 
-  defp parse_weekdays(token) when token in [nil, "daily", "everyday"], do: {:ok, nil}
-  defp parse_weekdays("weekdays"), do: {:ok, [1, 2, 3, 4, 5]}
-  defp parse_weekdays("weekends"), do: {:ok, [0, 6]}
+  # Sunday is 0; launchd also accepts 7 — fold 7→0 so it never emits a duplicate dict.
+  defp dedup_dow(:wild), do: :wild
 
-  defp parse_weekdays(spec) do
+  defp dedup_dow(days),
+    do: days |> Enum.map(&if(&1 == 7, do: 0, else: &1)) |> Enum.uniq() |> Enum.sort()
+
+  defp cron_cartesian(fields) do
+    Enum.reduce(fields, [%{}], fn {key, vals}, acc ->
+      for combo <- acc, v <- vals, do: Map.put(combo, key, v)
+    end)
+  end
+
+  # A comma-list of parts; a lone `*` part collapses the whole field to `:wild`.
+  defp cron_field(spec, min, max, names) do
     spec
     |> String.split(",")
-    |> Enum.reduce_while([], fn part, acc ->
-      case expand_part(part) do
-        {:ok, days} -> {:cont, acc ++ days}
+    |> Enum.reduce_while({:ok, []}, fn part, {:ok, acc} ->
+      case cron_part(part, min, max, names) do
+        {:ok, :wild} -> {:halt, {:ok, :wild}}
+        {:ok, vals} -> {:cont, {:ok, acc ++ vals}}
         :error -> {:halt, :error}
       end
     end)
     |> case do
+      {:ok, :wild} -> {:ok, :wild}
+      {:ok, vals} -> {:ok, vals |> Enum.uniq() |> Enum.sort()}
       :error -> :error
-      days -> {:ok, days |> Enum.uniq() |> Enum.sort()}
     end
   end
 
-  defp expand_part(part) do
-    case String.split(part, "-") do
-      [d] ->
-        case day_index(d) do
-          nil -> :error
-          i -> {:ok, [i]}
-        end
+  # One cron part: `*`, `a`, `a-b`, or any of those with a `/step` suffix.
+  defp cron_part(part, min, max, names) do
+    {base, step} =
+      case String.split(part, "/") do
+        [b] -> {b, 1}
+        [b, s] -> {b, cron_int(s)}
+        _ -> {:bad, :bad}
+      end
+
+    with true <- is_integer(step) and step >= 1,
+         {:ok, lo, hi, wild?} <- cron_bounds(base, min, max, names) do
+      cond do
+        wild? and step == 1 ->
+          {:ok, :wild}
+
+        true ->
+          # `*/n` and `a/n` step from the low bound to the field max; `a-b/n` respects b.
+          upper = if step > 1 and (wild? or lo == hi), do: max, else: hi
+          vals = lo |> Stream.iterate(&(&1 + step)) |> Enum.take_while(&(&1 <= upper))
+          if vals == [], do: :error, else: {:ok, vals}
+      end
+    else
+      _ -> :error
+    end
+  end
+
+  defp cron_bounds("*", min, max, _names), do: {:ok, min, max, true}
+
+  defp cron_bounds(base, min, max, names) do
+    case String.split(base, "-") do
+      [a] ->
+        with {:ok, n} <- cron_name(a, names), true <- n in min..max, do: {:ok, n, n, false}
 
       [a, b] ->
-        case {day_index(a), day_index(b)} do
-          {ai, bi} when is_integer(ai) and is_integer(bi) -> {:ok, day_range(ai, bi)}
-          _ -> :error
-        end
+        with {:ok, x} <- cron_name(a, names),
+             {:ok, y} <- cron_name(b, names),
+             true <- x in min..max and y in min..max and x <= y,
+             do: {:ok, x, y, false}
 
       _ ->
         :error
     end
   end
 
-  defp day_index(d), do: Enum.find_index(@weekdays, &(&1 == String.slice(d, 0, 3)))
-  defp day_range(a, b) when a <= b, do: Enum.to_list(a..b)
-  defp day_range(a, b), do: Enum.to_list(a..6) ++ Enum.to_list(0..b)
+  defp cron_name(tok, names) do
+    case Map.fetch(names, tok) do
+      {:ok, n} -> {:ok, n}
+      :error -> with n when is_integer(n) <- cron_int(tok), do: {:ok, n}
+    end
+  end
+
+  defp cron_int(s) do
+    case Integer.parse(s) do
+      {n, ""} -> n
+      _ -> :bad
+    end
+  end
 
   defp install_agent(r) do
     slug = r["slug"]
@@ -399,8 +446,6 @@ defmodule Core.Routines do
       |> String.replace(~r/[^a-z0-9]+/, "-")
       |> String.trim("-")
       |> String.slice(0, 50)
-
-  defp pad(n), do: n |> to_string() |> String.pad_leading(2, "0")
 
   # ── paths ─────────────────────────────────────────────────
   defp home, do: System.user_home!()
@@ -467,25 +512,21 @@ defmodule Core.Routines do
     """
   end
 
-  defp schedule_plist(%{"type" => "daily", "hour" => h, "minute" => m} = s) do
-    body =
-      case weekdays_of(s) do
-        nil -> cal_dict(h, m, nil)
-        [day] -> cal_dict(h, m, day)
-        days -> "<array>" <> Enum.map_join(days, &cal_dict(h, m, &1)) <> "</array>"
-      end
+  defp schedule_plist(%{"type" => "cron", "expr" => expr}) do
+    {:ok, dicts} = cron_intervals(expr)
 
-    "  <key>StartCalendarInterval</key>\n  #{body}\n"
+    "  <key>StartCalendarInterval</key>\n  <array>#{Enum.map_join(dicts, &interval_dict/1)}</array>\n"
   end
 
   defp schedule_plist(%{"type" => "interval", "seconds" => s}),
     do: "  <key>StartInterval</key><integer>#{s}</integer>\n"
 
-  defp cal_dict(h, m, nil),
-    do:
-      "<dict><key>Hour</key><integer>#{h}</integer><key>Minute</key><integer>#{m}</integer></dict>"
+  defp interval_dict(fields) do
+    inner =
+      for key <- ~w(Minute Hour Day Month Weekday), Map.has_key?(fields, key), into: "" do
+        "<key>#{key}</key><integer>#{fields[key]}</integer>"
+      end
 
-  defp cal_dict(h, m, wd),
-    do:
-      "<dict><key>Hour</key><integer>#{h}</integer><key>Minute</key><integer>#{m}</integer><key>Weekday</key><integer>#{wd}</integer></dict>"
+    "<dict>#{inner}</dict>"
+  end
 end

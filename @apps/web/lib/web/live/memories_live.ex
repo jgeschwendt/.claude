@@ -55,8 +55,11 @@ defmodule Web.MemoriesLive do
     # The memory can vanish between render and click (a watch-reload, another tab, or an
     # async distill that just re-staged) — Map.put(nil, …) would crash the socket.
     case Enum.find(active_bank(socket.assigns).memories, &(&1.name == name)) do
-      nil -> {:noreply, socket}
-      memory -> {:noreply, assign(socket, editing: Map.put(memory, :staged, memory[:staged] == true))}
+      nil ->
+        {:noreply, socket}
+
+      memory ->
+        {:noreply, assign(socket, editing: Map.put(memory, :staged, memory[:staged] == true))}
     end
   end
 
