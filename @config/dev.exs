@@ -1,8 +1,11 @@
 import Config
 
 config :web, Web.Endpoint,
-  # Loopback only — the dashboard serves and mutates ~/.claude with no auth.
-  http: [ip: {127, 0, 0, 1}],
+  # DANGER: bound to all interfaces (0.0.0.0) so other machines on the LAN can POST
+  # /feedback. This ALSO exposes every other route — which serves and mutates ~/.claude
+  # (deletes transcripts, rewrites memory, schedules auto-approved `claude` runs) with
+  # NO authentication. Revert to {127, 0, 0, 1} the moment LAN feedback isn't needed.
+  http: [ip: {0, 0, 0, 0}],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,

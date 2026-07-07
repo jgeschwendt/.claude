@@ -23,10 +23,11 @@ defmodule Web.Router do
     live "/routines", RoutinesLive
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Web do
-  #   pipe_through :api
-  # end
+  scope "/", Web do
+    pipe_through :api
+
+    post "/feedback", FeedbackController, :create
+  end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:web, :dev_routes) do

@@ -15,7 +15,7 @@ defmodule Core.GuardsTest do
 
   test "memory mutations reject non-writable/traversal banks" do
     assert {:error, :not_writable} =
-             Core.Memory.commit_fact(%{
+             Core.Memory.commit_memory(%{
                bank: "../..",
                name: "x",
                type: "reference",
@@ -23,8 +23,8 @@ defmodule Core.GuardsTest do
                description: "d"
              })
 
-    assert {:error, :not_writable} = Core.Memory.delete_fact("auto:whatever", "f.md")
-    assert {:error, :not_writable} = Core.Memory.delete_fact("bank", "../../x")
+    assert {:error, :not_writable} = Core.Memory.delete_memory("auto:whatever", "f.md")
+    assert {:error, :not_writable} = Core.Memory.delete_memory("bank", "../../x")
   end
 
   test "write_notes rejects a non-date key" do

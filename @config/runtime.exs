@@ -3,7 +3,7 @@ import Config
 # Executed for all environments at boot (after compilation), so it is the place
 # for configuration read from the machine — env vars, secrets.
 
-config :web, Web.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+config :web, Web.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "1024"))]
 
 if config_env() == :prod do
   secret_key_base =

@@ -6,5 +6,5 @@ erlang = "28.5.0.2"
 MIX_ENV = "dev"
 
 [tasks.dev]
-description = "Start the Phoenix dev server (http://localhost:4000)"
+description = "Start the Phoenix dev server (http://0.0.0.0:1024)"
 run = "mix phx.server"

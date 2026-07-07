@@ -190,7 +190,7 @@ defmodule Web.RoutinesLive do
             <input
               name="schedule"
               value={@modal.params["schedule"]}
-              placeholder="every 6h · daily at 09:00 · mon-fri at 09:00 · sat,sun at 10:00"
+              placeholder="every 6h · 0 9 * * * · 0 9-17 * * 1-5 · */30 9-17 * * mon-fri"
             />
             <% hint = schedule_hint(@modal.params["schedule"]) %>
             <span class={["hint", if(elem(hint, 0) == :ok, do: "hint-ok", else: "hint-err")]}>
