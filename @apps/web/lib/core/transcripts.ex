@@ -9,7 +9,11 @@ defmodule Core.Transcripts do
 
   @type_set ~w(user assistant)
 
-  def projects_dir, do: Path.join(System.user_home!(), ".claude/projects")
+  # Overridable so tests can run against fixture transcripts instead of the live ones.
+  def projects_dir,
+    do:
+      Application.get_env(:web, :projects_dir) ||
+        Path.join(System.user_home!(), ".claude/projects")
 
   @doc "Lightweight metadata for every session, newest first."
   def list_sessions do
@@ -43,7 +47,11 @@ defmodule Core.Transcripts do
              :ok <- archive_transcript(id, data),
              do: File.rm(path)
 
-      Phoenix.PubSub.broadcast(Core.PubSub, "transcripts", {:session_changed, project, id})
+      # The sweep runs from `mix memory.sweep` with no supervision tree — only
+      # broadcast when the app (and its PubSub) is actually up.
+      if Process.whereis(Core.PubSub),
+        do: Phoenix.PubSub.broadcast(Core.PubSub, "transcripts", {:session_changed, project, id})
+
       result
     else
       {:error, :invalid_path}

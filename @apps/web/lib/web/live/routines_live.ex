@@ -152,10 +152,14 @@ defmodule Web.RoutinesLive do
               <details class="tool">
                 <summary>
                   <.ph name="caret-right" class="chev" />
-                  <span class="name">prompt</span>
-                  <span class="summary">what claude runs, unattended</span>
+                  <span class="name">{if @active["command"], do: "command", else: "prompt"}</span>
+                  <span class="summary">
+                    {if @active["command"],
+                      do: "shell command, runs as-is",
+                      else: "what claude runs, unattended"}
+                  </span>
                 </summary>
-                <pre>{@active["prompt"]}</pre>
+                <pre>{@active["command"] || @active["prompt"]}</pre>
               </details>
 
               <details class="tool" open style="margin-top:12px">
@@ -198,6 +202,12 @@ defmodule Web.RoutinesLive do
             </span>
 
             <textarea name="prompt" rows="12" placeholder="what claude should do, unattended">{@modal.params["prompt"]}</textarea>
+
+            <input
+              name="command"
+              value={@modal.params["command"]}
+              placeholder="…or a shell command instead (advanced — runs as-is, no claude)"
+            />
 
             <div class="f-actions">
               <button type="button" class="btn" phx-click="close_modal">cancel</button>

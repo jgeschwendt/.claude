@@ -2,9 +2,12 @@ defmodule Core.Memory do
   @moduledoc """
   Sandman-shaped memory banks: one bank per sanitized-cwd under `~/.claude/@memory`,
   plus Claude Code's read-only built-in banks. Memories use sandman frontmatter
-  (`name`/`description`/`type`) and `<type>_<slug>.md` filenames. Whole conversations
-  are dissolved via the local `claude` CLI — extracted, judge-verified, and committed
-  autonomously; staging is only the judge-failure fallback and the mid-session inbox.
+  (`name`/`description`/`type`, plus bi-temporal `created`/`updated` and a `source`
+  session id) and `<type>_<slug>.md` filenames. Whole conversations are dissolved via
+  the local `claude` CLI — extracted and judge-verified with schema-validated output,
+  then committed autonomously; staging is only the judge-failure fallback and the
+  mid-session inbox. Superseded and deleted memories are never destroyed: they move to
+  the bank's `_archive/`, so every autonomous rewrite stays recoverable.
   """
 
   alias Core.Transcripts
@@ -31,13 +34,54 @@ defmodule Core.Memory do
   @types_doc "Types — user (role/preferences), feedback (guidance the user gave — corrections AND validations), project (ongoing work/goals/constraints not derivable from code/git), reference (pointers to external systems)."
   @shape ~s(Each item: {"name":"human-readable title","description":"one-line recall summary, specific","type":"user|feedback|project|reference","body":"the memory; for feedback/project add **Why:** and **How to apply:** lines"})
 
+  @memory_item_schema %{
+    "type" => "object",
+    "properties" => %{
+      "body" => %{"type" => "string"},
+      "description" => %{"type" => "string"},
+      "name" => %{"type" => "string"},
+      "type" => %{"enum" => @types}
+    },
+    "required" => ~w(body description name type)
+  }
+
+  @extract_schema %{
+    "type" => "object",
+    "properties" => %{"memories" => %{"type" => "array", "items" => @memory_item_schema}},
+    "required" => ["memories"]
+  }
+
+  @judge_schema %{
+    "type" => "object",
+    "properties" => %{
+      "verdicts" => %{
+        "type" => "array",
+        "items" => %{
+          "type" => "object",
+          "properties" => %{
+            "name" => %{"type" => "string"},
+            "replaces" => %{"type" => "array", "items" => %{"type" => "string"}},
+            "verdict" => %{"enum" => ["commit", "drop"]}
+          },
+          "required" => ~w(name verdict)
+        }
+      }
+    },
+    "required" => ["verdicts"]
+  }
+
   # ── paths ─────────────────────────────────────────────────
-  def memory_root, do: Path.join(System.user_home!(), ".claude/@memory")
+  # Overridable so tests can run against a tmp store instead of the live one.
+  def memory_root,
+    do:
+      Application.get_env(:web, :memory_root) || Path.join(System.user_home!(), ".claude/@memory")
+
   defp sandman_root, do: Path.join(System.user_home!(), ".claude/skills/sandman/memories")
   defp staging_path, do: Path.join(memory_root(), ".staging.json")
   defp steering_path, do: Path.join(memory_root(), "_steering.md")
 
-  defp sanitize(cwd), do: String.replace(cwd, ~r/[^a-zA-Z0-9]/, "-")
+  @doc "Sanitize a cwd into its bank id (every non-alphanumeric → `-`)."
+  def sanitize(cwd), do: String.replace(cwd, ~r/[^a-zA-Z0-9]/, "-")
 
   defp slug(name) do
     base =
@@ -60,23 +104,19 @@ defmodule Core.Memory do
 
   # Two distinct names can still slug to the same file (`"Deploy process"` /
   # `"Deploy Process!"`). Committing the second would overwrite the first, so if the
-  # target exists and belongs to a *different* memory (not one this commit replaces),
-  # disambiguate with a numeric suffix rather than clobber.
+  # target still exists (replaced files are archived before this runs) and holds a
+  # *different* memory, disambiguate with a numeric suffix rather than clobber.
   defp commit_file_name(dir, f) do
-    base = file_name(f)
-    owned = [base | f[:replaces] || []]
-
-    if collision?(Path.join(dir, base), f.name, owned),
+    if collision?(Path.join(dir, file_name(f)), f.name),
       do: free_name(dir, f.type, slug(f.name), 2),
-      else: base
+      else: file_name(f)
   end
 
-  defp collision?(path, name, owned) do
-    File.exists?(path) and Path.basename(path) not in owned and
-      case File.read(path) do
-        {:ok, raw} -> parse_memory(raw, path, nil).name != name
-        _ -> false
-      end
+  defp collision?(path, name) do
+    case File.read(path) do
+      {:ok, raw} -> parse_memory(raw, path, nil).name != name
+      _ -> false
+    end
   end
 
   defp free_name(dir, type, slug, n) do
@@ -127,11 +167,13 @@ defmodule Core.Memory do
     %{
       bank: bank,
       body: body,
+      created: meta["created"],
       description: meta["description"] || "",
       file: Path.basename(file),
       name: name,
       source: meta["source"],
-      type: type
+      type: type,
+      updated: meta["updated"]
     }
   end
 
@@ -151,8 +193,16 @@ defmodule Core.Memory do
   defp strip_quotes(s), do: String.replace(s, ~r/^["']|["']$/, "")
 
   defp serialize_memory(f) do
-    fm = ["---", "name: #{f.name}", "description: #{f.description}", "type: #{f.type}"]
-    fm = if f[:source], do: fm ++ ["source: #{f.source}"], else: fm
+    fm =
+      ["---", "name: #{f.name}", "description: #{f.description}", "type: #{f.type}"] ++
+        for {k, v} <- [
+              {"created", f[:created]},
+              {"source", f[:source]},
+              {"updated", f[:updated]}
+            ],
+            v not in [nil, ""],
+            do: "#{k}: #{v}"
+
     Enum.join(fm ++ ["---", "", String.trim(f.body), ""], "\n")
   end
 
@@ -357,6 +407,11 @@ defmodule Core.Memory do
   end
 
   # ── index + mutations ─────────────────────────────────────
+  # The recall surface (SessionStart hook, built-in loader) only reads MEMORY.md's
+  # first ~200 lines / 25KB (built-in contract as of 2026-07, re-check before raising)
+  # — cap the index inside that budget so no memory silently falls off the end.
+  @index_max_entries 180
+
   defp regen_index(bank) do
     %{memories: memories} = read_bank(bank, "")
 
@@ -364,6 +419,15 @@ defmodule Core.Memory do
       Enum.map(memories, fn f ->
         "- [#{f.name}](#{f.file}) — #{f.description |> String.replace(~r/\s+/, " ") |> String.slice(0, 150)}"
       end)
+
+    lines =
+      case Enum.split(lines, @index_max_entries) do
+        {kept, []} ->
+          kept
+
+        {kept, rest} ->
+          kept ++ ["- …#{length(rest)} more memories not indexed — consolidate this bank"]
+      end
 
     head =
       "---\nname: MEMORY index\ndescription: One-line map of all durable memories in this knowledge bank\ntype: reference\n---\n\n"
@@ -383,9 +447,22 @@ defmodule Core.Memory do
     if writable?(f.bank) do
       dir = Path.join(memory_root(), f.bank)
       File.mkdir_p!(dir)
-      # only remove replaced files that are plain components within this bank
-      for r <- f[:replaces] || [], Core.Store.component?(r), do: File.rm(Path.join(dir, r))
-      File.write!(Path.join(dir, commit_file_name(dir, f)), serialize_memory(f))
+      # only touch replaced files that are plain components within this bank
+      replaces = for r <- f[:replaces] || [], Core.Store.component?(r), do: r
+
+      # Bi-temporal lineage: `created` survives from the oldest file this commit
+      # supersedes (when a fact first became known), `updated` is this rewrite.
+      inherited =
+        replaces
+        |> Enum.map(&read_created(dir, &1))
+        |> Enum.reject(&is_nil/1)
+        |> Enum.min(fn -> nil end)
+
+      Enum.each(replaces, &archive_file(dir, &1))
+      now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601()
+      f = f |> Map.put(:created, f[:created] || inherited || now) |> Map.put(:updated, now)
+
+      Core.Store.write!(Path.join(dir, commit_file_name(dir, f)), serialize_memory(f))
       read_staging() |> Enum.reject(&(&1.bank == f.bank and &1.name == f.name)) |> write_staging()
       regen_index(f.bank)
       :ok
@@ -394,13 +471,37 @@ defmodule Core.Memory do
     end
   end
 
+  defp read_created(dir, file) do
+    case File.read(Path.join(dir, file)) do
+      {:ok, raw} -> parse_memory(raw, file, nil).created
+      _ -> nil
+    end
+  end
+
+  # Autonomous rewrites must be recoverable: superseded/deleted memories move into the
+  # bank's `_archive/` (timestamp-prefixed, so repeated rewrites of one slug can't
+  # collide) instead of being destroyed. `_`-prefixed entries are invisible to
+  # read_dir, so archives never re-enter listings or the index.
+  defp archive_file(dir, file) do
+    src = Path.join(dir, file)
+
+    if File.exists?(src) do
+      archive = Path.join(dir, "_archive")
+      File.mkdir_p!(archive)
+      stamp = DateTime.utc_now() |> Calendar.strftime("%Y%m%dT%H%M%S")
+      File.rename!(src, Path.join(archive, "#{stamp}_#{file}"))
+    end
+
+    :ok
+  end
+
   def reject_staged(bank, name) do
     read_staging() |> Enum.reject(&(&1.bank == bank and &1.name == name)) |> write_staging()
   end
 
   def delete_memory(bank, file) do
     if writable?(bank) and Core.Store.component?(file) do
-      File.rm(Path.join([memory_root(), bank, file]))
+      archive_file(Path.join(memory_root(), bank), file)
       regen_index(bank)
     else
       {:error, :not_writable}
@@ -453,46 +554,6 @@ defmodule Core.Memory do
     if segs == [], do: nil, else: "### #{m.role}\n" <> Enum.join(segs, "\n")
   end
 
-  defp run_claude(prompt) do
-    tmp = Path.join(System.tmp_dir!(), "claude_distill_#{System.unique_integer([:positive])}.txt")
-    File.write!(tmp, prompt)
-    claude = System.find_executable("claude") || "claude"
-    {out, _} = System.cmd("sh", ["-c", ~s('#{claude}' -p --output-format json < '#{tmp}')])
-    File.rm(tmp)
-
-    case Jason.decode(out) do
-      {:ok, %{"result" => r}} -> r
-      _ -> out
-    end
-  end
-
-  defp extract_json(text, open) do
-    close = if open == "[", do: "]", else: "}"
-
-    with s when not is_nil(s) <- index_of(text, open),
-         e when not is_nil(e) <- last_index_of(text, close),
-         true <- e > s,
-         {:ok, val} <- Jason.decode(binary_part(text, s, e - s + 1)) do
-      val
-    else
-      _ -> nil
-    end
-  end
-
-  defp index_of(text, ch) do
-    case :binary.match(text, ch) do
-      {i, _} -> i
-      :nomatch -> nil
-    end
-  end
-
-  defp last_index_of(text, ch) do
-    case :binary.matches(text, ch) do
-      [] -> nil
-      list -> list |> List.last() |> elem(0)
-    end
-  end
-
   defp sanitize_memory(raw, bank, source, replaces) when is_map(raw) do
     name = raw["name"]
     body = raw["body"]
@@ -515,9 +576,9 @@ defmodule Core.Memory do
   defp sanitize_memory(_, _, _, _), do: nil
 
   # Second `claude` pass: judge each candidate for autonomous commit (no human review
-  # downstream). Returns the survivors with `replaces` resolved against the bank; an
-  # unparseable judge response returns nil so the caller can fall back to staging
-  # rather than silently losing the candidates.
+  # downstream). Returns the survivors with `replaces` resolved against the bank; a
+  # failed judge call returns nil so the caller can fall back to staging rather than
+  # silently losing the candidates.
   defp judge(candidates, bank) do
     existing =
       read_bank(bank, "").memories
@@ -532,11 +593,11 @@ defmodule Core.Memory do
     CANDIDATES:
     #{Jason.encode!(Enum.map(candidates, &Map.take(&1, [:body, :description, :name, :type])))}
 
-    Return ONLY a JSON array, one entry per candidate, no prose, no code fences: [{"name":"<candidate name>","verdict":"commit|drop","replaces":["<existing filename to supersede>"]}]
+    Return one verdict per candidate.
     """
 
-    case extract_json(run_claude(prompt), "[") do
-      verdicts when is_list(verdicts) and verdicts != [] ->
+    case Core.Claude.run(prompt, schema: @judge_schema) do
+      {:ok, %{output: %{"verdicts" => verdicts}}} when verdicts != [] ->
         by_name = Map.new(verdicts, &{&1["name"], &1})
 
         Enum.flat_map(candidates, fn c ->
@@ -558,6 +619,11 @@ defmodule Core.Memory do
   Dissolve a WHOLE conversation into durable memories for its cwd-bank — verified by a
   judge pass, then committed automatically (no review queue). Staging is only the
   fallback when the judge call itself fails.
+
+  The result map always carries `:error` — `nil` on a clean run, the failure reason
+  when the *extraction* call failed. Callers that consume transcripts on success (the
+  sweep, the dashboard) must treat `error != nil` as "retry later", never as "this
+  conversation held no memories".
   """
   def distill_session(project, id) do
     case Transcripts.get_session(project, id) do
@@ -575,43 +641,84 @@ defmodule Core.Memory do
 
         #{@types_doc}
 
-        Extract 0 to 8 memories. Return ONLY a JSON array, no prose, no code fences. #{@shape}
+        Extract 0 to 8 memories. #{@shape}
 
         CONVERSATION (titled "#{session.title}", cwd #{session.cwd}):
         #{flatten(session)}
         """
 
-        candidates =
-          (extract_json(run_claude(prompt), "[") || [])
-          |> Enum.map(&sanitize_memory(&1, bank, id, nil))
-          |> Enum.reject(&is_nil/1)
+        case Core.Claude.run(prompt, schema: @extract_schema) do
+          {:error, reason} ->
+            %{bank: bank, memories: [], dropped: 0, staged: 0, error: reason}
 
-        case {candidates, candidates != [] && judge(candidates, bank)} do
-          {[], _} ->
-            %{bank: bank, memories: [], dropped: 0, staged: 0}
+          {:ok, %{output: %{"memories" => raw}}} ->
+            candidates =
+              raw |> Enum.map(&sanitize_memory(&1, bank, id, nil)) |> Enum.reject(&is_nil/1)
 
-          {_, nil} ->
-            # judge unavailable — stage rather than lose the extraction
-            staged =
-              read_staging()
-              |> Enum.reject(fn s ->
-                s.bank == bank and Enum.any?(candidates, &(&1.name == s.name))
-              end)
-
-            write_staging(staged ++ candidates)
-            %{bank: bank, memories: [], dropped: 0, staged: length(candidates)}
-
-          {_, committed} ->
-            Enum.each(committed, &commit_memory/1)
-
-            %{
-              bank: bank,
-              memories: committed,
-              dropped: length(candidates) - length(committed),
-              staged: 0
-            }
+            judge_and_commit(candidates, bank)
         end
     end
+  end
+
+  defp judge_and_commit([], bank),
+    do: %{bank: bank, memories: [], dropped: 0, staged: 0, error: nil}
+
+  defp judge_and_commit(candidates, bank) do
+    case judge(candidates, bank) do
+      nil ->
+        # judge unavailable — stage rather than lose the extraction
+        staged =
+          read_staging()
+          |> Enum.reject(fn s ->
+            s.bank == bank and Enum.any?(candidates, &(&1.name == s.name))
+          end)
+
+        write_staging(staged ++ candidates)
+        %{bank: bank, memories: [], dropped: 0, staged: length(candidates), error: nil}
+
+      committed ->
+        Enum.each(committed, &commit_memory/1)
+
+        %{
+          bank: bank,
+          dropped: length(candidates) - length(committed),
+          error: nil,
+          memories: committed,
+          staged: 0
+        }
+    end
+  end
+
+  @doc """
+  Drain the mid-session inbox (`.staging.json`): judge each bank's staged candidates
+  and commit the survivors. Entries whose judge call fails stay staged for the next
+  drain. Returns `%{committed: n, dropped: n, kept: n}`.
+  """
+  def drain_inbox do
+    read_staging()
+    |> Enum.group_by(& &1.bank)
+    |> Enum.reduce(%{committed: 0, dropped: 0, kept: 0}, fn {bank, staged}, acc ->
+      if writable?(bank) do
+        case judge(staged, bank) do
+          nil ->
+            %{acc | kept: acc.kept + length(staged)}
+
+          committed ->
+            Enum.each(committed, &commit_memory/1)
+            # judge-dropped entries leave staging — the judge is the reviewer here
+            names = MapSet.new(committed, & &1.name)
+            for s <- staged, not MapSet.member?(names, s.name), do: reject_staged(bank, s.name)
+
+            %{
+              acc
+              | committed: acc.committed + length(committed),
+                dropped: acc.dropped + (length(staged) - length(committed))
+            }
+        end
+      else
+        %{acc | kept: acc.kept + length(staged)}
+      end
+    end)
   end
 
   @doc "Merge several committed memories in one bank into a single replacing candidate."
@@ -635,13 +742,19 @@ defmodule Core.Memory do
       {:error, :need_two}
     else
       prompt = """
-      Merge these overlapping memories into ONE consolidated memory. Preserve every [[wikilink]] and keep the most specific detail. Return ONLY a JSON object, no prose. #{@shape}
+      Merge these overlapping memories into ONE consolidated memory. Preserve every [[wikilink]] and keep the most specific detail. #{@shape}
 
       MEMORIES:
       #{Enum.map_join(sources, "\n---\n", &serialize_memory/1)}
       """
 
-      case sanitize_memory(extract_json(run_claude(prompt), "{"), bank, nil, files) do
+      merged =
+        case Core.Claude.run(prompt, schema: @memory_item_schema) do
+          {:ok, %{output: raw}} -> sanitize_memory(raw, bank, nil, files)
+          _ -> nil
+        end
+
+      case merged do
         nil ->
           nil
 
@@ -651,5 +764,10 @@ defmodule Core.Memory do
           merged
       end
     end
+  end
+
+  @doc "Committed memories of one managed bank (full bodies), for the consolidation pass."
+  def bank_memories(bank) do
+    if Core.Store.component?(bank), do: read_bank(bank, "").memories, else: []
   end
 end

@@ -1,9 +1,10 @@
 defmodule Core.Routines do
   @moduledoc """
   User-defined scheduled routines, each backed by its own macOS launchd
-  LaunchAgent. A routine is a name + an unattended `claude` prompt + a schedule;
-  it is stored in `~/.claude/@routines/routines.json` and materialized as
-  `<slug>.sh` / `<slug>.prompt.txt` / `com.claude.routines.<slug>.plist`.
+  LaunchAgent. A routine is a name + a schedule + either an unattended `claude`
+  prompt or a plain shell `command` (for jobs like the memory sweep where a full
+  claude session would be waste); it is stored in `~/.claude/@routines/routines.json`
+  and materialized as `<slug>.sh` / `<slug>.prompt.txt` / `com.claude.routines.<slug>.plist`.
 
   launchd *is* the scheduler — nothing runs inside the BEAM. This module reads and
   manages the agents through `launchctl`, mirroring `Core.Memory`'s habit of
@@ -29,6 +30,12 @@ defmodule Core.Routines do
   """
 
   @default_routines [
+    %{
+      "command" => "cd $HOME/.claude && $HOME/.local/bin/mise exec -- mix memory.sweep",
+      "name" => "Memory sweep",
+      "schedule" => %{"seconds" => 3600, "type" => "interval"},
+      "slug" => "memory-sweep"
+    },
     %{
       "name" => "Update tools",
       "prompt" => @default_update_prompt,
@@ -91,12 +98,9 @@ defmodule Core.Routines do
       if Enum.any?(read_routines(), &(&1["slug"] == slug)) do
         {:error, "a routine named “#{attrs.name}” already exists"}
       else
-        routine = %{
-          "name" => attrs.name,
-          "prompt" => attrs.prompt,
-          "schedule" => attrs.schedule,
-          "slug" => slug
-        }
+        routine =
+          %{"name" => attrs.name, "schedule" => attrs.schedule, "slug" => slug}
+          |> Map.merge(attrs.run)
 
         write_routines(read_routines() ++ [routine])
         install_agent(routine)
@@ -115,12 +119,11 @@ defmodule Core.Routines do
           {:error, "routine not found"}
 
         old ->
-          routine = %{
+          routine =
             old
-            | "name" => attrs.name,
-              "prompt" => attrs.prompt,
-              "schedule" => attrs.schedule
-          }
+            |> Map.drop(["command", "prompt"])
+            |> Map.merge(%{"name" => attrs.name, "schedule" => attrs.schedule})
+            |> Map.merge(attrs.run)
 
           write_routines(Enum.map(routines, &if(&1["slug"] == slug, do: routine, else: &1)))
           install_agent(routine)
@@ -167,12 +170,14 @@ defmodule Core.Routines do
   end
 
   # ── form params <-> schedule ──────────────────────────────
-  def new_form_params, do: %{"name" => "", "prompt" => "", "schedule" => "every 6h"}
+  def new_form_params,
+    do: %{"command" => "", "name" => "", "prompt" => "", "schedule" => "every 6h"}
 
   def to_form_params(r),
     do: %{
+      "command" => r["command"] || "",
       "name" => r["name"],
-      "prompt" => r["prompt"],
+      "prompt" => r["prompt"] || "",
       "schedule" => humanize_schedule(r["schedule"])
     }
 
@@ -223,20 +228,26 @@ defmodule Core.Routines do
   defp validate(p) do
     name = String.trim(p["name"] || "")
     prompt = String.trim(p["prompt"] || "")
+    command = String.trim(p["command"] || "")
 
     cond do
       name == "" ->
         {:error, "name is required"}
 
-      prompt == "" ->
-        {:error, "prompt is required"}
+      prompt == "" and command == "" ->
+        {:error, "a prompt (claude) or a command (shell) is required"}
+
+      prompt != "" and command != "" ->
+        {:error, "give either a prompt or a command, not both"}
 
       slugify(name) == "" ->
         {:error, "name must contain letters or numbers"}
 
       true ->
+        run = if command != "", do: %{"command" => command}, else: %{"prompt" => prompt}
+
         with sched when is_map(sched) <- parse_schedule_string(p["schedule"]),
-             do: {:ok, %{name: name, prompt: prompt, schedule: sched}}
+             do: {:ok, %{name: name, run: run, schedule: sched}}
     end
   end
 
@@ -401,8 +412,8 @@ defmodule Core.Routines do
   defp install_agent(r) do
     slug = r["slug"]
     File.mkdir_p!(routines_dir())
-    File.write!(prompt_path(slug), r["prompt"])
-    File.write!(script_path(slug), script_for(slug))
+    if r["prompt"], do: File.write!(prompt_path(slug), r["prompt"])
+    File.write!(script_path(slug), script_for(slug, r))
     File.chmod!(script_path(slug), 0o755)
     File.mkdir_p!(Path.dirname(plist_path(slug)))
     File.write!(plist_path(slug), plist_for(slug, r["schedule"]))
@@ -462,7 +473,7 @@ defmodule Core.Routines do
   # `$HOME`/`$START`/… are bash expansions (Elixir only interpolates `#\{}`); the
   # prompt is read from a sibling file via "$(cat …)" so arbitrary prompt text can
   # never break the script's quoting. JSON is written with a heredoc (no escapes).
-  defp script_for(slug) do
+  defp script_for(slug, r) do
     """
     #!/usr/bin/env bash
     set -uo pipefail
@@ -472,9 +483,7 @@ defmodule Core.Routines do
     START="$(date +%Y-%m-%dT%H:%M:%S%z)"
     echo "──────── #{slug} · started $START ────────"
 
-    # --no-session-persistence: unattended runs shouldn't leave transcripts cluttering
-    # the human's Conversations view (and the daily-dream must not summarize its own run).
-    claude --permission-mode=auto --no-session-persistence -p "$(cat "$DIR/#{slug}.prompt.txt")"
+    #{run_line(slug, r)}
     CODE=$?
 
     END="$(date +%Y-%m-%dT%H:%M:%S%z)"
@@ -485,6 +494,15 @@ defmodule Core.Routines do
     exit $CODE
     """
   end
+
+  # Command routines run the shell line as-is; prompt routines run unattended claude.
+  # --no-session-persistence: unattended runs shouldn't leave transcripts cluttering
+  # the human's Conversations view (and the daily-dream must not summarize its own run).
+  defp run_line(_slug, %{"command" => command}) when is_binary(command), do: command
+
+  defp run_line(slug, _r),
+    do:
+      ~s|claude --permission-mode=auto --no-session-persistence -p "$(cat "$DIR/#{slug}.prompt.txt")"|
 
   defp plist_for(slug, schedule) do
     """

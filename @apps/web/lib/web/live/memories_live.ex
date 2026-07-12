@@ -37,7 +37,7 @@ defmodule Web.MemoriesLive do
   defp reload(socket) do
     banks = Memory.list_banks()
     active = socket.assigns[:active_id] || (List.first(banks) && List.first(banks).id)
-    assign(socket, banks: banks, active_id: active)
+    assign(socket, banks: banks, active_id: active, ledger: Core.Memory.Sweep.recent(8))
   end
 
   defp active_bank(%{banks: banks, active_id: id}),
@@ -139,15 +139,16 @@ defmodule Web.MemoriesLive do
   # Guard first: project/id are client-controlled (URL param, phx-value) so reject path
   # traversal, and a stale list (or a non-persisted dream run) can point at a transcript
   # that's already gone — dissolving that would crash distill_session with "session not
-  # found". Only consume the transcript when extraction produced memories: an empty result
-  # is indistinguishable from a failed `claude` run, and there is nothing to review.
+  # found". Consume the transcript on any successful extraction (memories committed,
+  # staged for a later judge, or a genuine clean zero); only an extraction *error*
+  # leaves it in place for retry — same contract as Core.Memory.Sweep.
   defp start_dissolve(socket, project, id) do
     if path_component?(project) and path_component?(id) and Transcripts.get_session(project, id) do
       socket
       |> assign(busy: "Dissolving via claude…", picker: nil)
       |> start_async(:distill, fn ->
         result = Memory.distill_session(project, id)
-        if result.memories != [], do: Transcripts.delete_session(project, id)
+        if is_nil(result.error), do: Transcripts.delete_session(project, id)
         result
       end)
     else
@@ -164,6 +165,9 @@ defmodule Web.MemoriesLive do
   def handle_async(:distill, {:ok, %{bank: bank, memories: memories} = result}, socket) do
     msg =
       cond do
+        result[:error] ->
+          "Extraction failed (#{inspect(result.error)}) — transcript kept; the sweep will retry."
+
         result[:staged] && result.staged > 0 ->
           "Judge unavailable — #{result.staged} candidate(s) staged for review."
 
@@ -221,6 +225,17 @@ defmodule Web.MemoriesLive do
           Steering instructions</button>
         </div>
         <div class="list">
+          <div :if={@ledger != []}>
+            <div class="group-label">Pipeline · recent sweep</div>
+            <div :for={e <- @ledger} class="item" title={e["title"] || e["id"]}>
+              <div class="title">{e["title"] || e["id"]}</div>
+              <div class="meta">
+                <span>{e["outcome"]}</span>
+                <span :if={e["memories"] not in [nil, []]}>{length(e["memories"])} memories</span>
+                <span :if={e["at"]}>{rel_time(e["at"])}</span>
+              </div>
+            </div>
+          </div>
           <div :for={kind <- [:managed, :auto]}>
             <% group = Enum.filter(@banks, &(&1.kind == kind)) %>
             <div :if={group != []}>

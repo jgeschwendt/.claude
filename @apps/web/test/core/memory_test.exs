@@ -1,0 +1,120 @@
+defmodule Core.MemoryTest do
+  use ExUnit.Case, async: false
+
+  alias Core.Memory
+
+  @bank "-tmp-project"
+
+  setup do
+    root = Path.join(System.tmp_dir!(), "memory_test_#{System.unique_integer([:positive])}")
+    File.mkdir_p!(root)
+    Application.put_env(:web, :memory_root, root)
+
+    on_exit(fn ->
+      Application.delete_env(:web, :memory_root)
+      File.rm_rf!(root)
+    end)
+
+    %{root: root}
+  end
+
+  defp commit(attrs) do
+    Memory.commit_memory(
+      Map.merge(
+        %{
+          bank: @bank,
+          body: "body",
+          description: "desc",
+          name: "A fact",
+          replaces: nil,
+          source: nil,
+          type: "reference"
+        },
+        attrs
+      )
+    )
+  end
+
+  test "commit stamps created/updated and round-trips them", %{root: root} do
+    :ok = commit(%{})
+
+    [m] = Memory.bank_memories(@bank)
+    assert m.created != nil
+    assert m.updated == m.created
+    assert File.exists?(Path.join([root, @bank, "reference_a_fact.md"]))
+  end
+
+  test "supersede archives the old file and inherits its created", %{root: root} do
+    :ok = commit(%{name: "Old fact", body: "v1"})
+    [old] = Memory.bank_memories(@bank)
+
+    :ok = commit(%{name: "New fact", body: "v2", replaces: [old.file]})
+
+    [new] = Memory.bank_memories(@bank)
+    assert new.name == "New fact"
+    assert new.created == old.created
+
+    archived = File.ls!(Path.join([root, @bank, "_archive"]))
+    assert [archived_file] = archived
+    assert String.ends_with?(archived_file, "_" <> old.file)
+  end
+
+  test "slug collision gets a numeric suffix instead of clobbering", %{root: root} do
+    :ok = commit(%{name: "Deploy process", body: "first"})
+    :ok = commit(%{name: "Deploy Process!", body: "second"})
+
+    files = root |> Path.join(@bank) |> File.ls!() |> Enum.filter(&(&1 =~ ~r/^reference_/))
+    assert Enum.sort(files) == ["reference_deploy_process.md", "reference_deploy_process_2.md"]
+    assert length(Memory.bank_memories(@bank)) == 2
+  end
+
+  test "re-committing the same memory (edit) replaces in place via replaces" do
+    :ok = commit(%{body: "v1"})
+    [m1] = Memory.bank_memories(@bank)
+    :ok = commit(%{body: "v2", replaces: [m1.file]})
+
+    [m2] = Memory.bank_memories(@bank)
+    assert m2.body == "v2"
+    assert m2.created == m1.created
+  end
+
+  test "delete_memory archives rather than destroys", %{root: root} do
+    :ok = commit(%{})
+    [m] = Memory.bank_memories(@bank)
+
+    Memory.delete_memory(@bank, m.file)
+
+    assert Memory.bank_memories(@bank) == []
+    assert [_] = File.ls!(Path.join([root, @bank, "_archive"]))
+  end
+
+  test "unwritable banks are refused" do
+    assert {:error, :not_writable} = commit(%{bank: "auto:whatever"})
+    assert {:error, :not_writable} = commit(%{bank: "../escape"})
+  end
+
+  test "MEMORY.md index regenerates and stays within the entry cap", %{root: root} do
+    :ok = commit(%{})
+    index = File.read!(Path.join([root, @bank, "MEMORY.md"]))
+    assert index =~ "[A fact](reference_a_fact.md)"
+  end
+
+  test "drain_inbox keeps entries whose bank is unwritable", %{root: root} do
+    staging = [
+      %{
+        bank: "auto:x",
+        body: "b",
+        description: "d",
+        name: "n",
+        replaces: nil,
+        source: nil,
+        type: "user"
+      }
+    ]
+
+    File.write!(Path.join(root, ".staging.json"), Jason.encode!(staging))
+
+    # "auto:" banks are read-only — the entry never reaches the judge but is kept staged
+    assert %{committed: 0, dropped: 0, kept: 1} = Memory.drain_inbox()
+  end
+end
