@@ -18,15 +18,17 @@ Why: in-session compliance evaporates at session end; only the encoded rule pers
 
 Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`).
 
-- **Read at session start:** if a bank matches the cwd (case-insensitive), read its `MEMORY.md` index and treat the memories as background context—point-in-time observations, verify before asserting.
+- **Recall is injected:** a SessionStart hook (`hooks/memory-recall.js`) feeds the cwd's bank plus ancestor banks into every session. Where hooks are disabled (some work sessions): if a bank matches the cwd (case-insensitive), read its `MEMORY.md` index yourself. Either way, memories are background context—point-in-time observations, verify before asserting.
 - **Write at the time of attention:** the moment a durable memory surfaces, stage it to `~/.claude/@memory/.staging.json`—append `{bank, body, description, name, replaces, source, type}`, replacing any entry with the same `bank`+`name`. Never defer to session end; the session may end via `/delete`, which extracts nothing.
-- **Commits happen at `/dissolve`, autonomously**—its verification harness judges, then writes directly to the bank; the staged inbox drains at the next `/dissolve` from any session. The dashboard is a viewer/editor, not a gate. Never hand-edit committed bank files or `MEMORY.md` outside that pipeline.
+- **Commits are autonomous, on two paths:** `/dissolve` (in-session: judge subagent → commit script), and the hourly "Memory sweep" routine (`mix memory.sweep`: auto-dissolves sessions idle 48h+, drains the staged inbox, runs bank consolidation). Superseded/deleted memories archive to the bank's `_archive/`—never destroyed. The dashboard is a viewer/editor, not a gate. Never hand-edit committed bank files or `MEMORY.md` outside these pipelines.
 - **Durable instructions still route through the Golden Rule**—artifacts for rules, memory for observations. Don't stage what belongs in a SKILL.md.
 
 ## Rules
 
 - Edit over create—question if new files add value
+- Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
 - Read the source or live docs for any library/API detail—never training data, which is a stale snapshot. Confident recall is not verification.
+- Scripts under `~/.claude` are bash (+jq)—never python
 - Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
 - Use Unicode symbols (typographic), never emojis (decorative).
 
@@ -54,5 +56,5 @@ A conclusion can be no sounder than the premise beneath it—and premises are ra
 
 ## Tools
 
-- `agent-browser` is your web browser—do all web tasks with this tool
+- `agent-browser` is your web browser—do all web tasks with this tool. Exception: `/research` discovery runs on WebSearch/WebFetch (fan-out needs cheap parallel calls); agent-browser is its escalation for JS-heavy or blocked pages
 - `ripgrep` over `grep`
