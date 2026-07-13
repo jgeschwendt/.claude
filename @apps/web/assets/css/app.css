@@ -681,6 +681,13 @@ details[open] .chev {
 .memory.sel {
   border-color: rgba(255, 255, 255, 0.7);
 }
+.memory.archived {
+  border-style: dashed;
+  opacity: 0.6;
+}
+.memory.archived:hover {
+  opacity: 1;
+}
 .memory-head {
   display: flex;
   align-items: center;

@@ -59,7 +59,7 @@ Short pastes tempt the Draft branch, which would invent a new prompt; anything t
 - **Interview** — one AskUserQuestion call; user picks a type (options, max 4: _Tool_ · _Skill/workflow_ · _Sub-agent persona_ · _Classifier/judge_; the built-in _Other_ covers system-prompt sections and hybrids); next turn routes to Draft (or Refine, if they then paste a draft).
 - **Hybrid** — same as Refine, with the description as governing intent when draft and description conflict.
 
-**Ship gate (any branch that reaches _Save_ or _Apply fixes_):** sweep §Stress-testing first. Tests 1, 3, 5, 9 are desk-checkable against the text — run them and fix what fails. Tests 2, 4, 6, 7, 8 need a live session — name them as untested in a rationale bullet rather than claiming them; _"known untested for adversarial input"_ beats silent uncertainty.
+**Ship gate (any branch that reaches _Save_ or _Apply fixes_):** sweep §Stress-testing first. Tests 1, 3, 5, 9 are desk-checkable against the text — run them and fix what fails. Tests 2, 4, 6, 7, 8 need a live session — name them as untested in a rationale bullet rather than claiming them; _"known untested for adversarial input"_ beats silent uncertainty. Any failure observed live becomes a named regression case beside the prompt (→ references/evals.md).
 
 Do NOT restate the user's request. Do NOT open with "Great question", "Let me help you", or any acknowledgment. Go straight to the artifact (Interview: straight to the type question) — preamble spends the turn on what the user already knows.
 
@@ -69,22 +69,23 @@ Not for writing documentation prose, commit messages, code comments, user-facing
 
 ## Reference library
 
-This skill is an index over six references under `${CLAUDE_SKILL_DIR}/references/`. The operational core is below; load a reference when the table says to (use Read/Grep — do not work from memory of them).
+This skill is an index over seven references under `${CLAUDE_SKILL_DIR}/references/`. The operational core is below; load a reference when the table says to (use Read/Grep — do not work from memory of them).
 
-| File                                                                               | Load it when                                                                 | Holds                                                                                                                                                                                                                                                                                                                 |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [references/techniques.md](references/techniques.md)                               | drafting or refining any prompt                                              | the exhaustive techniques catalog (Structure · Voice · Examples · Interaction · Delegation · Constraint enforcement · Failure-mode teaching · Persistence & throttling · Argument handling · Output formats · Persona & self-framing · Prompt assembly), plus the anti-patterns reject-list and the voice fingerprint |
-| [references/playbook.md](references/playbook.md)                                   | you need a stock phrase, XML tag, template variable, or special-case pattern | phrasebook · XML tag taxonomy · template variables · special-case patterns                                                                                                                                                                                                                                            |
-| [references/diagnostics.md](references/diagnostics.md)                             | a prompt misbehaves — you have a symptom, not a style itch                   | the failure-first index: observed symptom → root cause → fix, ~30 entries (rule-following · triggering · fabrication · scope · output · delegation · durability)                                                                                                                                                      |
-| [references/transformations.md](references/transformations.md)                     | before a large Refine, or to model the editing process                       | worked BAD→GOOD transformations with every move named, closing with what was deliberately NOT done                                                                                                                                                                                                                    |
-| [references/claude-code/exemplars.md](references/claude-code/exemplars.md)         | you need a worked model for a prompt kind                                    | canonical Claude Code prompts to study whole, grouped by kind (tool · agent · skill · command · system · safety)                                                                                                                                                                                                      |
-| [references/claude-code/architectures.md](references/claude-code/architectures.md) | you are building a prompt _system_, not authoring one prompt                 | Claude Code runtime mechanics: composition pipeline · cache scopes · attachment lifecycle · delegation · compaction                                                                                                                                                                                                   |
+| File                                                                               | Load it when                                                                 | Holds                                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [references/techniques.md](references/techniques.md)                               | drafting or refining any prompt                                              | the exhaustive techniques catalog (Structure · Voice · Examples · Interaction · Delegation · Constraint enforcement · Failure-mode teaching · Persistence and throttling · Argument handling · Output formats · Persona & self-framing · Prompt assembly), plus the anti-patterns reject-list and the voice fingerprint |
+| [references/playbook.md](references/playbook.md)                                   | you need a stock phrase, XML tag, template variable, or special-case pattern | phrasebook · XML tag taxonomy · template variables · special-case patterns                                                                                                                                                                                                                                              |
+| [references/diagnostics.md](references/diagnostics.md)                             | a prompt misbehaves — you have a symptom, not a style itch                   | the failure-first index: observed symptom → root cause → fix, ~40 entries (rule-following · triggering · fabrication · scope · output · delegation · durability · injection · cost · multi-turn)                                                                                                                        |
+| [references/transformations.md](references/transformations.md)                     | before a large Refine, or to model the editing process                       | four worked transformations with every move named (reviewer · deletion · closed-world judge · Debug minimal-diff), each closing with what was deliberately NOT done                                                                                                                                                     |
+| [references/evals.md](references/evals.md)                                         | at any ship gate, on a model upgrade, or when a fix needs a regression case  | eval-and-regression doctrine: regression-file shape · desk vs live checks · LLM-as-judge design · transcript-driven refine loop · model-upgrade protocol                                                                                                                                                                |
+| [references/claude-code/exemplars.md](references/claude-code/exemplars.md)         | you need a worked model for a prompt kind                                    | canonical Claude Code prompts to study whole, grouped by kind (tool · agent · skill · command · system · safety)                                                                                                                                                                                                        |
+| [references/claude-code/architectures.md](references/claude-code/architectures.md) | you are building a prompt _system_, not authoring one prompt                 | Claude Code runtime mechanics: composition pipeline · cache scopes · attachment lifecycle · delegation · compaction                                                                                                                                                                                                     |
 
-`references/<harness>/` holds faithful, real-name reference pulled from a specific harness (currently `claude-code/`); `techniques.md`, `playbook.md`, `diagnostics.md`, and `transformations.md` are the harness-agnostic distillation — ours. As more harnesses are studied, each gets its own `references/<harness>/`.
+`references/<harness>/` holds faithful, real-name reference pulled from a specific harness (currently `claude-code/`); `techniques.md`, `playbook.md`, `diagnostics.md`, `transformations.md`, and `evals.md` are the harness-agnostic distillation — ours. As more harnesses are studied, each gets its own `references/<harness>/`.
 
 When refining, walk the §Refinement checklist below and pull specific entries from `references/techniques.md` / `references/claude-code/exemplars.md` as needed. `techniques.md` exceeds one Read window — start from its `## Navigation` block and Grep the exact subgroup heading. Load co-needed references in parallel, in a single message. The catalog grows; treat these files as the source of truth over anything you recall.
 
-## Core principles (the house style in 10 rules)
+## Core principles (the house style in 12 rules)
 
 1. **Rule first, rationale second.** State the constraint in imperative form, then — same line or next — explain _why_ in one phrase. The why lets the model generalize to unlisted edge cases. Canonical: _"NEVER run destructive git commands … Taking unauthorized destructive actions is unhelpful and can result in lost work, so it's best to ONLY run these commands when given direct instructions"_.
 
@@ -100,11 +101,15 @@ When refining, walk the §Refinement checklist below and pull specific entries f
 
 7. **Silence on success.** Specify when the model should _not_ output. _"Only post to Slack if you actually found something stuck. If every session looks healthy, tell the user that directly — do not post an all-clear to the channel."_
 
-8. **Priority markers carry real weight.** `IMPORTANT`, `CRITICAL`, `NEVER`, `MUST`, `ALWAYS` — reserved for hard constraints. If they appear in every paragraph they mean nothing. Budget: 1–3 per major section.
+8. **Priority markers carry real weight.** `IMPORTANT`, `CRITICAL`, `NEVER`, `MUST`, `ALWAYS` — reserved for hard constraints. If they appear in every paragraph they mean nothing. Budget: 1–3 per major section. And they're calibrated to a model generation: emphasis that fixed undertriggering on an older model overtriggers on a newer, more instruction-responsive one — on upgrade, the fix is dialing back, not adding (→ evals.md §Model-upgrade protocol).
 
 9. **Parallel by default.** When multiple operations don't depend on each other, prescribe `"in parallel, in a single message"`. This phrase actually changes batching in practice.
 
-10. **Write for the executing model.** Weaker or faster models need prescription — closed worlds, literal templates, more examples. Frontier models need altitude — catalysts, rationale, room for judgment; over-prescription actively fights them. When one prompt must serve both, ship audience-keyed variants rather than averaging (→ playbook §Audience-keyed variants). Robustness is model-version-dependent: re-run the regression cases on every model upgrade.
+10. **Write for the executing model.** Weaker or faster models need prescription — closed worlds, literal templates, more examples. Frontier models need altitude — catalysts, rationale, room for judgment; over-prescription actively fights them. When one prompt must serve both, ship audience-keyed variants rather than averaging (→ playbook §Audience-keyed variants). Robustness is model-version-dependent: re-run the regression cases on every model upgrade (→ evals.md).
+
+11. **The smallest set of high-signal tokens.** Context rot is empirical — recall degrades as context grows — so every line must earn its place against the whole context, not merely read well alone. Refinement always includes a deletion pass; the best fix for a mis-followed prompt is often fewer words, not more. (per Anthropic context-engineering, verified 2026-07-13)
+
+12. **Conflicts are eliminated, not arbitrated.** Instruction hierarchy is unreliable — placement wins a contradiction as little as 10–46% of the time. Never ship a prompt whose rules disagree and hope the important one lands; find the conflict and resolve it in the text (→ techniques §Framing the Judgment).
 
 ## Anatomy by prompt type
 
@@ -157,10 +162,12 @@ Router-style skills (like this one) may replace `## Goal` + `## Steps` with a ro
 Frontmatter rules:
 
 - `allowed-tools`: minimum permissions, patterns over names (`Bash(gh:*)` not `Bash`)
-- `when_to_use` is load-bearing: start with "Use when…", include 2–3 trigger phrases verbatim
+- `when_to_use` is load-bearing: start with "Use when…", include 2–3 trigger phrases verbatim. It must carry the full trigger signal alone — skills are progressive disclosure: name+description always loaded, body loaded on trigger, referenced files on demand. A body rule can't rescue a description that never fires. (per Anthropic agent-skills guidance, verified 2026-07-13)
 - `context: fork` only for self-contained workflows with no mid-process user input
 - Use `$arg` in body for substitution; `${CLAUDE_SKILL_DIR}` references bundled files; `!`shell command`` injects live output at expansion time
 - Step-structure tips: concurrent steps use sub-numbers (3a, 3b); human-action steps get `[human]` in the title; keep simple skills simple — a 2-step skill doesn't need annotations everywhere
+- Body budget ~500 lines; split overflow into referenced files along usage boundaries — contexts that are mutually exclusive or rarely co-loaded belong on separate paths
+- Bundled scripts: state whether the model runs them or reads them as reference — ambiguity produces both behaviors
 
 ### C. Sub-agent persona prompt
 
@@ -254,9 +261,10 @@ When the argument contains a draft, run through these. For each hit, show the or
 **Rules**
 
 - [ ] Every `NEVER` / `MUST` has a rationale AND an escape hatch?
-- [ ] Priority markers (`IMPORTANT` / `CRITICAL`) ≤ 3 per major section?
+- [ ] Priority markers (`IMPORTANT` / `CRITICAL`) ≤ 3 per major section — and each survivor still needed on the current model generation, not inherited from an older one's reticence?
 - [ ] Every hallucination-prone behavior explicitly prohibited with a `Don't X` rule?
 - [ ] Every safety rule carries its WHY (use a past failure mode if the user can supply one)?
+- [ ] No two rules contradict — conflicts resolved in the text, not left to placement (principle 12)?
 
 **Interaction**
 
@@ -268,7 +276,8 @@ When the argument contains a draft, run through these. For each hit, show the or
 
 **Output**
 
-- [ ] Output format prescribed — structure, section names, length bound?
+- [ ] Output format prescribed — structure, section names, length bound — as the target shape, not only prohibitions?
+- [ ] Long input material (documents, transcripts) placed above the query, instructions at the end?
 - [ ] HEREDOC example for multi-line command args (commits, PR bodies)?
 - [ ] File references in `file_path:line_number` format?
 - [ ] GitHub refs in `owner/repo#123` format?
@@ -300,6 +309,7 @@ When the argument contains a draft, run through these. For each hit, show the or
 - [ ] Defensive error handling for impossible cases? Cut.
 - [ ] Claims success without prescribing verification? Add a verification step.
 - [ ] Any dead language ("Write clean code", "Be careful")? Cut or make specific.
+- [ ] Deletion pass run — does every line still earn its tokens against the whole context (principle 11)?
 
 ## Stress-testing a prompt
 
@@ -317,7 +327,7 @@ A prompt isn't done when it reads well. It's done when it survives adversarial i
 
 Tests 1, 3, 5, 9 are desk-checkable by reading the prompt; 2, 4, 6, 7, 8 require a live session. Cap each test at 2–3 minutes. If a test fails, fix the prompt, don't rationalize the failure. If you can't run one of these, say so explicitly in the prompt's description — _"known untested for adversarial input"_ beats silent uncertainty.
 
-**Keep the failures.** Every observed failure becomes a named regression case kept beside the prompt (an eval file or a comment block); re-run the set after every edit and every model upgrade. A prompt that doesn't carry its failure history re-learns the same lessons.
+**Keep the failures.** Every observed failure becomes a named regression case kept beside the prompt (an eval file or a comment block); re-run the set after every edit and every model upgrade. A prompt that doesn't carry its failure history re-learns the same lessons. The machinery — regression-file shape, desk vs live tiers, LLM-as-judge grading, the transcript-driven refine loop, the model-upgrade protocol — is in `references/evals.md`.
 
 ## Rules
 
@@ -333,7 +343,7 @@ Tests 1, 3, 5, 9 are desk-checkable by reading the prompt; 2, 4, 6, 7, 8 require
 
 ## Learning
 
-No capture queue. The moment a run goes off the documented playbook, encode the fix directly into its destination (Golden Rule, CLAUDE.md), backed by a concrete artifact (the draft, the user's hand-correction, or the `source/file.ts:line` of a newly-spotted pattern): a routing/turn-shape/checklist defect → this SKILL.md · a missing or wrong catalog entry → `references/techniques.md` / `references/claude-code/exemplars.md` / `references/playbook.md` · a newly observed symptom→fix → `references/diagnostics.md` · a Refine move the worked examples don't teach → `references/transformations.md` · a project-specific convention → that repo's `.claude/` · the user's personal style → user memory (`/dissolve` at session end). Stamp the edit `(since <date> · <artifact>)`. Net-zero — an overlap with an existing catalog entry or checklist line merges into that line, never adds one.
+No capture queue. The moment a run goes off the documented playbook, encode the fix directly into its destination (Golden Rule, CLAUDE.md), backed by a concrete artifact (the draft, the user's hand-correction, or the `source/file.ts:line` of a newly-spotted pattern): a routing/turn-shape/checklist defect → this SKILL.md · a missing or wrong catalog entry → `references/techniques.md` / `references/claude-code/exemplars.md` / `references/playbook.md` · a newly observed symptom→fix → `references/diagnostics.md` · a Refine move the worked examples don't teach → `references/transformations.md` · an eval/judging/regression move → `references/evals.md` · a project-specific convention → that repo's `.claude/` · the user's personal style → user memory (`/dissolve` at session end). Stamp the edit `(since <date> · <artifact>)`. Net-zero — an overlap with an existing catalog entry or checklist line merges into that line, never adds one.
 
 ## User input
 

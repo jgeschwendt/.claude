@@ -1,6 +1,6 @@
 > Referenced from SKILL.md. Lookup material: stock phrasebook, XML tag taxonomy, template variables, and special-case patterns.
 
-## Reference — stock phrasebook
+## Reference — Stock phrasebook
 
 These phrases are idiomatic in production agent prompts and carry specific, well-tested meaning — though several are rarer than their fame suggests. Prefer them over invented variants:
 
@@ -40,7 +40,7 @@ These phrases are idiomatic in production agent prompts and carry specific, well
 - **Pack a decision table into one sentence.** Introduce value definitions with a verb-plus-colon stem and separate cases with semicolons. _"`status` labels intent: 'normal' when replying to what they just asked; 'proactive' when you're initiating"_.
 - **Route feedback by symptom class, with an over-trigger guard.** Give a decision rule that maps symptom to channel and fences off the false-positive case. _"recommend the appropriate slash command: /issue for model-related problems (odd outputs, wrong tool choices, hallucinations, refusals), or /share to upload the full session transcript for product bugs... Only recommend these when the user is describing a problem with ${AGENT_HARNESS}."_.
 - **Default toward asking, not guessing.** Close a decision table with a blanket fallback so uncovered cases resolve to a question. _"When unsure, ask rather than guess"_.
-- **Ban proactive firing for stateful tools.** For a tool whose invocation mutates or tears down session state, state the anti-proactive ban outright — the deliberate inverse of the "use this proactively" push you give discovery tools. _"Do NOT call this proactively — only when the user asks"_.
+- **Ban proactive firing for stateful tools.** For a tool whose invocation mutates or tears down session state, state the anti-proactive ban outright — the deliberate inverse of the "use this proactively" push you give discovery tools. _"Do NOT call this proactively — only when the user asks"_. The middle ground partitions proactivity by risk class instead of banning it flat: _"Publishing proactively is fine for your own work-product — artifacts start private. The exception is content that could mislead or cause harm if shared onward."_ (since 2026-07-13 · live claude-code 2.1.207 system prompt)
 
 **Grounding and output shape** — pin the model to supplied content and to a parseable shape:
 
@@ -48,7 +48,7 @@ These phrases are idiomatic in production agent prompts and carry specific, well
 - **Flatly prohibit high-risk content.** For a high-risk category use a no-escape-hatch absolute, not a softened guideline. _"Never produce or reproduce exact song lyrics."_.
 - **Express a denylist as a positive exception.** When most capability is permitted, `All tools except X, Y, Z` is shorter and clearer than enumerating the allowed set. _"All tools except ${disallowedTools.join(', ')}"_.
 - **Quantify behavior with units, ranges, and parenthetical caps.** Give the model numbers to reason with, not adjectives. _"recurring tasks fire up to 10% of their period late (max 15 min); one-shot tasks landing on :00 or :30 fire up to 90 s early"_.
-- **Demand a machine-parseable category slug.** Require lowercase snake_case with examples so findings group cleanly. <!-- specimen truncated in transcription; re-pull from security-review source -->
+- **Demand a machine-parseable category slug.** Require a slug-cased category with inline examples so findings group cleanly across runs. _"The markdown output should contain the file, line number, severity, category (e.g. `sql_injection` or `xss`), description, exploit scenario, and fix recommendation."_ (re-pulled 2026-07-13 · security-review, claude-code 2.1.207)
 - **Mandate a navigable citation format.** State the format and the user benefit it serves. _"When referencing specific functions or pieces of code include the pattern file_path:line_number to allow the user to easily navigate to the source code location."_ and _"When referencing GitHub issues or pull requests, use the owner/repo#123 format (e.g. anthropics/claude-code#100) so they render as clickable links."_.
 - **Fix a rendering artifact by naming it.** Explain the artifact and the corrected phrasing rather than just forbidding it. _"Do not use a colon before tool calls. Your tool calls may not be shown directly in the output, so text like \"Let me read the file:\" followed by a read tool call should just be \"Let me read the file.\" with a period."_.
 - **Close diagnostic flows with plain-language explanation and next steps.** End an investigation by demanding actionable output, not a log dump. _"Explain what you found in plain language"_ / _"Suggest concrete fixes or next steps"_.
@@ -109,7 +109,7 @@ These phrases are idiomatic in production agent prompts and carry specific, well
 - **Annotate every nullable field with its absent case.** Say when a field is null or missing so generated code defends against the empty case. _"\"current_usage\": { // Token usage from last API call (null if no messages yet)"_.
 - **Pretty-print injected structured state inside a fenced `json` code block.** Hand the model state as fenced JSON so it parses cleanly and reads as separate from prose. _"**User's settings.json:**\n`json\n${settingsJson}\n`"_.
 
-## Reference — template variables
+## Reference — Template variables
 
 | Variable                            | Substitutes to                                              | When to use                                                                                                                                |
 | ----------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |

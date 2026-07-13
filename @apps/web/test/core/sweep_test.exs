@@ -10,18 +10,22 @@ defmodule Core.Memory.SweepTest do
     base = Path.join(System.tmp_dir!(), "sweep_test_#{System.unique_integer([:positive])}")
     memory = Path.join(base, "memory")
     projects = Path.join(base, "projects")
+    diary = Path.join(base, "log")
     File.mkdir_p!(memory)
     File.mkdir_p!(projects)
+    File.mkdir_p!(Path.join(diary, "archive"))
     Application.put_env(:web, :memory_root, memory)
     Application.put_env(:web, :projects_dir, projects)
+    Application.put_env(:web, :diary_root, diary)
 
     on_exit(fn ->
       Application.delete_env(:web, :memory_root)
       Application.delete_env(:web, :projects_dir)
+      Application.delete_env(:web, :diary_root)
       File.rm_rf!(base)
     end)
 
-    %{projects: projects}
+    %{projects: projects, diary: diary, memory: memory}
   end
 
   defp write_session(projects, id, messages, at) do
@@ -92,5 +96,87 @@ defmodule Core.Memory.SweepTest do
     assert report.deferred == 1
     assert report.results == []
     assert File.exists?(Path.join(projects, "-tmp-proj/real.jsonl"))
+  end
+
+  # ── dissolve queue ────────────────────────────────────────
+  # Same claude-spend rule as above: no queue fixture may be both archived and
+  # non-trivial unless the run is capped to max: 0.
+
+  defp write_archive(diary, id, messages) do
+    dir = Path.join([diary, "archive", "2026-07-13"])
+    File.mkdir_p!(dir)
+
+    lines =
+      Enum.map(messages, fn text ->
+        Jason.encode!(%{
+          "type" => "user",
+          "cwd" => "/tmp/proj",
+          "timestamp" => "2026-07-13T00:00:00Z",
+          "message" => %{"content" => text}
+        })
+      end)
+
+    data = :zlib.gzip(Enum.join(lines, "\n") <> "\n")
+    File.write!(Path.join(dir, id <> ".jsonl.gz"), data)
+  end
+
+  defp enqueue(id, opts \\ []) do
+    entry = %{
+      "id" => id,
+      "cwd" => opts[:cwd] || "/tmp/proj",
+      "title" => "t",
+      "queued_at" => opts[:queued_at] || DateTime.to_iso8601(DateTime.utc_now())
+    }
+
+    File.write!(Sweep.queue_path(), Jason.encode!(entry) <> "\n", [:append])
+  end
+
+  test "queued trivial sessions are consumed from the archive without a claude call",
+       %{diary: diary} do
+    write_archive(diary, "qtiny", ["hi"])
+    enqueue("qtiny")
+
+    report = Sweep.run()
+
+    assert [%{outcome: "trivial", id: "qtiny"}] = report.queue
+    assert Sweep.queued() == []
+    assert [%{"outcome" => "trivial", "source" => "queue"}] = Sweep.recent()
+  end
+
+  test "a queued entry with no archive yet waits and stays queued" do
+    enqueue("flushing")
+
+    report = Sweep.run()
+
+    assert [%{outcome: "waiting"}] = report.queue
+    assert [%{"id" => "flushing"}] = Sweep.queued()
+    # waiting is not a ledger event — it would spam one line per hour
+    assert Sweep.recent() == []
+  end
+
+  test "a queued entry whose archive never appears is lost after 24h" do
+    enqueue("gone", queued_at: iso_hours_ago(25))
+
+    report = Sweep.run()
+
+    assert [%{outcome: "lost"}] = report.queue
+    assert Sweep.queued() == []
+    assert [%{"outcome" => "lost", "id" => "gone"}] = Sweep.recent()
+  end
+
+  test "queue entries count against the shared dissolve cap", %{
+    diary: diary,
+    projects: projects
+  } do
+    write_archive(diary, "qreal", ["a", "b", "c", "d", "e"])
+    enqueue("qreal")
+    write_session(projects, "idle", ["a", "b", "c", "d", "e"], iso_hours_ago(72))
+
+    # max: 0 → neither the queued nor the idle session may spend a claude call
+    report = Sweep.run(max: 0)
+
+    assert report.queue == []
+    assert report.deferred == 1
+    assert [%{"id" => "qreal"}] = Sweep.queued()
   end
 end

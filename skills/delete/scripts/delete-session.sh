@@ -4,7 +4,8 @@
 #
 # Canonical kill used by BOTH skills:
 #   /delete   — kill only (the session had no value)
-#   /dissolve — extract memories first, THEN invoke /delete
+#   /dissolve — enqueue for memory extraction first, THEN invoke /delete (the archive
+#               this script writes is exactly what the sweep's queue consumer reads)
 #
 # The MODEL stops the specific background jobs it started BEFORE calling this.
 #

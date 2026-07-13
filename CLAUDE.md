@@ -16,21 +16,24 @@ Why: in-session compliance evaporates at session end; only the encoded rule pers
 
 ## Memory
 
-Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`).
+Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (sweep, judge, dissolve queue, consolidation) are documented in `@apps/web/lib/core/memory.md` and the `/dissolve`·`/delete` skills—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
 
-- **Recall is injected:** a SessionStart hook (`hooks/memory-recall.js`) feeds the cwd's bank plus ancestor banks into every session. Where hooks are disabled (some work sessions): if a bank matches the cwd (case-insensitive), read its `MEMORY.md` index yourself. Either way, memories are background context—point-in-time observations, verify before asserting.
-- **Write at the time of attention:** the moment a durable memory surfaces, stage it to `~/.claude/@memory/.staging.json`—append `{bank, body, description, name, replaces, source, type}`, replacing any entry with the same `bank`+`name`. Never defer to session end; the session may end via `/delete`, which extracts nothing.
-- **Commits are autonomous, on two paths:** `/dissolve` (in-session: judge subagent → commit script), and the hourly "Memory sweep" routine (`mix memory.sweep`: auto-dissolves sessions idle 48h+, drains the staged inbox, runs bank consolidation). Superseded/deleted memories archive to the bank's `_archive/`—never destroyed. The dashboard is a viewer/editor, not a gate. Never hand-edit committed bank files or `MEMORY.md` outside these pipelines.
-- **Durable instructions still route through the Golden Rule**—artifacts for rules, memory for observations. Don't stage what belongs in a SKILL.md.
+A session owes the system three behaviors:
+
+- **Recall is injected:** a SessionStart hook feeds the cwd's bank plus ancestor banks into every session. Hook-free fallback (some work sessions): read the matching bank's `MEMORY.md` yourself (case-insensitive cwd match). Either way, memories are point-in-time observations—verify before asserting.
+- **Write at the time of attention:** the moment a durable memory surfaces, append `{bank, body, description, name, replaces, source, type}` to `~/.claude/@memory/.staging.json`, replacing any entry with the same `bank`+`name`. Never defer to session end—not every ending extracts.
+- **Never hand-edit** committed bank files or `MEMORY.md`; every write flows through the pipeline, and the dashboard is a viewer/editor, not a gate. Durable _instructions_ still route through the Golden Rule—artifacts for rules, memory for observations. Don't stage what belongs in a SKILL.md.
 
 ## Rules
 
 - Edit over create—question if new files add value
 - Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
-- Read the source or live docs for any library/API detail—never training data, which is a stale snapshot. Confident recall is not verification.
+- Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
 - Scripts under `~/.claude` are bash (+jq)—never python
 - Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
+- Stale docs are bugs—an artifact that contradicts the live system gets corrected (or explicitly flagged) in the turn you notice it, never silently routed around.
 - Use Unicode symbols (typographic), never emojis (decorative).
+- Verify empirically—for library/API details read the live source or docs (training data is a stale snapshot); for behavior claims run the probe or the failing case. Confident recall is not verification; neither is plausible inference.
 
 ### Code
 
@@ -56,5 +59,5 @@ A conclusion can be no sounder than the premise beneath it—and premises are ra
 
 ## Tools
 
-- `agent-browser` is your web browser—do all web tasks with this tool. Exception: `/research` discovery runs on WebSearch/WebFetch (fan-out needs cheap parallel calls); agent-browser is its escalation for JS-heavy or blocked pages
+- `agent-browser` is your web browser—do all web tasks with it. Exception: a skill that prescribes its own web tooling wins (its SKILL.md governs).
 - `ripgrep` over `grep`
