@@ -67,6 +67,27 @@ defmodule Core.Transcripts do
 
   defp project_of(file), do: file |> Path.relative_to(projects_dir()) |> Path.split() |> hd()
 
+  @doc """
+  Parse a session from its newest gzip archive in the diary — how the dissolve-queue
+  consumer reads transcripts that `/delete` already archived. Returns nil when no
+  archive exists yet (the session may still be finalizing) or it doesn't parse.
+  """
+  def parse_archived(id) do
+    with true <- Core.Store.component?(id),
+         # date-dir names sort chronologically, so the last wildcard hit is the
+         # newest copy (finalize re-archives the final flush, possibly next day)
+         path when is_binary(path) <-
+           Core.UserLog.archive_root()
+           |> Path.join("*/#{id}.jsonl.gz")
+           |> Path.wildcard()
+           |> List.last(),
+         {:ok, gz} <- File.read(path) do
+      do_parse(:zlib.gunzip(gz), Path.basename(path, ".gz"), nil)
+    else
+      _ -> nil
+    end
+  end
+
   def parse_session(file, project) do
     case File.read(file) do
       {:ok, text} -> do_parse(text, file, project)
@@ -78,7 +99,7 @@ defmodule Core.Transcripts do
     init = %{
       branch: nil,
       created_at: nil,
-      cwd: decode_project(project),
+      cwd: project && decode_project(project),
       messages: [],
       model: nil,
       title: "",

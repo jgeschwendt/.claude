@@ -9,11 +9,13 @@ Diagnose from evidence, not vibes: get the transcript, or the exact misbehavior 
 - **One load-bearing rule lost among many.** Emphasis inflation — everything marked IMPORTANT → strip markers elsewhere; capitalize only the pivot word (→ techniques §Voice; playbook §Emphasis vocabulary).
 - **Rationalizes exceptions ("surely not for THIS one").** The trivial tempting cases aren't named → enumerate them: _"Even for 'hi'. Even for 'thanks'."_ (→ techniques §Voice).
 - **Ban honored, but the behavior resurfaces via another channel.** Prohibition without channel coverage → forbid across every output channel, and close the world to remove the motive (→ techniques §Leak Boundaries; §Precondition, Ordering & Cardinality Gates).
+- **Obeys one rule while violating its sibling; behavior flips between runs.** The prompt contradicts itself and placement doesn't arbitrate — instruction hierarchy is unreliable → find the conflict and eliminate it in the text (→ techniques §Framing the Judgment: "Eliminate rule conflicts").
 
 ## Triggering & routing
 
 - **Tool or skill under-fires.** Description lacks the user's literal phrasings; default tool reticence → verbatim trigger phrases in when-to-use; "use proactively"; quantify the vague threshold (→ techniques §Triggers & Use Boundaries).
 - **Over-fires on near-misses.** No negative boundary → add When-NOT-to-use with the nearest mis-trigger carved out and the redirect named in the same breath (→ SKILL.md principle 4).
+- **Fires eagerly right after a model upgrade.** Emphasis calibrated to an older model's reticence now over-steers the newer, more instruction-responsive one → dial back the aggressive language ("CRITICAL", "if in doubt, use it") rather than adding counter-rules; re-run the regression set (→ evals.md §Model-upgrade protocol).
 - **Flip-flops on ambiguous input.** Overlapping conditions with no precedence → first-match-wins ordering, most-specific first, plus a when-in-doubt tie-break (→ techniques §Routing Tables & Priority-Ordered Lookups).
 - **Mentions the capability instead of invoking it.** Say–do gap → ban naming without calling; make the call a BLOCKING REQUIREMENT before any prose; ensure examples show the invocation, not an inline answer (→ techniques §Interaction; §Meta-Prompt Example Generation).
 
@@ -32,6 +34,7 @@ Diagnose from evidence, not vibes: get the transcript, or the exact misbehavior 
 - **Summarizes instead of finishing.** Stop cues misread as conclusions → completion-gate blacklist; _"keep working — do not summarize"_ (→ techniques §Persistence; playbook §Stock phrasebook).
 - **Stalls: over-asks, waits, narrates idleness.** Permission not pre-granted → assume capability; bias-toward-action with a course-correct license; MUST-act/sleep rules for loops (→ techniques §Voice; §Persistence and throttling).
 - **Too bold: destructive or outward actions without consent.** No risk model → reversibility × blast-radius framing; authorization is scoped and non-transitive (→ claude-code/exemplars.md: Safety).
+- **Declines a legitimate task as too big or out of bounds.** Capability doubted, scope call hoarded → grant permission preemptively; defer scope judgment to the user; name the authorizing context in the prompt (→ techniques §Voice: "Grant permission preemptively", "Defer scope judgment to the user").
 
 ## Output shape
 
@@ -39,6 +42,8 @@ Diagnose from evidence, not vibes: get the transcript, or the exact misbehavior 
 - **Verbose; answer buried.** "Be concise" is unenforceable → numeric length anchors; a lead-with-answer whitelist of what output is FOR (→ techniques §Output formats).
 - **Meta-instructions leak into the deliverable.** Instruction channel unscrubbed → forbid the plumbing vocabulary by name; fence the instruction turn out of its own input scope (→ techniques §Leak Boundaries & Durable-Artifact Integrity).
 - **Format drifts run to run.** Field list but no specimen → one fully-rendered specimen; template with literal placeholders and loop markers (→ techniques §Rendered Format Specimens & Output Templates).
+- **JSON almost parses (prose preamble, markdown fence around it, trailing commentary).** Contract described but never specimened; first token unpinned → pin the literal first token, render one full specimen, bless the empty case in the same wrapper (→ SKILL.md anatomy §E; techniques §Rendered Format Specimens & Output Templates).
+- **Nested code fences corrupt the rendered artifact.** An inner ``` terminates the outer fence early → 4-backtick outer fence whenever the artifact itself contains triple-backtick fences (→ SKILL.md §Turn shape).
 - **Reproduces example content, not example shape.** Specification confused with illustration → vary surface details across examples; add `<reasoning>` naming the discriminating criteria; spend equal space on when-NOT cases (→ techniques §Teaching Wrappers & Reasoning Annotation).
 
 ## Delegation
@@ -52,6 +57,21 @@ Diagnose from evidence, not vibes: get the transcript, or the exact misbehavior 
 - **Behavior degrades after compaction.** Prompt isn't summary-proof → make the body self-explaining post-summary; restate the two load-bearing constraints in a critical reminder (→ claude-code/architectures.md §5).
 - **Forgets facts from cleared tool output.** No persistence directive → _"write down any important information … the original tool result may be cleared later"_ (→ playbook §Stock phrasebook).
 - **Stale priors beat live facts (wrong year, old product names).** Live values not injected → interpolate the current date, limits, and paths; restate renames parenthetically (→ playbook §Template variables).
+
+## Injection & untrusted input
+
+- **Obeys instructions embedded in fetched or pasted content.** Untrusted data shares the instruction channel → fence it in labeled delimiters with the task prompt outside the fence; state the data-not-instructions contract (→ techniques §Structural Tags For Machine & Runtime Channels: rule fences).
+- **Judge swayed by the content it was meant to grade.** Injected user config or graded material read as commands → frame injected material as evidence to weigh, never instructions to obey (→ techniques §Framing & Fencing Injected Context).
+
+## Cost & latency
+
+- **Prompt suddenly slow or expensive with no visible change.** A volatile literal (timestamp, counter, session id) in the cacheable prefix busts the cache every turn → static-first assembly; move volatiles behind the cache boundary (→ techniques §Prompt assembly; architectures §6 Prefix-stability discipline).
+- **Token spend grows linearly with session length.** A persistent mode reinjects its full directive every turn → full/sparse reminder throttling (→ techniques §Persistence and throttling).
+
+## Multi-turn & pushback
+
+- **Turn 2 drifts from turn 1's framing.** Turn shape specified only for the first response → make the per-turn contract explicit ("every response follows this") and anchor follow-ups to the established artifact (→ SKILL.md §Turn shape).
+- **Capitulates on verified facts under pushback.** No pushback protocol → split the two classes: preference pushback yields immediately; fact challenges re-verify, then hold with evidence (→ techniques §Voice: "Collaborator-not-executor framing").
 
 ---
 

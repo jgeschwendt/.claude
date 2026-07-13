@@ -9,7 +9,8 @@ Kill the current session: archive its transcript to the diary **immediately**, m
 un-resumable, and exit. The raw `.jsonl` is gzip-archived under `~/.claude/@log/archive/<date>/`
 (recoverable, fuel for the diary's daily dream) — but `claude --resume` will fail once the
 live file is finalized away. Use this when the session had **no** lasting value; if it did,
-use `/dissolve` (extracts memories first, then invokes this skill).
+use `/dissolve` (enqueues the conversation for the memory sweep's extraction, then invokes
+this skill — the archive written here is what the sweep reads).
 
 Run the steps **in order** — this is live work only a running session can do.
 

@@ -16,9 +16,11 @@ defmodule Web.MemoriesLive do
         editing: nil,
         selected: MapSet.new(),
         busy: nil,
-        steering: nil,
+        dream: nil,
         picker: nil,
-        active_id: nil
+        active_id: nil,
+        show_archive: false,
+        sweeping: false
       )
       |> reload()
 
@@ -37,8 +39,22 @@ defmodule Web.MemoriesLive do
   defp reload(socket) do
     banks = Memory.list_banks()
     active = socket.assigns[:active_id] || (List.first(banks) && List.first(banks).id)
-    assign(socket, banks: banks, active_id: active, ledger: Core.Memory.Sweep.recent(8))
+
+    socket
+    |> assign(
+      banks: banks,
+      active_id: active,
+      ledger: Core.Memory.Sweep.recent(8),
+      queue: Core.Memory.Sweep.queued()
+    )
+    |> reload_archive()
   end
+
+  defp reload_archive(%{assigns: %{show_archive: true, active_id: id}} = socket)
+       when is_binary(id),
+       do: assign(socket, archived: Memory.archived_memories(id))
+
+  defp reload_archive(socket), do: assign(socket, archived: [])
 
   defp active_bank(%{banks: banks, active_id: id}),
     do: Enum.find(banks, &(&1.id == id)) || List.first(banks)
@@ -49,7 +65,15 @@ defmodule Web.MemoriesLive do
   # ── events ────────────────────────────────────────────────
   @impl true
   def handle_event("select_bank", %{"id" => id}, socket),
-    do: {:noreply, assign(socket, active_id: id, selected: MapSet.new(), editing: nil)}
+    do:
+      {:noreply,
+       assign(socket,
+         active_id: id,
+         selected: MapSet.new(),
+         editing: nil,
+         show_archive: false,
+         archived: []
+       )}
 
   def handle_event("edit", %{"name" => name}, socket) do
     # The memory can vanish between render and click (a watch-reload, another tab, or an
@@ -116,18 +140,54 @@ defmodule Web.MemoriesLive do
      |> start_async(:merge, fn -> Memory.merge_memories(bank.id, files) end)}
   end
 
-  def handle_event("open_steering", _, socket),
-    do: {:noreply, assign(socket, steering: Memory.get_steering())}
-
-  def handle_event("close_steering", _, socket), do: {:noreply, assign(socket, steering: nil)}
-
-  def handle_event("save_steering", %{"text" => text}, socket) do
-    Memory.set_steering(text)
-    {:noreply, assign(socket, steering: nil)}
+  def handle_event("toggle_archive", _, socket) do
+    {:noreply,
+     socket |> assign(show_archive: not socket.assigns.show_archive) |> reload_archive()}
   end
 
+  def handle_event("restore", %{"file" => file}, socket) do
+    Memory.restore_memory(active_bank(socket.assigns).id, file)
+    {:noreply, reload(socket)}
+  end
+
+  def handle_event("sweep_now", _, socket) do
+    {:noreply,
+     socket
+     |> assign(busy: "Sweeping — dissolving idle sessions, draining the inbox…", sweeping: true)
+     |> start_async(:sweep, fn -> Core.Memory.Sweep.run() end)}
+  end
+
+  def handle_event("consolidate", _, socket) do
+    bank = active_bank(socket.assigns)
+
+    {:noreply,
+     socket
+     |> assign(busy: "Consolidating #{bank.label} via claude…")
+     |> start_async(:consolidate, fn -> Core.Memory.Consolidate.consolidate(bank.id) end)}
+  end
+
+  def handle_event("open_dream", _, socket),
+    do: {:noreply, assign(socket, dream: Memory.get_dream())}
+
+  def handle_event("close_dream", _, socket), do: {:noreply, assign(socket, dream: nil)}
+
+  def handle_event("save_dream", %{"text" => text}, socket) do
+    Memory.set_dream(text)
+    {:noreply, assign(socket, dream: nil)}
+  end
+
+  # Sessions pre-marked archive-on-exit belong to the session-end machinery — offering
+  # them here would consume a transcript that is about to archive itself.
   def handle_event("open_picker", _, socket),
-    do: {:noreply, assign(socket, picker: Transcripts.list_sessions())}
+    do:
+      {:noreply,
+       assign(socket,
+         picker:
+           Enum.reject(
+             Transcripts.list_sessions(),
+             &Core.Memory.Sweep.marked_archive_on_exit?(&1.id)
+           )
+       )}
 
   def handle_event("close_picker", _, socket), do: {:noreply, assign(socket, picker: nil)}
 
@@ -143,20 +203,29 @@ defmodule Web.MemoriesLive do
   # staged for a later judge, or a genuine clean zero); only an extraction *error*
   # leaves it in place for retry — same contract as Core.Memory.Sweep.
   defp start_dissolve(socket, project, id) do
-    if path_component?(project) and path_component?(id) and Transcripts.get_session(project, id) do
-      socket
-      |> assign(busy: "Dissolving via claude…", picker: nil)
-      |> start_async(:distill, fn ->
-        result = Memory.distill_session(project, id)
-        if is_nil(result.error), do: Transcripts.delete_session(project, id)
-        result
-      end)
-    else
-      assign(socket,
-        busy:
-          "That conversation no longer exists — it may have been dissolved, deleted, or archived.",
-        picker: nil
-      )
+    cond do
+      not (path_component?(project) and path_component?(id)) or
+          is_nil(Transcripts.get_session(project, id)) ->
+        assign(socket,
+          busy:
+            "That conversation no longer exists — it may have been dissolved, deleted, or archived.",
+          picker: nil
+        )
+
+      Core.Memory.Sweep.marked_archive_on_exit?(id) ->
+        assign(socket,
+          busy: "That session is ending on its own — its transcript will archive itself.",
+          picker: nil
+        )
+
+      true ->
+        socket
+        |> assign(busy: "Dissolving via claude…", picker: nil)
+        |> start_async(:distill, fn ->
+          result = Memory.distill_session(project, id)
+          if is_nil(result.error), do: Transcripts.delete_session(project, id)
+          result
+        end)
     end
   end
 
@@ -185,11 +254,53 @@ defmodule Web.MemoriesLive do
     {:noreply, socket |> assign(busy: msg, active_id: bank) |> reload()}
   end
 
-  def handle_async(:merge, {:ok, _}, socket),
-    do: {:noreply, socket |> assign(busy: "Merged candidate staged for review.") |> reload()}
+  def handle_async(:merge, {:ok, result}, socket) do
+    msg =
+      case result do
+        {:ok, merged} ->
+          "Merged #{length(merged.replaces)} memories into “#{merged.name}” — sources archived."
+
+        {:error, :need_two} ->
+          "Merge needs at least two memories that still exist."
+
+        {:error, reason} ->
+          "Merge failed (#{inspect(reason)}) — nothing changed."
+      end
+
+    {:noreply, socket |> assign(busy: msg) |> reload()}
+  end
+
+  def handle_async(:sweep, {:ok, :locked}, socket),
+    do:
+      {:noreply,
+       assign(socket, busy: "A sweep is already running — nothing started.", sweeping: false)}
+
+  def handle_async(:sweep, {:ok, %{} = report}, socket) do
+    inbox = report.inbox
+
+    msg =
+      "Sweep: #{length(report.queue)} queued · #{report.considered} considered · " <>
+        "#{length(report.results)} dissolved-or-tried · " <>
+        "#{report.trivial} trivial · #{report.deferred} deferred · " <>
+        "inbox #{inbox.committed}✓/#{inbox.dropped}✗/#{inbox.kept}… · " <>
+        "#{length(report.consolidated)} bank(s) consolidated."
+
+    {:noreply, socket |> assign(busy: msg, sweeping: false) |> reload()}
+  end
+
+  def handle_async(:consolidate, {:ok, result}, socket) do
+    msg =
+      cond do
+        result.error -> "Consolidation failed (#{inspect(result.error)}) — nothing changed."
+        result.ops == [] -> "Consolidation: no ops — the bank is already sharp."
+        true -> "Consolidation: #{length(result.ops)} op(s) applied."
+      end
+
+    {:noreply, socket |> assign(busy: msg) |> reload()}
+  end
 
   def handle_async(_, {:exit, reason}, socket),
-    do: {:noreply, assign(socket, busy: "Error: #{inspect(reason)}")}
+    do: {:noreply, assign(socket, busy: "Error: #{inspect(reason)}", sweeping: false)}
 
   @impl true
   def handle_info(:memory_changed, socket), do: {:noreply, reload(socket)}
@@ -206,6 +317,17 @@ defmodule Web.MemoriesLive do
   defp path_component?(s),
     do: is_binary(s) and s != "" and Path.basename(s) == s and not String.contains?(s, "..")
 
+  # Updated within the last hour — the session may still be open in a terminal, and a
+  # dissolve would consume its transcript out from under it. Confirm, don't forbid.
+  defp recently_active?(%{updated_at: ts}) when is_binary(ts) and ts != "" do
+    case DateTime.from_iso8601(ts) do
+      {:ok, dt, _} -> DateTime.diff(DateTime.utc_now(), dt) < 3600
+      _ -> false
+    end
+  end
+
+  defp recently_active?(_), do: false
+
   # ── render ────────────────────────────────────────────────
   @impl true
   def render(assigns) do
@@ -221,10 +343,22 @@ defmodule Web.MemoriesLive do
         </header>
         <div class="bank-actions">
           <button class="btn wide" phx-click="open_picker"><.ph name="drop" /> Dissolve a conversation</button>
-          <button class="btn wide" phx-click="open_steering"><.ph name="gear-six" />
-          Steering instructions</button>
+          <button class="btn wide" phx-click="open_dream"><.ph name="moon-stars" /> Dream instructions</button>
+          <button class="btn wide" phx-click="sweep_now" disabled={@sweeping}>
+            <.ph name="broom" /> Sweep now
+          </button>
         </div>
         <div class="list">
+          <div :if={@queue != []}>
+            <div class="group-label">Pipeline · dissolve queue</div>
+            <div :for={e <- @queue} class="item" title={e["title"] || e["id"]}>
+              <div class="title">{e["title"] || e["id"]}</div>
+              <div class="meta">
+                <span>waiting for sweep</span>
+                <span :if={e["queued_at"]}>{rel_time(e["queued_at"])}</span>
+              </div>
+            </div>
+          </div>
           <div :if={@ledger != []}>
             <div class="group-label">Pipeline · recent sweep</div>
             <div :for={e <- @ledger} class="item" title={e["title"] || e["id"]}>
@@ -274,8 +408,17 @@ defmodule Web.MemoriesLive do
             :if={@active && !@active.readonly && MapSet.size(@selected) >= 2}
             class="btn ok"
             phx-click="merge"
+            data-confirm={"Merge #{MapSet.size(@selected)} memories into one? Sources are archived, recoverable."}
           >
             <.ph name="arrows-merge" /> merge {MapSet.size(@selected)}
+          </button>
+          <button
+            :if={@active && !@active.readonly && length(committed(@active)) >= 2}
+            class="btn"
+            phx-click="consolidate"
+            title="One claude pass: merge/rewrite/archive ops, never grows the bank"
+          >
+            <.ph name="arrows-in-line-vertical" /> consolidate
           </button>
         </div>
         <div :if={@busy} class="banner">{@busy}</div>
@@ -283,7 +426,9 @@ defmodule Web.MemoriesLive do
         <div class="transcript">
           <div class="thread mem">
             <div :if={@active && staged(@active) != []} class="stage">
-              <div class="stage-label">Review queue · {length(staged(@active))} candidate(s)</div>
+              <div class="stage-label">
+                Inbox · {length(staged(@active))} staged — the hourly sweep judges these; act only to preempt it
+              </div>
               <%= for f <- staged(@active) do %>
                 <.memory_editor :if={editing?(@editing, f, true)} memory={@editing} />
                 <.memory_card :if={!editing?(@editing, f, true)} memory={f} mode={:staged} />
@@ -307,20 +452,47 @@ defmodule Web.MemoriesLive do
                 />
               <% end %>
             <% end %>
+
+            <div :if={@active && !@active.readonly} class="stage">
+              <button class="btn" phx-click="toggle_archive">
+                <.ph name={if @show_archive, do: "caret-down", else: "caret-right"} />
+                Archive — superseded &amp; deleted, recoverable
+              </button>
+              <div :if={@show_archive}>
+                <div :if={@archived == []} class="empty-mem">Nothing archived in this bank.</div>
+                <div :for={a <- @archived} class="memory archived">
+                  <div class="memory-head">
+                    <span class={["badge", a.type]}>{a.type}</span>
+                    <span class="memory-name">{a.name}</span>
+                    <span :if={a.archived_at} class="tag">archived {rel_time(a.archived_at)}</span>
+                    <div class="memory-tools">
+                      <button
+                        class="btn ok"
+                        phx-click="restore"
+                        phx-value-file={a.file}
+                        title="Restore into the bank"
+                      ><.ph name="arrow-counter-clockwise" /></button>
+                    </div>
+                  </div>
+                  <div class="memory-desc">{a.description}</div>
+                  <div class="memory-body">{a.body}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div :if={@steering} class="modal-bg" phx-click="close_steering">
-        <div class="modal" phx-click-away="close_steering" onclick="event.stopPropagation()">
-          <h3>Steering instructions</h3>
+      <div :if={@dream} class="modal-bg" phx-click="close_dream">
+        <div class="modal" phx-click-away="close_dream" onclick="event.stopPropagation()">
+          <h3>Dream instructions</h3>
           <p class="hint">
             Guides every dissolve. The whole conversation is always fed — these tune what's kept.
           </p>
-          <form phx-submit="save_steering" style="display:flex;flex-direction:column;gap:10px">
-            <textarea name="text" rows="16">{@steering}</textarea>
+          <form phx-submit="save_dream" style="display:flex;flex-direction:column;gap:10px">
+            <textarea name="text" rows="16">{@dream}</textarea>
             <div class="f-actions">
-              <button type="button" class="btn" phx-click="close_steering">cancel</button>
+              <button type="button" class="btn" phx-click="close_dream">cancel</button>
               <button type="submit" class="btn ok">save</button>
             </div>
           </form>
@@ -340,9 +512,14 @@ defmodule Web.MemoriesLive do
               phx-click="distill"
               phx-value-project={s.project}
               phx-value-id={s.id}
+              data-confirm={
+                recently_active?(s) &&
+                  "This session was active #{rel_time(s.updated_at)} — it may still be open, and dissolving consumes its transcript. Continue?"
+              }
             >
               <span class="title">{s.title}</span>
               <span class="tag">{project_name(s.cwd)}</span>
+              <span :if={recently_active?(s)} class="tag staged-count">active</span>
               <span class="tag">{rel_time(s.updated_at)}</span>
               <span class="tag">{s.message_count} msgs</span>
             </div>
@@ -385,7 +562,7 @@ defmodule Web.MemoriesLive do
             class="btn ok"
             phx-click="approve"
             phx-value-name={@memory.name}
-            title="Approve"
+            title="Commit now (skips the judge)"
           ><.ph name="check" /></button>
           <button
             :if={@mode != :readonly}
@@ -399,7 +576,7 @@ defmodule Web.MemoriesLive do
             class="btn warn"
             phx-click="reject"
             phx-value-name={@memory.name}
-            title="Reject"
+            title="Discard from the inbox"
           ><.ph name="x" /></button>
           <button
             :if={@mode == :committed}

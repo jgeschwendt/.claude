@@ -99,6 +99,37 @@ defmodule Core.MemoryTest do
     assert index =~ "[A fact](reference_a_fact.md)"
   end
 
+  test "archived_memories lists the archive newest-first with archived_at" do
+    :ok = commit(%{name: "Old fact", body: "v1"})
+    [old] = Memory.bank_memories(@bank)
+    :ok = commit(%{name: "New fact", body: "v2", replaces: [old.file]})
+
+    assert [a] = Memory.archived_memories(@bank)
+    assert a.name == "Old fact"
+    assert a.archived_at =~ ~r/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
+  end
+
+  test "restore_memory re-commits and consumes the archive entry", %{root: root} do
+    :ok = commit(%{})
+    [m] = Memory.bank_memories(@bank)
+    Memory.delete_memory(@bank, m.file)
+    [a] = Memory.archived_memories(@bank)
+
+    assert :ok = Memory.restore_memory(@bank, a.file)
+
+    assert [restored] = Memory.bank_memories(@bank)
+    assert restored.name == m.name
+    assert restored.created == m.created
+    assert Memory.archived_memories(@bank) == []
+    assert File.read!(Path.join([root, @bank, "MEMORY.md"])) =~ m.name
+  end
+
+  test "restore_memory refuses unwritable banks and bad paths" do
+    assert {:error, :not_found} = Memory.restore_memory("auto:x", "f.md")
+    assert {:error, :not_found} = Memory.restore_memory(@bank, "../escape.md")
+    assert {:error, :not_found} = Memory.restore_memory(@bank, "missing.md")
+  end
+
   test "drain_inbox keeps entries whose bank is unwritable", %{root: root} do
     staging = [
       %{

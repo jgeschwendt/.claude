@@ -1,6 +1,6 @@
 ## Canonical exemplars (study these whole)
 
-> Referenced from SKILL.md. These are complete prompts worth reading end-to-end, grouped by kind — tool, agent, skill, command, system, safety. The 7 from SKILL.md are preserved here with their commentary; the rest fill out each kind. For atomic techniques pulled from these same sources, see `../techniques.md`.
+> Referenced from SKILL.md. These are complete prompts worth reading end-to-end, grouped by kind — tool, agent, skill, command, system, safety. Each carries commentary naming what it demonstrates. For atomic techniques pulled from these same sources, see `../techniques.md`.
 
 ## Tool
 
@@ -89,6 +89,49 @@ Treat each command you execute with `dangerouslyDisableSandbox: true` individual
 (`tools/BashTool/prompt.ts:231-249`)
 
 A model for any escape-hatch flag. Sets a strong default (always sandbox), then enumerates narrow override conditions and an observable evidence checklist so the decision is grounded, not guessed. Pre-empts false attribution — the model is told failures usually aren't the sandbox's fault and given mundane alternative causes. Finally it resets state per-action so a one-time override never silently becomes the new default.
+
+### Workflow tool — defaults with rebutted rationalizations, smell tests, pattern catalog (since 2026-07-13 · live claude-code 2.1.207 system prompt)
+
+```
+ONLY call this tool when the user has explicitly opted into multi-agent orchestration. Workflows can spawn dozens of agents and consume a large amount of tokens; the user must request that scale, not have it inferred. Explicit opt-in means one of:
+- The user included the keyword "ultracode" in their prompt ...
+- The user directly asked you to run a workflow or use multi-agent orchestration in their own words ("use a workflow", ...). The ask must be in the user's words — a task that would merely benefit from a workflow does not count.
+...
+For any other task — even one that would clearly benefit from parallelism — do NOT call this tool. ... briefly describe what a multi-agent workflow could do and how much it would roughly cost, and ask the user whether to run it. Mention they can ask for one with "use a workflow" in a future message to skip the ask.
+...
+DEFAULT TO pipeline(). Only reach for a barrier (parallel between stages) when you genuinely need ALL prior-stage results together.
+
+A barrier is correct ONLY when stage N needs cross-item context from all of stage N-1:
+- Dedup/merge across the full result set before expensive downstream work
+- Early-exit if the total count is zero ("0 bugs found → skip verification entirely")
+- Stage N's prompt references "the other findings" for comparison
+
+A barrier is NOT justified by:
+- "I need to flatten/map/filter first" — do it inside a pipeline stage: ...
+- "The stages are conceptually separate" — that's what pipeline() models. Separate stages ≠ synchronized stages.
+- "It's cleaner code" — barrier latency is real. If 5 finders run and the slowest takes 3× the fastest, a barrier wastes 2/3 of the fast finders' idle time.
+
+Smell test: if you wrote
+  const a = await parallel(...)
+  const b = transform(a)        // flatten, map, filter — no cross-item dependency
+  const c = await parallel(b.map(...))
+that middle transform doesn't need the barrier. Rewrite as a pipeline with the transform inside a stage. When in doubt: pipeline.
+...
+Quality patterns — common shapes; pick by task and compose freely:
+- Adversarial verify: spawn N independent skeptics per finding, each prompted to REFUTE. Kill if ≥majority refute. Prevents plausible-but-wrong findings from surviving.
+...
+- Loop-until-dry: for unknown-size discovery (bugs, issues, edge cases), keep spawning finders until K consecutive rounds return nothing new. Simple counters (while count < N) miss the tail.
+...
+- No silent caps: if a workflow bounds coverage (top-N, no-retry, sampling), `log()` what was dropped — silent truncation reads as "covered everything" when it didn't.
+
+Scale to what the user asked for. "find any bugs" → a few finders, single-vote verify. "thoroughly audit this" or "be comprehensive" → larger finder pool, 3–5 vote adversarial pass, synthesis stage. When unsure, lean toward thoroughness for research/review/audit requests and toward brevity for quick checks.
+
+These patterns aren't exhaustive — compose novel harnesses when the task calls for it (tournament brackets, self-repair loops, staged escalation, whatever fits).
+```
+
+(live system prompt, Workflow tool description — excerpted)
+
+The richest orchestration prompt in the current harness, and a model for prompting any powerful-but-expensive capability. Four moves worth studying. The opt-in gate doesn't just require consent — it enumerates the closed set of signals that count, explicitly rules out inferred benefit ("a task that would merely benefit … does not count"), and gives the near-miss redirect a script (describe the cost, name the magic phrase). The pipeline-vs-barrier rule is a default bracketed from both sides: a "correct ONLY when" list and a "NOT justified by" list that quotes the model's own rationalizations and answers each — the ban lands at the reasoning step, before the wrong code exists. The smell test teaches misuse recognition in the artifact's own language: a three-line code shape the model can pattern-match its next draft against. And the closing pattern catalog is explicitly a menu with a composition license, plus a calibration rule that keys fan-out size to the user's phrasing. Note also the API-hazard teaching inline where the API is defined: _"`Date.now()`/`Math.random()`… throw (they would break resume); pass timestamps in via `args`"_ — impossibility, mechanism, and substitute in one breath.
 
 ## Agent
 
@@ -478,3 +521,15 @@ You are not a lawyer and never comment on the legality of your own prompts and r
 (`tools/WebFetchTool/prompt.ts:31-33`)
 
 Expresses a copyright guardrail as a hard numeric ceiling plus an explicit license carve-out, rather than a vague "don't copy too much" that the model would interpret generously. The companion rule blocks a tempting failure mode by denying the model a role it isn't fit for ("You are not a lawyer") and forbidding meta-commentary on its own legality — a self-adjudication the model would otherwise volunteer.
+
+### Artifact tool — read-before-publish and the total refusal (since 2026-07-13 · live claude-code 2.1.207 system prompt)
+
+```
+**Files you did not write**: Read the complete file before publishing it, even when asked not to ("it's personal", "no need to open it") — publishing distributes the content, and you must never distribute what you haven't seen. A request for privacy is a reason to read before publishing, not an exemption. If you cannot read it, do not publish it.
+...
+**Never publish**: pages that impersonate a real person or organization (their name, branding, byline, or domain); fabricated records, receipts, or reviews presented as genuine; forms or flows that collect credentials or payment details under false pretenses; or content targeting a private individual. This applies whether you authored the page or the user supplied it, and regardless of claimed purpose ("it's a prop", "for testing") when the page would function as the real thing. If publishing is refused, do not suggest other ways to host or distribute the page.
+```
+
+(live system prompt, Artifact tool description — excerpted)
+
+A safety block built for adversarial pressure rather than good-faith compliance. The read-before-publish rule anticipates the exact social-engineering move that would defeat it — the user asking Claude _not_ to look — quotes those excuse phrasings verbatim, and inverts them: the plea for privacy becomes the argument _for_ the check, with a hard no-check-no-action fallback. The never-publish list is closed-world with concrete categories, then sealed at both remaining seams: provenance ("whether you authored the page or the user supplied it") and purpose-claims ("'it's a prop', 'for testing'"), with a functional test — would it work as the real thing — replacing intent as the criterion. The final sentence makes the refusal total: no suggesting alternative hosts, because a refusal that offers a workaround isn't one.

@@ -22,7 +22,10 @@ defmodule Core.UserLog do
   @weekdays ~w(Monday Tuesday Wednesday Thursday Friday Saturday Sunday)
 
   # ── paths ─────────────────────────────────────────────────
-  def diary_root, do: Path.join(System.user_home!(), ".claude/@log")
+  # Overridable so tests can run against a tmp diary instead of the live one.
+  def diary_root,
+    do: Application.get_env(:web, :diary_root) || Path.join(System.user_home!(), ".claude/@log")
+
   def archive_root, do: Path.join(diary_root(), "archive")
 
   defp dream_path(date), do: Path.join(diary_root(), "#{date}.dream.md")
