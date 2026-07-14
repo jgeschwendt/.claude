@@ -392,6 +392,18 @@ These are masterclass structures for organizing _your own_ information and for d
 - **Networked thought / "second brain"** — bidirectional links, transclusion, daily notes, and graph views; favors emergence (network) over hierarchy. Strong for synthesis and discovery, weak for guaranteed structure — pair with PARA or an index for a backbone.
 - **The Garden and the Stream (Mike Caulfield)** — two complementary modes of digital info: the **Stream** (chronological, feed, in-the-moment) vs the **Garden** (cultivated, linked, revisited, topical). Most knowledge tools need both; conflating them is a common failure.
 
+### Agent-context structures (LLM skills, memory, reference corpora)
+
+The newest substrate — and the one this playbook itself runs in. The budget is context, not clicks: every loaded token competes with the task (context rot is Hick's Law for models), so the load-bearing scheme is **progressive disclosure** — hub-and-spoke (3.6) indexes always loaded, bodies fetched on demand:
+
+- **Three-layer loading** — name+description always in context (the trigger layer); body loaded on invocation; reference files on demand. The trigger signal must live entirely in the always-loaded layer — a body rule can't rescue a description that never fires. This is labeling (§5) under a harsher constraint: a skill description is a link label whose information scent (§7) gets one pass, no berrypicking.
+- **Router-over-read** — an always-loaded index that routes to sections (grep the anchor, read the offset) beats a corpus read whole; a SKILL.md fronting a large reference is a table of contents functioning as navigation (§6). Split reference files along usage boundaries: contexts rarely co-loaded belong on separate paths.
+- **Memory banks** — per-scope stores (per-directory = LATCH Location) of atomic one-fact-per-file records (Zettelkasten, §12) with wiki-links as the network layer and an always-loaded index as the hub. Memories are point-in-time observations: dates and provenance are load-bearing metadata — design a records system, not a truth system. Measured validation (2026-07-14 · @research/skill-gap-analysis-2026): dedicated agentic-memory frameworks lose to plain BM25-over-notes on MemoryAgentBench, and superseded-fact revision is the unsolved failure everywhere (≤6% for every method) — so simple retrievable atoms win, links carry multi-hop retrieval where flat search fails, and eager consolidation of stale entries is load-bearing, not hygiene.
+- **Duplication is drift** — nothing re-syncs prose between artifacts, so restated content diverges silently; prefer one canonical home plus pointers. Where duplication is deliberate (an always-loaded router mirroring a fuller table), write the sync obligation down beside the copy.
+- **Assembled-context ordering** — retrieval over long contexts is U-shaped in position and taxed by near-duplicates: put the load-bearing item at the head or tail, never buried mid-list; prune semantically-near distractors (one is a measured cost); and don't invest in narrative coherence inside a retrieval corpus — shuffled ordering measurably beat coherent flow across 18 models (Chroma context-rot). A focused few-hundred-token assembly beats the same content in a 100k-token dump.
+- **Compaction content model** — when compressing agent history, preserve decisions and open threads, drop tool noise; target 1–2k-token handoffs from sub-tasks (~50–60% cuts measured in production). Consolidate in idle time only what future queries will predictably reuse — sleep-time compute pays ~5× on predictable/reused queries and wastes the precompute on one-offs.
+- **Splitting and manifests** — fixed ~200-word/512-token splitting on natural boundaries matches or beats semantic chunking (skip the compute); a curated manifest (llms.txt-style) has zero measured effect on external AI findability across 300k domains — its only valid role is the internal token-lean index this section already prescribes.
+
 ---
 
 ## §13 — Bridges to systems, data & enterprise architecture
@@ -571,6 +583,7 @@ Past a few thousand assets, browsing the namespace stops working and discovery b
 | Choosing a warehouse modeling approach                       | Layer the schools: integration → dimensional → OBT serving (§16.3)                      |
 | Naming database elements/columns                             | ISO/IEC 11179-5 pattern: object + property + representation (§16.3)                     |
 | One data org, many domains fighting over the schema          | Mesh tradeoff: federate ownership only with a governance contract (§16.4)               |
+| Structuring an LLM agent's context (skills, memory, refs)    | Progressive disclosure + router-over-read + atomic memory (§12)                         |
 
 ---
 

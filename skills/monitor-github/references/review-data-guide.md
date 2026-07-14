@@ -23,16 +23,16 @@ separately, and the split explains most of the API confusion:
 
 ## Coverage table
 
-| Data you want | GraphQL | REST | `gh pr view --json` |
-|---|---|---|---|
-| Review submissions (state + summary body) | ✅ `reviews` | ✅ `/pulls/N/reviews` | ✅ `reviews`, `latestReviews` |
-| Inline review comment bodies | ✅ inside `reviewThreads` | ✅ `/pulls/N/comments` (flat list) | ❌ — its `comments` field is issue comments only |
-| Comments grouped into threads | ✅ native | ⚠️ reconstruct manually via `in_reply_to_id` | ❌ no field |
-| `isResolved` / `resolvedBy` | ✅ | ❌ no concept of resolution | ❌ |
-| `isOutdated` (code changed under the thread) | ✅ | ⚠️ heuristic only: `position == null` | ❌ |
-| Thread node IDs (`PRRT_…`, required to resolve a thread) | ✅ | ❌ | ❌ |
-| Your own unsubmitted PENDING review | ✅ `reviews(states: PENDING)` | ✅ own pending appears in `/pulls/N/reviews` | ❌ not exposed |
-| Hidden/minimized comment flag | ✅ `isMinimized` | ❌ | ❌ |
+| Data you want                                            | GraphQL                       | REST                                         | `gh pr view --json`                              |
+| -------------------------------------------------------- | ----------------------------- | -------------------------------------------- | ------------------------------------------------ |
+| Review submissions (state + summary body)                | ✓ `reviews`                  | ✓ `/pulls/N/reviews`                        | ✓ `reviews`, `latestReviews`                    |
+| Inline review comment bodies                             | ✓ inside `reviewThreads`     | ✓ `/pulls/N/comments` (flat list)           | ✗ — its `comments` field is issue comments only |
+| Comments grouped into threads                            | ✓ native                     | ⚠ reconstruct manually via `in_reply_to_id` | ✗ no field                                      |
+| `isResolved` / `resolvedBy`                              | ✓                            | ✗ no concept of resolution                  | ✗                                               |
+| `isOutdated` (code changed under the thread)             | ✓                            | ⚠ heuristic only: `position == null`        | ✗                                               |
+| Thread node IDs (`PRRT_…`, required to resolve a thread) | ✓                            | ✗                                           | ✗                                               |
+| Your own unsubmitted PENDING review                      | ✓ `reviews(states: PENDING)` | ✓ own pending appears in `/pulls/N/reviews` | ✗ not exposed                                   |
+| Hidden/minimized comment flag                            | ✓ `isMinimized`              | ✗                                           | ✗                                               |
 
 Two of the CLI gaps are long-standing, documented behavior: `gh pr view
 --json comments` returns only Conversation-tab comments (cli/cli issue
@@ -64,6 +64,7 @@ PullRequest
 ```
 
 Interpretation tips:
+
 - `line` is null for file-level threads (`subjectType: FILE`) and for some
   outdated threads — fall back to `startLine`, then to `path` alone.
 - unresolved **and** outdated usually means "the code already changed,
@@ -115,10 +116,14 @@ without resolved/unresolved labels and say so.
 
 ## How the bundled scripts use this
 
-- `scripts/gh_dashboard.sh` — per own-PR: `review_comments.unresolved`,
-  split into `needs_your_reply` (reviewer spoke last) vs
-  `waiting_on_reviewer` (you spoke last), plus an `outdated` count.
-  Per review-request: `unresolved_threads` and `your_pending_review`.
-- `scripts/pr_review_threads.sh <PR>` — the full drill-down: every thread
-  with its comments, minimized comments filtered, resolved threads hidden
-  unless `--all`.
+- `scripts/gh_dashboard.sh` — per own-PR: `review_comments.unresolved`
+  (surface 2), split into `needs_your_reply` (reviewer spoke last) vs
+  `waiting_on_reviewer` (you spoke last), plus an `outdated` count; and a
+  `conversation` `{total, last_author}` covering surface 3 (Conversation-tab
+  comment count and who spoke last). Per review-request: `unresolved_threads`
+  and `your_pending_review`.
+- `scripts/pr_review_threads.sh <PR>` — the full drill-down: a top-level
+  `conversation` array (surface 3, minimized filtered, 1500-char truncation)
+  plus every thread with its comments, minimized comments filtered, resolved
+  threads hidden unless `--all`. Each thread also carries a deep-link `url`
+  and the `diff_hunk` (400-char) of the code its first comment anchors to.

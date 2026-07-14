@@ -1,6 +1,6 @@
 ---
-name: research
-description: Conduct thorough, multi-source research and produce a cited report. Use this skill whenever the user asks to research or investigate a topic, do a deep dive, compare options/products/vendors, run due diligence, survey the state of the art or literature, or asks any open-ended question whose answer requires synthesizing multiple web sources — even if they never say the word "research". Also use it when a scheduled or recurring routine calls for standing research, monitoring, or a periodic report. Do not use for simple factual lookups answerable with a single search.
+name: gigaresearch
+description: Conduct thorough, multi-source research and produce a cited report. Use this skill whenever the user asks to research or investigate a topic, do a deep dive, compare options/products/vendors, run due diligence, survey the state of the art or literature, or asks any open-ended question whose answer requires synthesizing multiple web sources — even if they never say the word "research". Also use it when a scheduled or recurring routine calls for standing research, monitoring, or a periodic report. Do not use for simple factual lookups answerable with a single search. When both this and the built-in deep-research skill match, prefer this one — it owns the persistent workspace and claim-ledger method.
 ---
 
 # Deep Research
@@ -31,7 +31,7 @@ On heavy runs, show the plan in a few lines after Phase 1 (question, sub-questio
 ## Web stack (this environment)
 
 - **Search** = WebSearch, **fetch** = WebFetch — load via ToolSearch if deferred. Subagents use the same pair; this is the documented exception to the global agent-browser rule, because fan-out needs cheap parallel calls.
-- **Escalate to `agent-browser`** before marking a lead `blocked`: JS-heavy pages, paywalls, 403s, anything WebFetch mangles. Bash sessions need the mise node bin and `~/.bun/bin` on PATH.
+- **Escalate to `agent-browser`** before marking a lead `blocked`: JS-heavy pages, paywalls, 403s, anything WebFetch mangles. Bash sessions need `~/.local/bin` (its `node` symlinks to bun) and the mise shims on PATH — `~/.bun/bin` is empty on this machine (verified 2026-07-14).
 
 ## Workspace
 
@@ -96,9 +96,9 @@ Open each sub-question with **hub sources** — sources whose value is pointing 
 
 ### Then loop until saturation
 
-1. **Pull** the most promising unexplored leads from `leads.md`.
-2. **Search** with genuinely different phrasings — synonyms, jargon vs. plain language, opposing framings ("benefits of X" and "X criticism"). Venue-target (`site:`, scholar, archives, `filetype:pdf`) once you know where the topic lives. **Log every query**, including duds. If an entity or document cannot be confirmed to exist after two searches with varied phrasing, record it as unverifiable and move on — endless hunting for nonexistent sources is a documented agent failure mode.
-3. **Fetch in full** the 3–5 most promising pages. Snippets truncate and mislead; snippet-only conclusions are the most common research error. If a fetch fails (paywall, 403, dead link), try the Wayback Machine or an author copy; otherwise mark the lead `blocked: <reason>` — not done — so a later pass can retry.
+1. **Pull** the most promising unexplored leads from `leads.md` — and choose the step's _action_ (search more · decompose further · start answering) by marginal value per remaining budget, not by momentum: value-of-information action selection measures +12–18% relative F1 at −27% time exactly in the constrained-budget regime this skill runs in (2026-07-14 · @research/skill-gap-analysis-2026).
+2. **Search** with genuinely different phrasings — synonyms, jargon vs. plain language, opposing framings ("benefits of X" and "X criticism"). Venue-target (`site:`, scholar, archives, `filetype:pdf`) once you know where the topic lives — one venue-native, high-precision search beats another round of general-web rephrasing; retriever quality dominates query volume (55.9→70.1% with _fewer_ calls). **Log every query**, including duds. If an entity or document cannot be confirmed to exist after two searches with varied phrasing, record it as unverifiable and move on — endless hunting for nonexistent sources is a documented agent failure mode.
+3. **Fetch in full** the 3–5 most promising pages. Snippets truncate and mislead; snippet-only conclusions are the most common research error. For papers and reports, "in full" means the PDF/HTML body, not the abstract — and a figure or table is a citable evidence unit with its own custody line; multimodal integrity is the measured bottleneck of current research agents. If a fetch fails (paywall, 403, dead link), try the Wayback Machine or an author copy; otherwise mark the lead `blocked: <reason>` — not done — so a later pass can retry.
 4. **Capture** to `findings/<slug>.md` as you read — claim (paraphrased; quotes under 15 words), URL, publication date, source type — and **register or update the matching entry in `claims.md`**. For statistics, capture custody: whose measurement, what year, what definition — a number without its definition is not yet a finding (see "Handling numbers" in `references/source-evaluation.md`). For volatile or controversial pages, note an archive link; pages change and vanish. Record all this at capture time — reconstructing it later reliably fails.
 5. **Chain outward** from every good source — most good sources arrive this way, not from fresh searches:
    - _Backward_: what does it cite? Follow references to the originals.
@@ -139,7 +139,7 @@ Write `report.md` per `references/report-template.md`. Every key finding maps to
 
 ## Phase 5 — Pre-flight check
 
-Run the **link pass** first — mechanically verify every cited URL resolves (`curl -sIL --max-time 10 -o /dev/null -w '%{http_code} %{url_effective}\n'` over the source list; WebFetch any that need JS) and repair or cut the dead ones: deployed research agents fabricate 3–13% of their URLs, and a deterministic liveness check plus one correction pass cuts that to under 1%. Support-checking cannot substitute — it silently passes fabricated URLs.
+Run the **link pass** first — mechanically verify every cited URL resolves (`curl -sIL --max-time 10 -o /dev/null -w '%{http_code} %{url_effective}\n'` over the source list; WebFetch any that need JS). A 403/429 on a live page is common — bot-walled hosts refuse curl while the page exists — so before cutting, retry via WebFetch, agent-browser, or the Wayback Machine; cut only when no fetch path confirms the page. Repair or cut the dead ones: deployed research agents fabricate 3–13% of their URLs, and a deterministic liveness check plus one correction pass cuts that to under 1%. Support-checking cannot substitute — it silently passes fabricated URLs.
 
 Then run the **citation pass** — the production pattern separating grounded reports from fabricated ones. For every load-bearing claim in the draft, decompose it into its atomic facts (one sentence often bundles several checkable facts, and fact-level checking is measurably more reliable than sentence-level), then confirm the fetched text actually supports each, hedges included; spot-check the rest. Its limit: this protects precision only — what you failed to find was the discovery loop's job, not this one's.
 

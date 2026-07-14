@@ -12,3 +12,11 @@ Rule → measured source. Added 2026-07-12 from a heavy-mode self-audit run (wor
 - **Broad-short-first querying** — Anthropic: untuned agents default to over-specific queries that return few results; broad-then-narrow fixed it.
 - **Viewpoint-conditioned synthesis** — Diverge (arXiv 2602.00238, ICML 2025): retrieval diversity alone does not survive into answers (models homogenize); viewpoint-conditioning restores 2.1–2.7× semantic diversity at ~0.04/5 quality cost.
 - **Corroborated as-designed** (no change needed): claims ledger with contradictions/gaps (Dossier, ACM CAIS 2026: +23pp BrowseComp-Plus vs ReAct); compression at every stage boundary and schema-forced subagent returns (universal across production systems); restorable-over-lossy compression — keep the URL, drop the page (Manus 2025-07); scripted resume protocol (Anthropic harnesses 2025-11).
+
+Added 2026-07-14 from the skill-gap-analysis pass (workspace: `~/.claude/@research/skill-gap-analysis-2026/` — wave-2 verified against primaries):
+
+- **VoI action selection** — Inference-Time Budget Control (arXiv 2605.05701): ranking Search/Decompose/Answer by marginal value per remaining budget: relative F1 +5.7–18.4% across four multi-hop benchmarks, −27.2% wall time; gains concentrate at low/mid budgets.
+- **Retriever quality over query volume** — BrowseComp-Plus (arXiv 2508.06600, ACL 2026): GPT-5 55.9→70.1% from a retriever swap, with fewer search calls; compensating for weak retrieval with more queries is measurably inferior.
+- **PDF/figure integrity is the bottleneck** — MMDR-Bench (arXiv 2601.12346): text-only pipelines systematically lose on citation-evidence and text-visual integrity; agents recall <5% of expert-core papers (arXiv 2601.12369).
+- **GraphRAG rejected for open-web runs** — GraphRAG-Bench (arXiv 2506.05690, ICLR 2026): ~368× token cost, −11.6pts on simple lookup, fixed-corpus assumption; the ledger + section-wise synthesis already approximates its multi-hop benefit.
+- **Causal memory for standing research** — AMA-Bench (arXiv 2602.22769): causality-linked memory +11.2pts over similarity recall; encoded in unattended-mode recurring-runs.

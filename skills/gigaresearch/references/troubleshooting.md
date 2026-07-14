@@ -4,8 +4,8 @@ For the session running deep-research when something feels off, breaks, or the o
 
 ## 60-second health check (run any time mid-flight)
 
-1. Does every `claims.md` entry at `reported` or above have a URL fetched *this run*? (No → quarantine protocol below.)
-2. Is the query log growing with *varied* vocabulary, or repeating the same words rearranged?
+1. Does every `claims.md` entry at `reported` or above have a URL fetched _this run_? (No → quarantine protocol below.)
+2. Is the query log growing with _varied_ vocabulary, or repeating the same words rearranged?
 3. Has the leads queue both grown and shrunk? Only grown → you're hoarding; start consuming. Never grew → chaining isn't happening.
 4. Do the load-bearing claims draw on at least 3 venue types?
 5. Has anything surprised you yet? No surprises after 10+ sources → suspect confirmation drift; run the adversarial pass early.
@@ -22,7 +22,7 @@ Diagnosis: echo chamber or citation laundering. Check upstream roots (same press
 Diagnosis: usually scope, not conflict. Fix: adjudication order — differing definitions/timeframes/populations first, then recency, then shared-root garbling, and only then a genuine dispute → mark `contested` and report both sides.
 
 **Searches return nothing useful.**
-Fix ladder: reframe (who *else* would care, and what do they call it?) → adjacent field's vocabulary → venue-native search (Scholar, EDGAR, court records, forum search) → other languages → archives. Log every dud. If still nothing, that's a Limitations finding, not a failure.
+Fix ladder: reframe (who _else_ would care, and what do they call it?) → adjacent field's vocabulary → venue-native search (Scholar, EDGAR, court records, forum search) → other languages → archives. Log every dud. If still nothing, that's a Limitations finding, not a failure.
 
 **Fetches keep failing (403, timeout, paywall).**
 Fix: Wayback Machine; author preprint or institutional copy; citing works' descriptions (flagged as secondary). Mark the lead `blocked: <reason>` — not done — so a later pass can retry.
@@ -34,7 +34,7 @@ Rule: no file, no findings. Treat the summary as leads at best. Re-dispatch narr
 Quarantine protocol: demote to `unverified` immediately. Re-verify from a fresh fetch or cut it. Audit sibling claims captured in the same stretch. If it steered earlier direction, note that in Limitations.
 
 **Session interrupted or context compacted.**
-Resume protocol: read `plan.md`, then `outline.md`, then `claims.md`, then `leads.md` — in that order. Trust file statuses over anything remembered. Continue at the first `pending` sub-question or unexplored lead. Append; never rewrite history.
+Run the resume protocol in SKILL.md §Resuming an interrupted run (canonical there — file order, trust statuses over memory, append never rewrite).
 
 **Numbers won't reconcile.**
 Numbers custody: trace each figure to its origin; state its definition, period, and population; plausibility-check the magnitude against known totals; treat verbatim repetition across outlets as one source.

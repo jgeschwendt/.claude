@@ -28,6 +28,7 @@ A session owes the system three behaviors:
 
 - Edit over create—question if new files add value
 - Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
+- Premium models never implement—in a Fable (or other premium-model) session, implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below; agents inherit the session model by default, so an unpinned agent is a rule violation. The session model decomposes, orchestrates, judges, and reviews—it never types the code.
 - Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
 - Scripts under `~/.claude` are bash (+jq)—never python
 - Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
