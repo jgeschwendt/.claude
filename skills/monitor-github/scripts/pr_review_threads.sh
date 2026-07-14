@@ -11,8 +11,10 @@
 #   pr_review_threads.sh OWNER/REPO 123
 #   ... add --all to include resolved threads (default: unresolved only)
 #
-# Output: one JSON object — PR header, review submissions, and threads with
-#         every non-minimized comment (bodies truncated at 1500 chars).
+# Output: one JSON object — PR header, review submissions, Conversation-tab
+#         comments, and threads with every non-minimized comment (bodies
+#         truncated at 1500 chars). Each thread also carries a deep-link url and
+#         the diff_hunk its first comment anchors to (truncated at 400 chars).
 # Paginates automatically, so large PRs are covered completely.
 
 set -euo pipefail
@@ -56,6 +58,9 @@ query($owner: String!, $name: String!, $number: Int!, $endCursor: String) {
       reviews(first: 30) {
         nodes { author { login } state submittedAt body }
       }
+      comments(first: 30) {
+        nodes { author { login } createdAt isMinimized body }
+      }
       reviewThreads(first: 50, after: $endCursor) {
         pageInfo { hasNextPage endCursor }
         totalCount
@@ -63,7 +68,7 @@ query($owner: String!, $name: String!, $number: Int!, $endCursor: String) {
           isResolved isOutdated path startLine line subjectType
           resolvedBy { login }
           comments(first: 30) {
-            nodes { author { login } createdAt isMinimized body }
+            nodes { author { login } createdAt isMinimized body url diffHunk }
           }
         }
       }
@@ -89,6 +94,14 @@ JQ_HEAD='
           body: ((.body // "") | if length > 600 then .[0:600] + " …[truncated]" else . end)
         }
     ],
+    conversation: [ $pr.comments.nodes[]?
+      | select(.isMinimized | not)
+      | {
+          author: (.author.login // "ghost"),
+          at: .createdAt,
+          body: ((.body // "") | if length > 1500 then .[0:1500] + " …[truncated]" else . end)
+        }
+    ],
     threads: [ .[].data.repository.pullRequest.reviewThreads.nodes[]'
 JQ_FILTER='
       | select(.isResolved | not)'
@@ -100,6 +113,9 @@ JQ_TAIL='
           line: (.line // .startLine),
           type: .subjectType,
           resolved_by: (.resolvedBy.login // null),
+          url: (.comments.nodes[0].url // null),
+          diff_hunk: ((.comments.nodes[0].diffHunk // "")
+            | if length > 400 then .[0:400] + " …[truncated]" else . end),
           comments: [ .comments.nodes[]
             | select(.isMinimized | not)
             | {
@@ -115,7 +131,8 @@ JQ_TAIL='
 if [ "$ALL" = true ]; then JQ_FILTER=''; fi
 
 # --paginate follows pageInfo/$endCursor; --slurp wraps the pages in an array.
+# ✻ piped into jq, not --jq: gh ≥2.95 rejects --slurp combined with --jq
 gh api graphql --paginate --slurp \
   -F owner="$OWNER" -F name="$REPO" -F number="$NUMBER" \
   -f query="$QUERY" \
-  --jq "${JQ_HEAD}${JQ_FILTER}${JQ_TAIL}"
+  | jq "${JQ_HEAD}${JQ_FILTER}${JQ_TAIL}"

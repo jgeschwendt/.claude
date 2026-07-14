@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # gh_dashboard.sh — collect the authenticated user's GitHub attention items.
 #
-# Gathers, in two API calls (~2s):
+# Gathers, in two API calls (~2s) — one GraphQL query + `gh api user`:
 #   1. Their open PRs: CI status, review decision, merge conflicts, and
 #      unresolved review-thread counts split by who owes the next reply
 #      (review-thread resolution state is GraphQL-only — REST and
-#      `gh pr view --json` cannot see it, which is why this uses gh api graphql)
+#      `gh pr view --json` cannot see it, which is why this uses gh api graphql).
+#      Also: merge_state (mergeStateStatus), in_merge_queue, auto_merge,
+#      base branch, latest_reviews, Conversation-tab comment activity, and a
+#      computed ready_to_merge flag.
 #   2. Open PRs where their review is requested (oldest-waiting first),
 #      including whether the user has an UNSUBMITTED pending review sitting there
-#   3. Open issues assigned to them
+#   3. Open issues assigned to them (with up to 5 label names)
+#   4. Open Issues and PRs that mention them (last 30 days, not self-authored)
 #
 # Usage:   gh_dashboard.sh [limit]     # items per section, default 20, max 50
 # Output:  one JSON object on stdout (see SKILL.md for field meanings)
@@ -38,19 +42,26 @@ fi
 # search strings work identically on github.com and Enterprise hosts.
 LOGIN="$(gh api user --jq .login)"
 
+# 30-day lower bound for the mentions search (BSD date first, GNU fallback).
+SINCE="$(date -u -v-30d +%F 2>/dev/null || date -u -d '30 days ago' +%F)"
+
 QUERY='
-query($myq: String!, $revq: String!, $issq: String!, $limit: Int!) {
+query($myq: String!, $revq: String!, $issq: String!, $menq: String!, $limit: Int!) {
   viewer { login }
   myPRs: search(query: $myq, type: ISSUE, first: $limit) {
     issueCount
     nodes {
       ... on PullRequest {
         number title url isDraft reviewDecision mergeable updatedAt
+        mergeStateStatus isInMergeQueue baseRefName
+        autoMergeRequest { enabledAt }
         repository { nameWithOwner }
         commits(last: 1) { nodes { commit { statusCheckRollup { state } } } }
         reviewRequests(first: 10) {
           nodes { requestedReviewer { ... on User { login } ... on Team { name } } }
         }
+        latestReviews(first: 10) { nodes { author { login } state } }
+        comments(last: 1) { totalCount nodes { author { login } } }
         reviewThreads(first: 50) {
           nodes {
             isResolved isOutdated
@@ -78,8 +89,17 @@ query($myq: String!, $revq: String!, $issq: String!, $limit: Int!) {
     nodes {
       ... on Issue {
         number title url updatedAt
+        labels(first: 5) { nodes { name } }
         repository { nameWithOwner }
       }
+    }
+  }
+  mentions: search(query: $menq, type: ISSUE, first: $limit) {
+    issueCount
+    nodes {
+      __typename
+      ... on Issue        { number title url updatedAt author { login } repository { nameWithOwner } }
+      ... on PullRequest  { number title url updatedAt author { login } repository { nameWithOwner } }
     }
   }
 }'
@@ -91,19 +111,33 @@ gh api graphql \
   -f myq="is:pr is:open author:$LOGIN archived:false sort:updated-desc" \
   -f revq="is:pr is:open review-requested:$LOGIN archived:false sort:updated-asc" \
   -f issq="is:issue is:open assignee:$LOGIN archived:false sort:updated-desc" \
+  -f menq="is:open mentions:$LOGIN -author:$LOGIN updated:>=$SINCE sort:updated-desc" \
   -F limit="$LIMIT" \
   --jq '.data.viewer.login as $login | {
     login: $login,
     my_prs: {
       total: .data.myPRs.issueCount,
-      items: [.data.myPRs.nodes[] | {
+      items: [.data.myPRs.nodes[]
+        | (.isDraft) as $draft
+        | (.reviewDecision // "NONE") as $review
+        | (.commits.nodes[0].commit.statusCheckRollup.state // "NO_CHECKS") as $ci
+        | {
         repo: .repository.nameWithOwner,
         number, title, url,
-        draft: .isDraft,
-        review: (.reviewDecision // "NONE"),
+        draft: $draft,
+        review: $review,
         mergeable,
-        ci: (.commits.nodes[0].commit.statusCheckRollup.state // "NO_CHECKS"),
+        ci: $ci,
+        merge_state: (.mergeStateStatus // "UNKNOWN"),
+        in_merge_queue: (.isInMergeQueue // false),
+        auto_merge: (.autoMergeRequest != null),
+        base: .baseRefName,
         pending_reviewers: [.reviewRequests.nodes[].requestedReviewer | values | (.login // .name)],
+        latest_reviews: [.latestReviews.nodes[]? | {author: (.author.login // "ghost"), state}],
+        conversation: {
+          total: (.comments.totalCount // 0),
+          last_author: (.comments.nodes[0].author.login // null)
+        },
         review_comments: (
           [.reviewThreads.nodes[]? | select(.isResolved | not)] as $u | {
             unresolved: ($u | length),
@@ -112,6 +146,8 @@ gh api graphql \
             outdated: ([$u[] | select(.isOutdated)] | length)
           }
         ),
+        ready_to_merge: (($draft | not) and $review == "APPROVED"
+          and ($ci == "SUCCESS" or $ci == "NO_CHECKS") and .mergeable == "MERGEABLE"),
         updatedAt
       }]
     },
@@ -132,7 +168,20 @@ gh api graphql \
     assigned_issues: {
       total: .data.assignedIssues.issueCount,
       items: [.data.assignedIssues.nodes[] | {
-        repo: .repository.nameWithOwner, number, title, url, updatedAt
+        repo: .repository.nameWithOwner, number, title, url,
+        labels: [.labels.nodes[]?.name],
+        updatedAt
+      }]
+    },
+    mentions: {
+      total: .data.mentions.issueCount,
+      items: [.data.mentions.nodes[]
+        | select(.__typename == "Issue" or .__typename == "PullRequest")
+        | {
+        repo: .repository.nameWithOwner, number, title, url,
+        kind: .__typename,
+        author: (.author.login // "ghost"),
+        updatedAt
       }]
     }
   }'

@@ -199,3 +199,35 @@ The chain's spine borrows from traditions with long track records rather than no
 **Finding**: LLM evaluators score their own generations higher than others' while human annotators rate them equal; out-of-the-box self-recognition is non-trivial, and fine-tuning shows a linear, causal relationship between self-recognition and self-preference strength.
 **Source**: Panickssery, Bowman & Feng, "LLM Evaluators Recognize and Favor Their Own Generations," NeurIPS 2024 (arXiv:2404.13076).
 **Design consequence**: the turn→turn inheritance rule — re-cite your past self at the rung it earned then, not the confidence it acquired by sitting in the transcript.
+
+# Round 5 findings (2026-07-14 skill-gap-analysis pass — workspace `~/.claude/@research/skill-gap-analysis-2026/`, wave-2 verified against primaries)
+
+## 31. Inverse scaling in test-time compute
+
+**Finding**: Longer reasoning monotonically worsens accuracy on four task classes across Claude/GPT/o3-mini/Qwen: distraction by misleading detail, spurious-correlation amplification, framing overfitting, and confabulation on truthfulness questions.
+**Source**: Anthropic, "Inverse Scaling in Test-Time Compute," arXiv:2507.14417 (July 2025).
+**Design consequence**: the task-class gate in Calibrating depth — planted frames / misleading detail / bare truthfulness get a short chain plus a rung-3 check, not more thoughts.
+
+## 32. Reasoning training degrades abstention
+
+**Finding**: Reasoning fine-tuning degrades abstention by ~24% on average across 20 frontier LLMs × 20 datasets (unanswerable, underspecified, false-premise, outdated), even in-domain; scale barely helps; scaffolded prompts partially recover it.
+**Source**: AbstentionBench, arXiv:2506.09038 (June 2025).
+**Design consequence**: clarify-or-abstain is an enforced checklist outcome of the premise audit, never trusted to trained instinct.
+
+## 33. Verbalized confidence is miscalibrated; consistency-weighting repairs it
+
+**Finding**: Single-sample verbalized confidence runs ~98% stated vs far lower accuracy (ECE up to 0.335); aggregating independent samples weighted by answer agreement (CoCoA-class) reaches ECE 0.06–0.08.
+**Source**: "Systematic Evaluation of Uncertainty Estimation Methods," arXiv:2510.20460 (Oct 2025).
+**Design consequence**: the Conclude rule — a lone self-reported percentage never gates anything; consequential odds come from agreement across the gate's independent derivations.
+
+## 34. Conversational debate fails; independent convergence stands (two lineages)
+
+**Finding**: Multi-agent debate does not reliably beat single-agent self-consistency (conformity + error propagation); independently, expert teams average below their best member by up to 37.6% via integrative compromise. Anonymization reduces conformity bias (IBC 0.608→0.024) without measured accuracy gain.
+**Sources**: arXiv:2511.07784; Smit et al. arXiv:2311.17371 (ICML 2024); ICLR 2025 5-framework×9-benchmark evaluation; arXiv:2602.01011 (ICML 2026); arXiv:2510.07517.
+**Design consequence**: hardened wording of the gate's no-debate rule — the two lineages share no citations, so this is genuine convergence, not an echo.
+
+## 35. Evaluated, not encoded: monitor-before-generate rubric
+
+**Finding**: Difficulty-estimation before solving + a 4-axis verify rubric (coherence/plausibility/consistency/goal-conduciveness) beat generate-then-critique (75.4% vs 68.4% Self-Refine on GSM8K, Llama-3.1-8B).
+**Source**: arXiv:2510.16374 (Oct 2025).
+**Design consequence**: none yet — single small-model benchmark, and the challenge gate's named checks already subsume the rubric; revisit if replicated on frontier models.

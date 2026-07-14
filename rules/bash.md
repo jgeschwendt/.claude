@@ -7,7 +7,7 @@ paths:
 
 ## Compatibility
 
-- Target macOS `/bin/bash` 3.2: never put `case` inside `$( )` command substitution—the 3.2 parser fails on the pattern's `)`. Hoist the block into a function and call it inside the substitution. (since 2026-07-12 · github-monitor/scripts/monitor.sh)
+- Target macOS `/bin/bash` 3.2: never put `case` inside `$( )` command substitution—the 3.2 parser fails on the pattern's `)`. Hoist the block into a function and call it inside the substitution. (since 2026-07-12 · monitor-github/scripts/monitor.sh)
 
 ## Comments
 

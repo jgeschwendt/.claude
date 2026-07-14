@@ -2,7 +2,7 @@
 
 Dispatch waves through Claude Code's Workflow tool: schema-forced returns (no parsing subagent prose), journal-backed resume, automatic concurrency. **This skill's instruction here is the required Workflow opt-in.** If Workflow is unavailable, fall back to plain parallel subagents with the same briefs.
 
-Division of labor is unchanged: workflows run the _legwork_; the main session stays the editor — it curates `leads.md`, keeps `claims.md`, and decides each next wave. One wave per invocation, deliberately: lead triage between waves is a judgment call, not a script.
+Division of labor is unchanged: workflows run the _legwork_; the main session stays the editor — it curates `leads.md`, keeps `claims.md`, and decides each next wave. One wave per invocation, deliberately: lead triage between waves is a judgment call, not a script. Every `agent()` pins `model: "opus"` — discovery and verification are legwork, and an unpinned agent inherits the premium session model (CLAUDE.md: premium models never implement).
 
 ## Script 1 — discovery wave
 
@@ -10,7 +10,7 @@ Pass `args` as real JSON: `{ws, context, targets: [{slug, brief}]}` — `brief` 
 
 ```js
 export const meta = {
-  name: "research-wave",
+  name: "gigaresearch-wave",
   description: "One discovery wave: an agent per target, structured findings + leads back",
   phases: [{ title: "Discover" }],
 };
@@ -43,7 +43,7 @@ const results = await parallel(
 Context: ${A.context}
 Load WebSearch and WebFetch via ToolSearch before starting.
 Write findings to ${A.ws}/findings/${t.slug}.md — create it even if thin, and say why it is thin.`,
-        { label: t.slug, schema: FINDINGS },
+        { label: t.slug, model: "opus", schema: FINDINGS },
       ),
   ),
 );
@@ -58,7 +58,7 @@ Draft 2–3 open-form questions per load-bearing claim, then pass `{claims: [{id
 
 ```js
 export const meta = {
-  name: "research-verify",
+  name: "gigaresearch-verify",
   description: "Blind factored verification of load-bearing claims",
   phases: [{ title: "Verify" }],
 };
@@ -81,7 +81,7 @@ const out = await parallel(
           `Answer from fresh web evidence only — load WebSearch and WebFetch via ToolSearch first. Do not speculate; if the answer is unfindable, say so and return confidence: low.
 
 ${q}`,
-          { label: `${c.id}.q${i + 1}`, schema: ANSWER },
+          { label: `${c.id}.q${i + 1}`, model: "opus", schema: ANSWER },
         ).then((a) => ({ claim: c.id, question: q, ...a })),
     ),
   ),
@@ -92,6 +92,7 @@ return out.filter(Boolean);
 ## Mechanics
 
 - Scripts are plain JS; `Date.now()`/`Math.random()` throw (resume safety) — stamp times in the main session.
+- This file shows the minimal API. The live tool also provides `pipeline(items, ...stages)`, `opts.phase`, `opts.model`, and `opts.effort` (verified 2026-07-14) — waves here stay `parallel` deliberately, per the one-wave-per-invocation rule above.
 - `args` may arrive as a JSON-encoded string rather than an object (observed 2026-07-12) — both scripts open with a defensive parse; keep it in any new script.
 - Agents queue automatically past the concurrency cap; 10+ targets in one wave is fine.
 - Interrupted run: relaunch with `{scriptPath, resumeFromRunId}` — completed agents return cached instantly. Before diagnosing an odd result, Read the run's `journal.jsonl` for the agents' actual returns.
