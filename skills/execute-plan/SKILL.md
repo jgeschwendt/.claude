@@ -45,7 +45,8 @@ Therefore `model:` is mandatory on EVERY `agent()` call this skill makes; no
 stage relies on inheritance. `effort: 'low'` additionally on mechanical stages
 (renames, mass edits, boilerplate) — the measured shape is a sandwich: deep
 at decompose and review, lower through the mechanical middle; uniform maximum
-loses under wall-clock limits (2026-07-14 · @research/skill-gap-analysis-2026).
+loses under wall-clock limits (2026-07-14 · LangChain harness-engineering,
+Terminal-Bench 2.0).
 The session model spends tokens only on resolving, decomposing, orchestrating,
 reviewing, and reporting — never on implementation.
 
@@ -74,8 +75,9 @@ none). If the plan names a different repo than the cwd, stop and say so.
   inherit nothing from this session — each brief must stand alone, and
   without the owned-by-others fence two agents on one tree collide in the
   shared import/index files.
-- Every brief carries the executor contract (2026-07-14 ·
-  @research/skill-gap-analysis-2026): DONE requires EXECUTED verification —
+- Every brief carries the executor contract (2026-07-14 · MAST, arXiv
+  2503.13657 + LangChain harness-engineering): DONE requires EXECUTED
+  verification —
   run the probe, return its output in `verification`; self-reading your own
   code is not verification (forced pre-completion verification moved a
   production harness +13.7pp, model fixed, and unverified self-approval plus
@@ -176,7 +178,7 @@ return results;
 report and a `pass: true` verdict. Steps that come back `died` or
 `pass: false` get re-dispatched once with the verifier's evidence appended to
 the brief; a second failure is reported as unimplemented — never counted as
-done. A `clarify` return gets its question answered from the plan (or the
+done, and a reproducible failure nobody can explain is /gigadebug material. A `clarify` return gets its question answered from the plan (or the
 user) and the unit re-dispatched. Repair locally: hold passed units' results
 and re-dispatch only the failed node and its dependents — never re-derive the
 whole decomposition for one failure. For a genuinely high-uncertainty node,
