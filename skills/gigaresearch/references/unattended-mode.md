@@ -44,7 +44,7 @@ Someone triaging ten scheduled reports reads only this block unless it demands a
 ## Recurring runs — the schedule's real payoff
 
 - The workspace (`$WS` under `~/.claude/@research/`) persists between runs by design — reload the previous run's `claims.md` and `report.md` at start.
-- Link ledger claims causally (`supersedes:` / `depends-on:`), not only by topic — similarity recall over past findings measurably underperforms causal structure for standing questions (+11pts AMA-Bench; 2026-07-14 · @research/skill-gap-analysis-2026).
+- Link ledger claims causally (`supersedes:` / `depends-on:`), not only by topic — similarity recall over past findings measurably underperforms causal structure for standing questions (+11pts AMA-Bench, arXiv 2602.22769; 2026-07-14 · `references/evidence.md`).
 - **Lead with the delta**: new findings, claims that changed status, contradictions of the prior report. A status downgrade on a load-bearing claim (`established` → `contested`) is the highest-value alert a recurring routine can produce.
 - Don't re-verify stable `established` claims every run; do re-verify volatile facts whose "as of" date has aged past what their volatility warrants.
 - Date-scope discovery to "since the last run" first; then spot-check that the stable claims still hold.

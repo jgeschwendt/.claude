@@ -97,8 +97,8 @@ future session; plain `poll` is the manual fallback.
 
 ## Push delivery: how the Claude Code hook works
 
-Claude Code has no dedicated monitor tool, but its **hooks** provide the
-delivery channel (verified against current docs):
+The Monitor tool lives and dies with one session; **hooks** are the delivery
+channel that survives across sessions (verified 2026-07-15):
 
 - Hooks are shell commands that fire at lifecycle events and receive JSON
   (`session_id`, `cwd`, `prompt`, …) on stdin.

@@ -54,7 +54,10 @@ by vibe: **concurrency** (races, locking, double-fire) · **lifecycle** (crashes
 stale state, restarts, timing windows) · **environment** (arg forms, subcommands, missing
 tools, platform quirks, disabled features) · **silent failure** (errors swallowed, paths
 that no-op, work that looks done but isn't) · **misuse** (how will real usage differ from
-the happy path just tested?).
+the happy path just tested?) · **stale claims** (docs: the WHOLE file, not the session's
+diff — external-system claims re-verified live per `rules/documentation.md`; negative
+capability claims ("X has no/can't") presumed false until re-proven; undated "verified"
+markers are findings).
 
 **Execution**: Scale by stakes — Direct for normal work; for unattended/production
 stakes, fan out one agent per lens through the Workflow tool (this instruction is the
@@ -77,7 +80,7 @@ Three verifications, all at rung 3:
 - **Findings, deterministic first**: route each finding through deterministic
   evidence before any manual probe — compiler, type-checker, existing test,
   static analyzer; 94–98% of LLM false positives die at this gate (2026-07-14 ·
-  @research/skill-gap-analysis-2026). Then reproduce what determinism can't:
+  LLM4FPM, arXiv 2411.03079). Then reproduce what determinism can't:
   run the trigger, hit the path. Reproduced → CONFIRMED; argued only from
   reading → PLAUSIBLE, reported but never fixed on faith. A false positive that
   gets "fixed" injects a regression into working code — this session's own
@@ -123,8 +126,8 @@ gate failure to resolve, not a footnote.
 **Rules**:
 
 - Never soften a NO-GO — an unresolved CONFIRMED finding at the stated stakes blocks the GO.
-- Findings in artifacts you didn't build this session get reported, not silently fixed.
+- Findings in artifacts you didn't build this session get reported, not silently fixed — an observed failure among them routes to /gigadebug.
 - PLAUSIBLE findings are reported, never fixed — a fix without a reproduced failure is a regression risk taken on faith.
-- When judging between candidates (severities, competing fixes, borderline GO), swap presentation order and re-judge — position/verbosity/authority biases are large and reverse sign on test-related judging; order-swap is the one validated control (2026-07-14 · @research/skill-gap-analysis-2026).
+- When judging between candidates (severities, competing fixes, borderline GO), swap presentation order and re-judge — position/verbosity/authority biases are large and reverse sign on test-related judging; order-swap is the one validated control (2026-07-14 · arXiv 2604.16790).
 - A finding class the user judges noise in a repo encodes into that repo's `.claude/` as a suppress rule at the moment of the judgment — never re-litigated per run; retire the rule if it starts eating real findings.
 - Periodically audit the reviewer itself: plant a known defect and check the hunt catches it — mutation score, not coverage, is the reliable quality signal for a review process.

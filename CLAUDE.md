@@ -33,6 +33,7 @@ A session owes the system three behaviors:
 - Scripts under `~/.claude` are bash (+jq)—never python
 - Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
 - Stale docs are bugs—an artifact that contradicts the live system gets corrected (or explicitly flagged) in the turn you notice it, never silently routed around.
+- Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path: `@memory`/`@research` are gitignored and exist only on the machine that wrote them.
 - Use Unicode symbols (typographic), never emojis (decorative).
 - Verify empirically—for library/API details read the live source or docs (training data is a stale snapshot); for behavior claims run the probe or the failing case. Confident recall is not verification; neither is plausible inference.
 

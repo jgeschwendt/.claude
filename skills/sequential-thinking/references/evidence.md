@@ -200,7 +200,7 @@ The chain's spine borrows from traditions with long track records rather than no
 **Source**: Panickssery, Bowman & Feng, "LLM Evaluators Recognize and Favor Their Own Generations," NeurIPS 2024 (arXiv:2404.13076).
 **Design consequence**: the turn→turn inheritance rule — re-cite your past self at the rung it earned then, not the confidence it acquired by sitting in the transcript.
 
-# Round 5 findings (2026-07-14 skill-gap-analysis pass — workspace `~/.claude/@research/skill-gap-analysis-2026/`, wave-2 verified against primaries)
+# Round 5 findings (2026-07-14 skill-gap-analysis pass — wave-2 verified against primaries; sources per entry. Fuller audit trail in the personal machine's `@research/skill-gap-analysis-2026` workspace only)
 
 ## 31. Inverse scaling in test-time compute
 
