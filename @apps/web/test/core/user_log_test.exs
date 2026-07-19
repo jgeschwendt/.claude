@@ -1,5 +1,7 @@
 defmodule Core.UserLogTest do
-  use ExUnit.Case, async: true
+  # async: false — the list_days/1 test overrides the :web/:diary_root application env
+  # (a global), so it cannot run concurrently with other cases touching the same env.
+  use ExUnit.Case, async: false
 
   alias Core.UserLog
 
@@ -17,6 +19,36 @@ defmodule Core.UserLogTest do
     test "a path-traversal key returns the empty day shape" do
       assert %{archived: [], conversations: [], dream: "", notes: "", weekday: ""} =
                UserLog.get_day("../../etc/passwd")
+    end
+  end
+
+  describe "list_days/1" do
+    test "unions dream pages and session days newest-first, flagging dreamt? and preview" do
+      root = Path.join(System.tmp_dir!(), "user_log_days_#{System.unique_integer([:positive])}")
+      File.mkdir_p!(root)
+      Application.put_env(:web, :diary_root, root)
+      on_exit(fn -> Application.delete_env(:web, :diary_root) end)
+      on_exit(fn -> File.rm_rf!(root) end)
+
+      File.write!(Path.join(root, "2026-07-18.dream.md"), """
+      ---
+      date: 2026-07-18
+      type: dream
+      ---
+      # heading
+      The prose line.
+      """)
+
+      days = UserLog.list_days([%{updated_at: "2026-07-17T12:00:00Z"}])
+
+      assert Enum.map(days, & &1.date) == ["2026-07-18", "2026-07-17"]
+
+      dream_day = Enum.find(days, &(&1.date == "2026-07-18"))
+      assert dream_day.dreamt? == true
+      assert dream_day.preview == "The prose line."
+
+      session_day = Enum.find(days, &(&1.date == "2026-07-17"))
+      assert session_day.dreamt? == false
     end
   end
 end

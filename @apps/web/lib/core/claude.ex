@@ -1,6 +1,6 @@
 defmodule Core.Claude do
   @moduledoc """
-  Shared runner for unattended `claude` CLI calls (memory pipeline, diary dream).
+  Shared runner for the unattended server-side `claude` CLI calls of the memory pipeline (extraction, judging, merge, consolidation).
 
   Every run is `-p --output-format json --no-session-persistence` so pipeline runs
   never leave transcripts for the pipeline to later dissolve. `CLAUDE_MEMORY_PIPELINE=1`
@@ -26,8 +26,7 @@ defmodule Core.Claude do
     * `:schema` — JSON-schema map; the reply is validated by the CLI and returned
       decoded (the `structured_output`).
     * `:model` — model alias/id, default `#{inspect(@default_model)}`.
-    * `:permission_mode` — set e.g. `"auto"` for runs that need tools (the dream);
-      omitted otherwise.
+    * `:permission_mode` — pass e.g. `"auto"` for runs that need tools; omitted otherwise.
 
   Returns `{:ok, %{output: output, cost: usd}}` where `output` is the decoded
   structured output (when `:schema` given) or the result text, else

@@ -328,12 +328,23 @@ defmodule Web.MemoriesLive do
   @impl true
   def render(assigns) do
     active = active_bank(assigns)
+    by_kind = Enum.group_by(assigns.banks, & &1.kind)
+
+    bank_groups =
+      for {kind, label} <- [
+            managed: "Managed · dissolved",
+            auto: "Auto · Claude Code (read-only)"
+          ],
+          group = Map.get(by_kind, kind, []),
+          group != [],
+          do: {label, group}
 
     assigns =
       assign(assigns,
         active: active,
         active_staged: (active && staged(active)) || [],
-        active_committed: (active && committed(active)) || []
+        active_committed: (active && committed(active)) || [],
+        bank_groups: bank_groups
       )
 
     ~H"""
@@ -373,27 +384,20 @@ defmodule Web.MemoriesLive do
               </div>
             </div>
           </div>
-          <div :for={kind <- [:managed, :auto]}>
-            <% group = Enum.filter(@banks, &(&1.kind == kind)) %>
-            <div :if={group != []}>
-              <div class="group-label">
-                {if kind == :managed,
-                  do: "Managed · dissolved",
-                  else: "Auto · Claude Code (read-only)"}
-              </div>
-              <div
-                :for={b <- group}
-                class={["item", @active && @active.id == b.id && "active"]}
-                phx-click="select_bank"
-                phx-value-id={b.id}
-                title={b.label}
-              >
-                <div class="title">{b.label}</div>
-                <div class="meta">
-                  <span>{length(committed(b))} memories</span>
-                  <% pend = length(staged(b)) %>
-                  <span :if={pend > 0} class="staged-count">{pend} pending</span>
-                </div>
+          <div :for={{label, group} <- @bank_groups}>
+            <div class="group-label">{label}</div>
+            <div
+              :for={b <- group}
+              class={["item", @active && @active.id == b.id && "active"]}
+              phx-click="select_bank"
+              phx-value-id={b.id}
+              title={b.label}
+            >
+              <div class="title">{b.label}</div>
+              <div class="meta">
+                <span>{length(committed(b))} memories</span>
+                <% pend = length(staged(b)) %>
+                <span :if={pend > 0} class="staged-count">{pend} pending</span>
               </div>
             </div>
           </div>

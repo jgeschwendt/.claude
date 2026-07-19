@@ -301,6 +301,7 @@ defmodule Core.Memory do
     |> Enum.filter(&(&1.memories != [] or &1.index != ""))
   end
 
+  @doc "Every bank for the dashboard — managed banks first, then read-only `auto:` banks. NOT pure: seeds the sandman corpus into the store on first read. Merges each bank's staged candidates in (so not-yet-committed dissolves still surface), relabels managed banks to their real cwd, and drops banks with neither memories nor an index."
   def list_banks do
     seed_from_sandman()
 
@@ -391,7 +392,7 @@ defmodule Core.Memory do
     Core.Store.write!(staging_path(), Jason.encode!(data, pretty: true))
   end
 
-  # ── dream (curation guidance applied while the sweep sleeps) ──
+  # ── dream (curation guidance fed into every extraction) ──
   def get_dream do
     case File.read(dream_path()) do
       {:ok, txt} -> (String.trim(txt) == "" && @default_dream) || String.trim(txt)
@@ -498,6 +499,7 @@ defmodule Core.Memory do
     read_staging() |> Enum.reject(&(&1.bank == bank and &1.name == name)) |> write_staging()
   end
 
+  @doc "Archive (never destroy) a committed memory of a managed bank: moves the file to `_archive/` (recoverable via `restore_memory/2`) and regens the index. Returns `{:error, :not_writable}` for an auto/unsafe bank. Both the consolidation archive op and the dashboard delete button route here."
   def delete_memory(bank, file) do
     if writable?(bank) and Core.Store.component?(file) do
       archive_file(Path.join(memory_root(), bank), file)
@@ -745,43 +747,40 @@ defmodule Core.Memory do
   the sources recoverable. Returns `{:ok, merged}` or `{:error, reason}`.
   """
   def merge_memories(bank, files) do
-    sources =
-      if writable?(bank) do
-        files
-        |> Enum.filter(&Core.Store.component?/1)
-        |> Enum.map(fn file ->
-          case File.read(Path.join([memory_root(), bank, file])) do
-            {:ok, raw} -> parse_memory(raw, file, bank)
-            _ -> nil
-          end
-        end)
-        |> Enum.reject(&is_nil/1)
-      else
-        []
-      end
-
     cond do
       not writable?(bank) ->
         {:error, :not_writable}
 
-      length(sources) < 2 ->
-        {:error, :need_two}
-
       true ->
-        prompt = """
-        Merge these overlapping memories into ONE consolidated memory. Preserve every [[wikilink]] and keep the most specific detail. #{@shape}
+        sources =
+          files
+          |> Enum.filter(&Core.Store.component?/1)
+          |> Enum.map(fn file ->
+            case File.read(Path.join([memory_root(), bank, file])) do
+              {:ok, raw} -> parse_memory(raw, file, bank)
+              _ -> nil
+            end
+          end)
+          |> Enum.reject(&is_nil/1)
 
-        MEMORIES:
-        #{Enum.map_join(sources, "\n---\n", &serialize_memory/1)}
-        """
-
-        with {:ok, %{output: raw}} <- Core.Claude.run(prompt, schema: @memory_item_schema),
-             merged when merged != nil <- sanitize_memory(raw, bank, nil, files),
-             :ok <- commit_memory(merged) do
-          {:ok, merged}
+        if length(sources) < 2 do
+          {:error, :need_two}
         else
-          nil -> {:error, :bad_output}
-          {:error, reason} -> {:error, reason}
+          prompt = """
+          Merge these overlapping memories into ONE consolidated memory. Preserve every [[wikilink]] and keep the most specific detail. #{@shape}
+
+          MEMORIES:
+          #{Enum.map_join(sources, "\n---\n", &serialize_memory/1)}
+          """
+
+          with {:ok, %{output: raw}} <- Core.Claude.run(prompt, schema: @memory_item_schema),
+               merged when merged != nil <- sanitize_memory(raw, bank, nil, files),
+               :ok <- commit_memory(merged) do
+            {:ok, merged}
+          else
+            nil -> {:error, :bad_output}
+            {:error, reason} -> {:error, reason}
+          end
         end
     end
   end

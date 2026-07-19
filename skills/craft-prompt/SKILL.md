@@ -59,7 +59,7 @@ Short pastes tempt the Draft branch, which would invent a new prompt; anything t
 - **Interview** — one AskUserQuestion call; user picks a type (options, max 4: _Tool_ · _Skill/workflow_ · _Sub-agent persona_ · _Classifier/judge_; the built-in _Other_ covers system-prompt sections and hybrids); next turn routes to Draft (or Refine, if they then paste a draft).
 - **Hybrid** — same as Refine, with the description as governing intent when draft and description conflict.
 
-**Ship gate (any branch that reaches _Save_ or _Apply fixes_):** sweep §Stress-testing first. Tests 1, 3, 5, 9 are desk-checkable against the text — run them and fix what fails. Tests 2, 4, 6, 7, 8 need a live session — name them as untested in a rationale bullet rather than claiming them; _"known untested for adversarial input"_ beats silent uncertainty. Any failure observed live becomes a named regression case beside the prompt (→ references/evals.md).
+**Ship gate (any branch that reaches _Save_ or _Apply fixes_):** sweep §Stress-testing first — run its desk-checkable tests (1, 3, 5, 9) and fix what fails; name the live-only tests (2, 4, 6, 7, 8) as untested in a rationale bullet rather than claiming them. Any failure observed live becomes a named regression case beside the prompt (→ references/evals.md).
 
 Do NOT restate the user's request. Do NOT open with "Great question", "Let me help you", or any acknowledgment. Go straight to the artifact (Interview: straight to the type question) — preamble spends the turn on what the user already knows.
 
@@ -143,7 +143,7 @@ description: one-line description
 when_to_use: "Use when... Examples: 'trigger phrase', 'another phrase'"
 allowed-tools: [Bash(gh:*), Read, Write, AskUserQuestion]
 argument-hint: "[hint showing argument placeholders]"
-arguments: [foo, bar] # omit if no args; use $foo in body
+arguments: [foo, bar] # @internal alias of argument-hint, the documented form (CLI 2.1.215); use $foo in body
 context: fork # omit for inline; use for self-contained workflows
 ---
 ```
@@ -331,11 +331,10 @@ Tests 1, 3, 5, 9 are desk-checkable by reading the prompt; 2, 4, 6, 7, 8 require
 
 ## Rules
 
-- Present the full draft in a fenced code block before writing to disk. Let the user review with syntax highlighting and approve.
+- Present the full draft in a fenced code block before writing to disk — let the user review with syntax highlighting and give explicit approval; no file is written without it.
 - Save personal skills to `~/.claude/skills/<name>/SKILL.md`; project-scoped skills to `.claude/skills/<name>/SKILL.md`. Ask via AskUserQuestion if unclear.
 - Use `AskUserQuestion` for every choice the user makes — never in plain prose, where options aren't clickable and get lost in scroll. Recommended option first with `(Recommended)`; the built-in _Other_ is always present — never hand-build one.
 - When the argument names an existing skill or file instead of pasting it, locate it with Glob and Read it before refining.
-- Do NOT write files without explicit approval of the draft.
 - For very short prompts (< 20 lines), most of §Refinement checklist won't apply. Skip what doesn't match. Do not pad.
 - Preserve the user's voice when it's clearer than the house style. The house style is a default, not a filter. An explicit style instruction from the user outranks it: apply the structural and correctness groups, skip §Voice, and say so.
 - When refining, show a unified diff or a clear before/after. Do not silently rewrite — the user should see what changed and why.

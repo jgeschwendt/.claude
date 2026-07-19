@@ -92,7 +92,8 @@ defmodule Web.RoutinesLive do
   # ── render ────────────────────────────────────────────────
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, active: selected_routine(assigns))
+    active = selected_routine(assigns)
+    assigns = assign(assigns, active: active, log: active && Routines.log_tail(active["slug"]))
 
     ~H"""
     <div class="app">
@@ -168,7 +169,7 @@ defmodule Web.RoutinesLive do
                   <span class="name">{@active["slug"]}.log</span>
                   <span class="summary">{Routines.log_path(@active["slug"])}</span>
                 </summary>
-                <pre>{log_or_empty(@active["log"])}</pre>
+                <pre>{log_or_empty(@log)}</pre>
               </details>
             </div>
           </div>

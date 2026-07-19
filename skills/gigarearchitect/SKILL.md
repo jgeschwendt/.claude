@@ -44,10 +44,12 @@ line moved.
 
 ## Reference library
 
-Domain knowledge lives in `references/` — the steps below cite it, and every
-hunt or plan brief names the catalog entries it works from (a lens or stage
-that can't name its entry is improvising). Load with Read at the step that
-needs it, not up front.
+Domain knowledge lives in `${CLAUDE_SKILL_DIR}/references/` — the steps below
+cite it, and every hunt or plan brief names the catalog entries it works from
+(a lens or stage that can't name its entry is improvising). Load with Read at
+the step that needs it, not up front; a brief handed to a fan-out agent
+carries the `${CLAUDE_SKILL_DIR}`-resolved absolute path — agents run from the
+project cwd, where a bare `references/…` does not resolve.
 
 | File                    | Load when                                           | Holds                                                                            |
 | ----------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -124,8 +126,8 @@ it. `map.md` holds inventory, graph, gap statement.
 
 ### 3. Reimagine — the center
 
-Session-model work, never delegated — this is the premium judgment the skill
-exists for.
+Session-model work, never delegated — this is the whole-system synthesis the
+skill exists for.
 
 - Generate 3 candidate architectures from genuinely different organizing
   principles drawn from `references/styles.md` — pick styles whose

@@ -149,7 +149,7 @@ flowchart TD
     COL -->|no| WR
     SUF --> WR["Store.write! (atomic temp+rename)"]
     WR --> PR["prune same bank+name from .staging.json"]
-    PR --> IX["regen MEMORY.md — sorted, ≤180 entries,<br/>overflow line: '…N more — consolidate this bank'"]
+    PR --> IX["regen MEMORY.md — sorted, ≤180 entries,<br/>overflow line: '…N more memories not indexed — consolidate this bank'"]
 ```
 
 ## The write paths

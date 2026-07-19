@@ -5,7 +5,7 @@ description: A corpus of information-architecture structures — organization sc
 
 # Information Architecture
 
-A reference to pick from — not a methodology to follow. The full corpus lives in `references/playbook.md` (~600 lines, 18 sections). Do not read it whole: route with the axes and decision guide below, then read only the sections that match — locate a section with `rg -n '^## §4' references/playbook.md` and Read from that line offset.
+A reference to pick from — not a methodology to follow. The full corpus lives in `references/playbook.md` (~600 lines, 18 sections). Do not read it whole: route with the axes and decision guide below, then read only the sections that match — locate a section with `rg -n '^## §4' ${CLAUDE_SKILL_DIR}/references/playbook.md` and Read from that line offset.
 
 ## The decision axes
 

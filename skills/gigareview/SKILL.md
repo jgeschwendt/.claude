@@ -59,10 +59,12 @@ diff — external-system claims re-verified live per `rules/documentation.md`; n
 capability claims ("X has no/can't") presumed false until re-proven; undated "verified"
 markers are findings).
 
-**Execution**: Scale by stakes — Direct for normal work; for unattended/production
-stakes, fan out one agent per lens through the Workflow tool (this instruction is the
-Workflow opt-in). Every fan-out agent pins `model: 'opus'` — the hunt is legwork, and
-an unpinned agent burns premium tokens (CLAUDE.md model split). Schema-force the
+**Execution**: Scale by the step-1 bar — Direct at an interactive/low-stakes bar; at
+an unattended/production bar (the default when no stakes were stated), fan out one
+agent per lens through the Workflow tool (this instruction is the Workflow opt-in).
+Every fan-out agent pins `model: 'opus'` — the hunt is legwork, and an unpinned agent
+inherits whatever model drives the session instead of the split's tier (CLAUDE.md
+model split). Schema-force the
 returns (`{findings: [{artifact, failure_scenario, lens, summary}]}`) and give each
 brief its scope triad: artifacts it owns, artifacts sibling lenses own, shared
 context. Their findings arrive as claims carrying their own assumptions, not as

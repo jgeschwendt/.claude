@@ -90,22 +90,16 @@ Use this format:
 
 ```markdown
 ---
-name: { { skill-name } }
-description: { { one-line description } }
-allowed-tools: { { list of tool permission patterns observed during session } }
-when_to_use:
-  {
-    {
-      detailed description of when Claude should automatically invoke this skill,
-      including trigger phrases and example user messages,
-    },
-  }
-argument-hint: "{{hint showing argument placeholders}}"
-arguments: { { list of argument names } }
-context: { { inline or fork -- omit for inline } }
+name: <skill-name>
+description: <one-line description>
+when_to_use: <when Claude should auto-invoke this skill — start with "Use when...", include trigger phrases and example user messages>
+allowed-tools: <minimal tool permission patterns observed during session>
+argument-hint: "<hint showing argument placeholders>"
+arguments: <argument names — @internal alias of argument-hint, the documented form; omit unless needed>
+context: <inline or fork — omit for inline>
 ---
 
-# {{Skill Title}}
+# <Skill Title>
 
 Description of skill
 
@@ -152,6 +146,8 @@ IMPORTANT: see the next section below for the per-step annotations you can optio
 - `arguments` and `argument-hint`: Only include if the skill takes parameters. Use `$name` in the body for substitution.
 
 ### Step 4: Confirm and Save
+
+Before presenting, run craft-prompt's §Refinement checklist over the draft (~/.claude/skills/craft-prompt/SKILL.md) — skillify captures the process; craft-prompt owns the prose standard.
 
 Before writing the file, output the complete SKILL.md content as a yaml code block in your response so the user can review it with proper syntax highlighting. Then ask for confirmation using AskUserQuestion with a simple question like "Does this SKILL.md look good to save?" — do NOT use the body field, keep the question concise.
 
