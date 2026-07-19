@@ -35,7 +35,7 @@ finalize (re-archive the final flush, remove the live `.jsonl` + handoff + marke
 one of two paths:
 
 - A detached `nohup` watcher always finalizes after the CLI dies (idempotent via lock).
-- **Wrapped sessions** (`shell/claude.zsh` sourced in `.zshrc` sets `CLAUDE_WRAPPER_STATE`)
+- **Wrapped sessions** (`skills/delete/claude.zsh` sourced in `.zshrc` sets `CLAUDE_WRAPPER_STATE`)
   additionally **respawn a fresh claude in the same terminal as an ephemeral fork** —
   pre-marked archive-on-exit, so however it ends (even plain `/exit`) its transcript
   dissolves to the @log archive. To keep a fork after all:

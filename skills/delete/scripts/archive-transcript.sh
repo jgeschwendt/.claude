@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # archive-transcript.sh — compact-delete a session's transcript(s): gzip-archive to the
 # @log archive (~/.claude/@log/archive/<date>/), then remove the live .jsonl so the session is
-# un-resumable. Marker-driven and idempotent — the zsh wrapper (shell/claude.zsh) and the
+# un-resumable. Marker-driven and idempotent — the zsh wrapper (skills/delete/claude.zsh) and the
 # detached watcher fallback can both fire; the mkdir lock makes double-fire harmless.
 #
 # Modes:

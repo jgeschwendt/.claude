@@ -11,7 +11,7 @@
 #
 # Flow: archive NOW (gzip copy secured while the CLI is alive) → write the
 # archive-on-exit marker → post-exit finalize re-archives the final flush and removes
-# the live .jsonl. Wrapped sessions (shell/claude.zsh exports CLAUDE_WRAPPER_STATE):
+# the live .jsonl. Wrapped sessions (skills/delete/claude.zsh exports CLAUDE_WRAPPER_STATE):
 # the wrapper finalizes deterministically after exit and respawns an ephemeral fork in
 # the same terminal. Unwrapped: a detached watcher finalizes; no respawn is possible.
 # Finally we signal the CLI to exit (Ctrl-C twice, escalating to SIGTERM).
