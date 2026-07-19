@@ -35,6 +35,52 @@ defmodule Core.MemoryTest do
     )
   end
 
+  defp msg(role, text, opts \\ []) do
+    %{
+      blocks: [%{kind: "text", text: text}],
+      is_meta: Keyword.get(opts, :is_meta, false),
+      is_sidechain: Keyword.get(opts, :is_sidechain, false),
+      role: role
+    }
+  end
+
+  describe "flatten/1" do
+    test "drops sidechain messages, keeps normal ones" do
+      session = %{
+        messages: [
+          msg("user", "NORMAL_TEXT"),
+          msg("assistant", "SIDECHAIN_SECRET", is_sidechain: true)
+        ]
+      }
+
+      out = Memory.flatten(session)
+      assert out =~ "NORMAL_TEXT"
+      refute out =~ "SIDECHAIN_SECRET"
+    end
+
+    test "over-60k text keeps head and tail with a middle-truncation marker" do
+      session = %{
+        messages: [
+          msg("user", "FIRSTUNIQUE" <> String.duplicate("a", 40_000)),
+          msg("user", String.duplicate("b", 40_000) <> "LASTUNIQUE")
+        ]
+      }
+
+      out = Memory.flatten(session)
+      assert out =~ "FIRSTUNIQUE"
+      assert out =~ "LASTUNIQUE"
+      assert out =~ "[middle truncated]"
+      assert String.length(out) <= 60_100
+    end
+
+    test "a conversation at or under 60k is untouched" do
+      session = %{messages: [msg("user", "just a short line")]}
+      out = Memory.flatten(session)
+      refute out =~ "[middle truncated]"
+      assert out == "### user\njust a short line"
+    end
+  end
+
   test "commit stamps created/updated and round-trips them", %{root: root} do
     :ok = commit(%{})
 
@@ -86,6 +132,20 @@ defmodule Core.MemoryTest do
 
     assert Memory.bank_memories(@bank) == []
     assert [_] = File.ls!(Path.join([root, @bank, "_archive"]))
+  end
+
+  test "recall frontmatter key round-trips through commit and parse", %{root: root} do
+    :ok = commit(%{name: "Pinned fact", recall: "pin"})
+
+    [pinned] = Memory.bank_memories(@bank)
+    assert pinned.recall == "pin"
+    assert File.read!(Path.join([root, @bank, "reference_pinned_fact.md"])) =~ "recall: pin"
+
+    :ok = commit(%{name: "Plain fact"})
+
+    [plain] = @bank |> Memory.bank_memories() |> Enum.filter(&(&1.name == "Plain fact"))
+    assert plain.recall == nil
+    refute File.read!(Path.join([root, @bank, "reference_plain_fact.md"])) =~ "recall:"
   end
 
   test "unwritable banks are refused" do

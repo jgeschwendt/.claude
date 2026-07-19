@@ -19,7 +19,7 @@ flowchart TB
         DEL["/delete — kill only, no extraction"]
     end
 
-    HOOK["hooks/memory-recall.js (SessionStart)<br/>cwd bank + ancestor banks, ≤9k chars,<br/>user/feedback full-body first, degrade to index"]
+    HOOK["hooks/memory-recall.js (SessionStart)<br/>cwd bank + ancestor banks, ≤9k chars,<br/>recall:pin + user/feedback full-body first,<br/>degrade to index (pin stays full), recall:mute skipped"]
     HOOK -->|additionalContext| SS
 
     STG[".staging.json — the inbox<br/>(mid-session writes +<br/>judge-failure fallback)"]
@@ -61,7 +61,9 @@ flowchart TB
     BANK --> HOOK
     UI --- BANK
 
-    DREAM["_dream.md<br/>(else @default_dream)"] -.->|tunes every extract| X
+    DREAM["_dream.md<br/>(else @default_dream)"] -.->|tunes extraction,<br/>judging & consolidation| X
+    DREAM -.-> J
+    DREAM -.-> CO
     LEDGER[".sweep.jsonl — append-only ledger"] -.-> SW
 ```
 
@@ -91,11 +93,15 @@ stateDiagram-v2
     end note
 ```
 
-Judge bars (`Core.Memory.judge/2`): **durable** (useful in a future, unrelated session) ·
-**non-derivable** (not recoverable from code/git/CLAUDE.md) · **one idea per memory** ·
-**description specific enough to trigger recall** · deduped against the bank (covered →
-drop; updates/subsumes → commit with `replaces`). Tie-break: _when in doubt, drop_ — with
-no reviewer downstream, a missed memory costs less than committed noise.
+Judge bars (`Core.Memory.judge/2`, read under the dream — the same curation guidance the
+extractor followed): **durable** (useful in a future, unrelated session) · **non-derivable**
+(not recoverable from code/git/CLAUDE.md) · **one idea per memory** · **description specific
+enough to trigger recall**. Dedup runs against the existing memories' **full bodies** (not
+titles) as a cascade, most decisive rule first: covered by an existing body → drop;
+updates/corrects/subsumes → commit with those files in `replaces`; contradicts an existing
+memory → the candidate is the newer observation, commit with the contradicted file in
+`replaces`; otherwise genuinely new → commit. Tie-break: _when in doubt, drop_ — with no
+reviewer downstream, a missed memory costs less than committed noise.
 
 ## Banks and memory files
 
@@ -126,6 +132,7 @@ name: <human-readable title, ≤90 chars>
 description: <one-line recall summary, whitespace collapsed>
 type: feedback | project | reference | user
 created: <ISO8601 — when the fact first became known; survives rewrites>
+recall: <optional — pin | index | mute; absent = the recall hook's type policy>
 source: <session uuid — omitted if unknown>
 updated: <ISO8601 — this rewrite>
 ---
@@ -232,7 +239,8 @@ Every server-side claude call is `claude -p --output-format json --no-session-pe
 `CLAUDE_MEMORY_PIPELINE=1` exported — the recall hook exits and the SessionEnd hook
 refuses under that flag, so pipeline runs can never feed the pipeline their own children,
 and extraction is never biased by existing memories. Long conversations are flattened
-(tool calls one-lined) and capped at 60k chars.
+(tool calls one-lined, subagent sidechains dropped) and capped at 60k chars (head +
+tail kept, middle truncated).
 
 ## Sleep-time consolidation
 
@@ -259,13 +267,24 @@ flowchart LR
     START[SessionStart] --> ENV{"CLAUDE_MEMORY_PIPELINE=1?"}
     ENV -->|yes| BLIND["exit 0 — pipeline runs stay memory-blind"]
     ENV -->|no| CHAIN["walk cwd → ancestors → $HOME,<br/>match banks case-insensitively"]
-    CHAIN --> RANK["per bank: sort user → feedback →<br/>project → reference, newest first"]
+    CHAIN --> RANK["per bank: drop recall:mute, then sort<br/>recall:pin → user → feedback → project →<br/>reference, newest first within a rank"]
     RANK --> BUDGET{"render ≤ 9,000 chars?"}
-    BUDGET -->|no| DEG["degrade farthest ancestor first:<br/>full bodies → index lines"]
+    BUDGET -->|no| DEG["degrade farthest ancestor first:<br/>full bodies → index lines<br/>(recall:pin stays full)"]
     DEG --> BUDGET
     BUDGET -->|yes| INJ["additionalContext injection"]
     FALL["hooks disabled (work account):<br/>CLAUDE.md § Memory — read MEMORY.md manually"] -.-> INJ
 ```
+
+An optional `recall:` frontmatter key lets a single memory override the hook's type-based
+render policy (`hooks/memory-recall.js`); absent, or any value outside the trio, falls back
+to that policy:
+
+- **`pin`** — always rendered full-body regardless of type, and sorted **first** (ahead of
+  even `user`). It stays a full `### ` block even when its bank degrades to index mode, so
+  the degraded bank emits the pinned memory's full body above its index lines.
+- **`index`** — always rendered as a one-line index entry regardless of type (even
+  `user`/`feedback`, which the type policy would otherwise render full).
+- **`mute`** — skipped entirely: it never appears in full mode nor as an index line.
 
 Recall latency note: a dissolved session's memories exist only after the next sweep run
 (≤1 h). Anything the very next session must know is covered by write-at-attention staging
