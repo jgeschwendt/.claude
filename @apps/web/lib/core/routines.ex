@@ -82,8 +82,7 @@ defmodule Core.Routines do
       Map.merge(r, %{
         "installed" => File.exists?(plist_path(slug)),
         "last_run" => last_run(slug),
-        "loaded" => loaded?(slug),
-        "log" => log_tail(slug)
+        "loaded" => loaded?(slug)
       })
     end)
   end
@@ -298,7 +297,7 @@ defmodule Core.Routines do
   constrained fields (wildcards omitted). Returns `{:ok, dicts}` or `:error`.
   """
   def cron_intervals(expr) do
-    with [mn, hr, dom, mon, dow] <- String.split(expr, ~r/\s+/, trim: true),
+    with [mn, hr, dom, mon, dow] <- String.split(expr),
          {:ok, minutes} <- cron_field(mn, 0, 59, %{}),
          {:ok, hours} <- cron_field(hr, 0, 23, %{}),
          {:ok, days} <- cron_field(dom, 1, 31, %{}),
@@ -465,7 +464,18 @@ defmodule Core.Routines do
   defp result_path(slug), do: Path.join(routines_dir(), "#{slug}.last-run.json")
   defp prompt_path(slug), do: Path.join(routines_dir(), "#{slug}.prompt.txt")
 
-  defp uid, do: "id" |> System.cmd(["-u"]) |> elem(0) |> String.trim()
+  defp uid do
+    case :persistent_term.get({__MODULE__, :uid}, nil) do
+      nil ->
+        uid = "id" |> System.cmd(["-u"]) |> elem(0) |> String.trim()
+        :persistent_term.put({__MODULE__, :uid}, uid)
+        uid
+
+      uid ->
+        uid
+    end
+  end
+
   defp domain, do: "gui/#{uid()}"
   defp service(slug), do: "#{domain()}/#{label(slug)}"
 

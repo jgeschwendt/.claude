@@ -6,11 +6,12 @@ when_to_use: >
   ~/.claude/plans/) and the user wants it carried out. Trigger phrases:
   "/execute-plan", "execute the plan", "run the plan", "carry out the plan",
   "ultracode the plan", "build it". Replaces the old two-session pattern
-  (Fable plans → separate opus+ultracode session executes): execution happens
+  (premium-model plans → separate opus+ultracode session executes): execution happens
   in-session, with the model split pushed into the workflow agents.
 argument-hint: "[plan file — defaults to newest in ~/.claude/plans/]"
 allowed-tools:
   - Agent
+  - AskUserQuestion
   - Bash
   - Edit
   - Glob
@@ -26,14 +27,14 @@ allowed-tools:
 $ARGUMENTS
 
 Carry out an approved plan with the cost split enforced: the session model
-(Fable or whatever premium model is driving) plans, orchestrates, judges, and
-reviews — it NEVER types implementation code. Every implementing agent is
+plans, orchestrates, judges, and reviews — it NEVER types implementation code.
+Every implementing agent is
 pinned to `model: 'opus'` (or cheaper). Runs inline — the reviewer needs the
 planner's context.
 
 ## Goal
 
-The plan carried out exactly by pinned cheaper agents, deviations surfaced
+The plan carried out exactly by pinned opus-or-cheaper agents, deviations surfaced
 (never silently absorbed), the result reviewed in-session by the model that
 wrote the plan, and a report the user can accept without re-reading the diff.
 
@@ -175,9 +176,10 @@ return results;
 ```
 
 **Success criteria**: Workflow completes; every step has an implementer
-report and a `pass: true` verdict. Steps that come back `died` or
-`pass: false` get re-dispatched once with the verifier's evidence appended to
-the brief; a second failure is reported as unimplemented — never counted as
+report and a `pass: true` verdict. Steps that come back `pass: false` get re-dispatched once with the verifier's
+evidence appended to the brief; a `died` step (no verdict exists — the
+implementer produced nothing to verify) is re-dispatched once on the original
+brief. A second failure is reported as unimplemented — never counted as
 done, and a reproducible failure nobody can explain is /gigadebug material. A `clarify` return gets its question answered from the plan (or the
 user) and the unit re-dispatched. Repair locally: hold passed units' results
 and re-dispatch only the failed node and its dependents — never re-derive the
@@ -186,7 +188,7 @@ dispatch N parallel attempts and let the verifier select (multi-attempt
 roughly doubles hard-task success at N× cost — gate behind the same stakes
 trigger as the gigareview escalation). For serial pipelines (dependent
 steps), checkpoint-commit after each green step so a later failure rolls back
-to the last good state; for parallel fan-outs, commit once after step 4.
+to the last good state; for parallel fan-outs, commit once after the step-4 review passes.
 
 ### 4. Review in-session
 
@@ -222,8 +224,9 @@ Run via Bash with `run_in_background: true`; review here (step 4) when it
 exits. Step 1 (repo confirmation) still runs first, and both pins are
 mandatory: the absolute plan path and the `cd` to the confirmed repo —
 `acceptEdits` auto-accepts file edits with no human present, so a wrong cwd
-means unattended edits in the wrong repository. Headless runs inherit premium
-defaults, so the `--model opus` pin is mandatory. Unlike unattended sweeps,
+means unattended edits in the wrong repository. Headless runs use the CLI's
+configured default model — not any pin from this session — so the
+`--model opus` pin is mandatory. Unlike unattended sweeps,
 do NOT strip settings sources — the executor needs project permissions and
 skills.
 

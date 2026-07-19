@@ -315,7 +315,11 @@ defmodule Core.Transcripts do
   defp as_text(c), do: Jason.encode!(c)
 
   defp meta_text?([%{kind: "text", text: t}]),
-    do: Regex.match?(~r/^<(command-|local-command-|user-prompt-submit)/, String.trim_leading(t))
+    do:
+      String.starts_with?(
+        String.trim_leading(t),
+        ["<command-", "<local-command-", "<user-prompt-submit"]
+      )
 
   defp meta_text?(_), do: false
 

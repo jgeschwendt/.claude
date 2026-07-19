@@ -52,7 +52,8 @@ defmodule Core.UserLog do
   map — `:date`, `:dreamt?`, `:noted?`, `:archived` count, and a one-line `:preview`.
   """
   def list_days(sessions \\ Transcripts.list_sessions()) do
-    file_days = page_dates() |> MapSet.union(archive_dates())
+    archive_days = archive_dates()
+    file_days = MapSet.union(page_dates(), archive_days)
     conv_days = session_dates(sessions)
 
     (MapSet.to_list(file_days) ++ MapSet.to_list(conv_days))
@@ -62,7 +63,7 @@ defmodule Core.UserLog do
       dream = read_dream(date)
 
       %{
-        archived: archived_count(date),
+        archived: (MapSet.member?(archive_days, date) && archived_count(date)) || 0,
         date: date,
         dreamt?: dream != "",
         noted?: read_notes(date) != "",

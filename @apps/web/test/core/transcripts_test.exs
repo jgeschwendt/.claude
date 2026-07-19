@@ -1,5 +1,7 @@
 defmodule Core.TranscriptsTest do
-  use ExUnit.Case, async: true
+  # async: false — the session_cwds/0 test overrides the :web/:projects_dir application
+  # env (a global), so it cannot run concurrently with other cases touching the same env.
+  use ExUnit.Case, async: false
 
   alias Core.Transcripts
 
@@ -12,6 +14,7 @@ defmodule Core.TranscriptsTest do
   end
 
   defp write_lines(file, objects) do
+    File.mkdir_p!(Path.dirname(file))
     File.write!(file, Enum.map_join(objects, "\n", &Jason.encode!/1))
   end
 
@@ -68,5 +71,30 @@ defmodule Core.TranscriptsTest do
     assert session.message_count == 2
     assert session.tokens.input == 13
     assert session.tokens.output == 7
+  end
+
+  test "session_cwds/0 takes the first cwd seen per transcript and drops cwd-less ones" do
+    root = Path.join(System.tmp_dir!(), "transcripts_cwds_#{System.unique_integer([:positive])}")
+    Application.put_env(:web, :projects_dir, root)
+    on_exit(fn -> Application.delete_env(:web, :projects_dir) end)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    # proj-a: cwd on the very first line.
+    write_lines(Path.join([root, "proj-a", "s1.jsonl"]), [
+      %{"type" => "user", "cwd" => "/tmp/a", "message" => %{"content" => "hi"}}
+    ])
+
+    # proj-b: no cwd on the first line, cwd on a later line (locks scan-through).
+    write_lines(Path.join([root, "proj-b", "s2.jsonl"]), [
+      %{"type" => "user", "message" => %{"content" => "hi"}},
+      %{"type" => "user", "cwd" => "/tmp/b", "message" => %{"content" => "again"}}
+    ])
+
+    # proj-c: no cwd anywhere (locks the drop).
+    write_lines(Path.join([root, "proj-c", "s3.jsonl"]), [
+      %{"type" => "user", "message" => %{"content" => "hi"}}
+    ])
+
+    assert Enum.sort(Transcripts.session_cwds()) == ["/tmp/a", "/tmp/b"]
   end
 end

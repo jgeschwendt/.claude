@@ -149,10 +149,7 @@ defmodule Core.Memory.Sweep do
     {take, defer} = Enum.split(entries, max)
     results = Enum.map(take, &consume_entry(&1, now))
 
-    keep =
-      Enum.zip(take, results)
-      |> Enum.filter(fn {_e, r} -> r.outcome in ["error", "waiting"] end)
-      |> Enum.map(&elem(&1, 0))
+    keep = for {e, r} <- Enum.zip(take, results), r.outcome in ["error", "waiting"], do: e
 
     if entries != [], do: write_queue(keep ++ defer)
     {results, length(take)}

@@ -148,4 +148,17 @@ defmodule Core.MemoryTest do
     # "auto:" banks are read-only — the entry never reaches the judge but is kept staged
     assert %{committed: 0, dropped: 0, kept: 1} = Memory.drain_inbox()
   end
+
+  test "punctuation-only names fall back to distinct x<digest> slugs", %{root: root} do
+    :ok = commit(%{name: "!!!"})
+    :ok = commit(%{name: "@@@"})
+
+    names = @bank |> Memory.bank_memories() |> Enum.map(& &1.name) |> Enum.sort()
+    assert names == ["!!!", "@@@"]
+
+    files = root |> Path.join(@bank) |> File.ls!() |> Enum.filter(&(&1 =~ ~r/^reference_/))
+    assert length(files) == 2
+    assert Enum.all?(files, &(&1 =~ ~r/^reference_x[0-9a-f]{8}\.md$/))
+    assert files |> Enum.uniq() |> length() == 2
+  end
 end

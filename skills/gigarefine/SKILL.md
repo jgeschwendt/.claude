@@ -49,7 +49,7 @@ can see WHY it stopped.
 
 - **Target**: `$ARGUMENTS` › artifacts this session created or modified › ask.
   Resolve to a concrete file list. An intent word in `$ARGUMENTS`
-  ("readability", "structure") narrows the step-3 lens set; absent, run all.
+  ("readability", "efficiency") narrows the step-3 lens set; absent, run all.
   Intent gate first: an ask naming structural outcomes — components split,
   moved, merged, removed — routes to /gigarearchitect NOW; "refactor" in the
   wild usually means restructure, and a polish pass is the wrong deliverable
@@ -115,8 +115,8 @@ Each pass, until step 4 says stop:
   checklist as the brief's checklist (copy it from
   `~/.claude/skills/craft-prompt/SKILL.md` §Refinement checklist — a cold
   brief can't cite what it never loaded).
-- **Judge** (session model, inline — judging is the premium work and is
-  never delegated): accept or reject each proposal against the invariant and
+- **Judge** (session model, inline — judging needs whole-run context and
+  is never delegated): accept or reject each proposal against the invariant and
   the axes. Proposals arrive as claims, not evidence (premise inheritance).
   Reject blends — a proposal serving two axes poorly loses to one serving
   either well (CLAUDE.md · Compromise). Two proposals for the same location:
