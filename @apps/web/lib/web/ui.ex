@@ -19,7 +19,7 @@ defmodule Web.UI do
     ~H"""
     <nav class="rail">
       <.link navigate="/" class={rail_class(@active == :conversations)} title="Conversations"><.ph name="chats-circle" /></.link>
-      <.link navigate="/log" class={rail_class(@active == :log)} title="Diary · daily dream"><.ph name="moon-stars" /></.link>
+      <.link navigate="/log" class={rail_class(@active == :log)} title="Diary · voyage log"><.ph name="compass" /></.link>
       <.link navigate="/memories" class={rail_class(@active == :memories)} title="Memory banks"><.ph name="brain" /></.link>
       <.link navigate="/routines" class={rail_class(@active == :routines)} title="Routines"><.ph name="lightning" /></.link>
     </nav>

@@ -4,7 +4,7 @@ defmodule Core.Memory.Dream do
   *smaller and sharper* rather than waiting for recall to fail. (Offline consolidation
   is the best-evidenced quality axis for a personal memory bank — see
   `~/.claude/@research/claude-memory-system/report.md`.) (The memory pass formerly
-  labeled consolidation; distinct from the diary's daily dream.)
+  labeled consolidation; distinct from the diary's voyage log.)
 
   A bank is due when it has gained `@growth_trigger`+ memories since its last pass and
   the last pass is `@min_interval_hours`+ old (state in the bank's

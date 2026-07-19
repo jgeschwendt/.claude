@@ -44,7 +44,7 @@ defmodule Web.UserLogLive do
         %{
           archived: 0,
           date: today,
-          dreamt?: false,
+          logged?: false,
           noted?: false,
           preview: "",
           weekday: UserLog.weekday(today)
@@ -61,11 +61,11 @@ defmodule Web.UserLogLive do
   def handle_event("select", %{"date" => date}, socket),
     do: {:noreply, assign(socket, selected: date, day: UserLog.get_day(date))}
 
-  def handle_event("dream", %{"date" => date}, socket) do
+  def handle_event("log_day", %{"date" => date}, socket) do
     {:noreply,
      socket
-     |> assign(busy: "Dreaming #{date} via claude…")
-     |> start_async(:dream, fn -> UserLog.dream(date) end)}
+     |> assign(busy: "Writing the voyage log for #{date}…")
+     |> start_async(:voyage, fn -> UserLog.voyage(date) end)}
   end
 
   def handle_event("save_notes", %{"text" => text}, socket) do
@@ -77,10 +77,10 @@ defmodule Web.UserLogLive do
     do: {:noreply, push_navigate(socket, to: ~p"/memories?dissolve=#{p <> "/" <> id}")}
 
   @impl true
-  def handle_async(:dream, {:ok, %{date: date}}, socket),
-    do: {:noreply, socket |> assign(busy: "Dreamt #{date}.", selected: date) |> load()}
+  def handle_async(:voyage, {:ok, %{date: date}}, socket),
+    do: {:noreply, socket |> assign(busy: "Logged #{date}.", selected: date) |> load()}
 
-  def handle_async(:dream, {:exit, reason}, socket),
+  def handle_async(:voyage, {:exit, reason}, socket),
     do: {:noreply, assign(socket, busy: "Error: #{inspect(reason)}")}
 
   @impl true
@@ -126,10 +126,10 @@ defmodule Web.UserLogLive do
                 <span :if={d.date == @today} class="tag">today</span>
               </div>
               <div class="meta">
-                <span :if={d.dreamt?} title="dreamt"><.ph name="moon-stars" /> dream</span>
+                <span :if={d.logged?} title="logged"><.ph name="compass" /> log</span>
                 <span :if={d.noted?} title="has notes"><.ph name="pencil-simple" /> notes</span>
                 <span :if={d.archived > 0}>{d.archived} archived</span>
-                <span :if={!d.dreamt? && !d.noted? && d.archived == 0} class="empty-hint">—</span>
+                <span :if={!d.logged? && !d.noted? && d.archived == 0} class="empty-hint">—</span>
               </div>
             </div>
           </div>
@@ -141,24 +141,24 @@ defmodule Web.UserLogLive do
           <h2>{@day.weekday} · {@day.date}</h2>
           <span class="tag">{length(@day.conversations)} live conversation(s)</span>
           <span :if={@day.archived != []} class="tag">{length(@day.archived)} archived</span>
-          <button class="btn dissolve" phx-click="dream" phx-value-date={@day.date}>
-            <.ph name="moon-stars" /> {if @day.dream == "", do: "dream this day", else: "re-dream"}
+          <button class="btn dissolve" phx-click="log_day" phx-value-date={@day.date}>
+            <.ph name="compass" /> {if @day.voyage == "", do: "log this day", else: "re-log"}
           </button>
         </div>
         <div :if={@busy} class="banner">{@busy}</div>
 
         <div class="transcript">
           <div class="thread mem">
-            <%!-- the daily dream --%>
+            <%!-- the voyage log --%>
             <div class="diary-section">
-              <div class="diary-label"><.ph name="moon-stars" /> Daily dream</div>
-              <%= if @day.dream == "" do %>
+              <div class="diary-label"><.ph name="compass" /> Voyage log</div>
+              <%= if @day.voyage == "" do %>
                 <div class="diary-empty">
-                  No dream yet for this day. Press <strong>dream this day</strong> to distill its
-                  conversations into a page — or it runs nightly via the “Daily dream” routine.
+                  No voyage log for this day yet. Press <strong>log this day</strong> to distill its
+                  conversations into a page — or it runs nightly via the “Voyage log” routine.
                 </div>
               <% else %>
-                <div class="diary-page text">{strip_fm(@day.dream)}</div>
+                <div class="diary-page text">{strip_fm(@day.voyage)}</div>
               <% end %>
             </div>
 

@@ -6,15 +6,15 @@ defmodule Core.UserLog do
 
   Each day holds up to two files so the auto and manual halves never clobber each other:
 
-    * `YYYY-MM-DD.dream.md`  — the **daily dream**: a compact summary of the day's
+    * `YYYY-MM-DD.voyage.md`  — the **voyage log**: a compact summary of the day's
       conversations, written by `claude` (on demand here, or nightly via a Routine).
     * `YYYY-MM-DD.notes.md`  — your own notes for the day, edited in the dashboard.
 
-  The dream is the diary's sibling to `Memory`'s dissolve: dissolve distills one
-  conversation into durable memories; the dream distills a whole *day* into one page. When
-  a session is killed (`/delete` / `/dissolve`), its raw transcript is "compact-deleted" —
-  gzip-archived under `archive/YYYY-MM-DD/` rather than removed — so the dream still has
-  the day's conversations to draw on and nothing is lost.
+  The voyage log is the diary's sibling to `Memory`'s dissolve: dissolve distills one
+  conversation into durable memories; the voyage log distills a whole *day* into one page.
+  When a session is killed (`/delete` / `/dissolve`), its raw transcript is "compact-deleted"
+  — gzip-archived under `archive/YYYY-MM-DD/` rather than removed — so the voyage log still
+  has the day's conversations to draw on and nothing is lost.
   """
 
   alias Core.Transcripts
@@ -28,11 +28,11 @@ defmodule Core.UserLog do
 
   def archive_root, do: Path.join(diary_root(), "archive")
 
-  defp dream_path(date), do: Path.join(diary_root(), "#{date}.dream.md")
+  defp voyage_path(date), do: Path.join(diary_root(), "#{date}.voyage.md")
   defp notes_path(date), do: Path.join(diary_root(), "#{date}.notes.md")
 
   # A diary page key is strictly `YYYY-MM-DD`; anything else is a tampered param and
-  # must never reach a file path or the dream prompt (which tells claude what to write).
+  # must never reach a file path or the voyage prompt (which tells claude what to write).
   defp date?(date), do: is_binary(date) and Regex.match?(~r/^\d{4}-\d{2}-\d{2}$/, date)
 
   @doc "Today's date as an ISO string (`YYYY-MM-DD`), the diary's page key."
@@ -47,9 +47,9 @@ defmodule Core.UserLog do
 
   # ── listing (the year lookback) ───────────────────────────
   @doc """
-  Every day worth showing, newest first: the union of days that have a dream page, a
+  Every day worth showing, newest first: the union of days that have a voyage page, a
   notes page, archived transcripts, or live conversations. Each entry is a lightweight
-  map — `:date`, `:dreamt?`, `:noted?`, `:archived` count, and a one-line `:preview`.
+  map — `:date`, `:logged?`, `:noted?`, `:archived` count, and a one-line `:preview`.
   """
   def list_days(sessions \\ Transcripts.list_sessions()) do
     archive_days = archive_dates()
@@ -60,14 +60,14 @@ defmodule Core.UserLog do
     |> Enum.uniq()
     |> Enum.sort(:desc)
     |> Enum.map(fn date ->
-      dream = read_dream(date)
+      voyage = read_voyage(date)
 
       %{
         archived: (MapSet.member?(archive_days, date) && archived_count(date)) || 0,
         date: date,
-        dreamt?: dream != "",
+        logged?: voyage != "",
         noted?: read_notes(date) != "",
-        preview: preview_of(dream),
+        preview: preview_of(voyage),
         weekday: weekday(date)
       }
     end)
@@ -78,7 +78,7 @@ defmodule Core.UserLog do
       {:ok, names} ->
         names
         |> Enum.flat_map(fn name ->
-          case Regex.run(~r/^(\d{4}-\d{2}-\d{2})\.(dream|notes)\.md$/, name) do
+          case Regex.run(~r/^(\d{4}-\d{2}-\d{2})\.(voyage|notes)\.md$/, name) do
             [_, date, _] -> [date]
             _ -> []
           end
@@ -119,23 +119,23 @@ defmodule Core.UserLog do
   end
 
   # ── a single day ──────────────────────────────────────────
-  @doc "Everything needed to render one day: its dream, notes, and the day's conversations."
+  @doc "Everything needed to render one day: its voyage, notes, and the day's conversations."
   def get_day(date, sessions \\ Transcripts.list_sessions()) do
     if date?(date) do
       %{
         archived: list_archived(date),
         conversations: conversations_on(date, sessions),
         date: date,
-        dream: read_dream(date),
         notes: read_notes(date),
+        voyage: read_voyage(date),
         weekday: weekday(date)
       }
     else
-      %{archived: [], conversations: [], date: date, dream: "", notes: "", weekday: ""}
+      %{archived: [], conversations: [], date: date, notes: "", voyage: "", weekday: ""}
     end
   end
 
-  def read_dream(date), do: read_or_empty(dream_path(date))
+  def read_voyage(date), do: read_or_empty(voyage_path(date))
   def read_notes(date), do: read_or_empty(notes_path(date))
 
   defp read_or_empty(path) do
@@ -179,24 +179,27 @@ defmodule Core.UserLog do
 
   defp archived_count(date), do: length(list_archived(date))
 
-  # ── the daily dream (shell out to claude) ─────────────────
+  # ── the voyage log (shell out to claude) ─────────────────
   @doc """
-  Dream a day: run the dream prompt through the local `claude` CLI, which reads that
-  day's conversations and writes `YYYY-MM-DD.dream.md` itself. Returns the CLI's text.
-  Slow (a full claude turn) — drive it from a `start_async` in the LiveView.
+  Log a day's voyage: run the voyage prompt through the local `claude` CLI, which reads
+  that day's conversations and writes `YYYY-MM-DD.voyage.md` itself. Returns the CLI's
+  text. Slow (a full claude turn) — drive it from a `start_async` in the LiveView.
   """
-  def dream(date \\ nil) do
+  def voyage(date \\ nil) do
     date = date || today()
 
     if date?(date) do
       File.mkdir_p!(diary_root())
-      tmp = Path.join(System.tmp_dir!(), "claude_dream_#{System.unique_integer([:positive])}.txt")
-      File.write!(tmp, dream_prompt(date))
+
+      tmp =
+        Path.join(System.tmp_dir!(), "claude_voyage_#{System.unique_integer([:positive])}.txt")
+
+      File.write!(tmp, voyage_prompt(date))
       claude = System.find_executable("claude") || "claude"
 
-      # --no-session-persistence: the dream must not leave its own transcript in
-      # ~/.claude/projects — else it clutters Conversations and the next dream summarizes
-      # its own dreaming. Print-mode only, which is exactly how we run it.
+      # --no-session-persistence: the voyage log must not leave its own transcript in
+      # ~/.claude/projects — else it clutters Conversations and the next voyage log
+      # summarizes its own run. Print-mode only, which is exactly how we run it.
       {out, _} =
         System.cmd(
           "sh",
@@ -212,19 +215,19 @@ defmodule Core.UserLog do
   end
 
   @doc """
-  The single source-of-truth dream prompt, parameterized by target date. Self-contained
-  so it runs identically whether driven from the dashboard (`dream/1`) or unattended by
-  the "Daily dream" Routine via launchd. Pass `nil` for a routine that should target the
+  The single source-of-truth voyage prompt, parameterized by target date. Self-contained
+  so it runs identically whether driven from the dashboard (`voyage/1`) or unattended by
+  the "Voyage log" Routine via launchd. Pass `nil` for a routine that should target the
   current day at run time.
   """
-  def dream_prompt(date \\ nil) do
+  def voyage_prompt(date \\ nil) do
     home = System.user_home!()
 
     target =
       if date, do: "**#{date}** (#{weekday(date)})", else: "today (compute it with `date +%F`)"
 
     """
-    You are the DAILY DREAM — the diary's nightly distiller. Running UNATTENDED: never
+    You are the VOYAGE LOG — the diary's nightly distiller. Running UNATTENDED: never
     wait for input or ask questions. Your one job is to write a compact diary page for a
     single day from that day's Claude Code conversations, then stop.
 
@@ -238,7 +241,7 @@ defmodule Core.UserLog do
     under the `message` key. If there are NO conversations for the day, write nothing and
     stop — do not invent a page.
 
-    WRITE exactly one file: `#{home}/.claude/@log/<TARGET-DATE>.dream.md`. Overwrite it
+    WRITE exactly one file: `#{home}/.claude/@log/<TARGET-DATE>.voyage.md`. Overwrite it
     if it exists (it is regenerable). Touch NOTHING else — never the matching
     `<TARGET-DATE>.notes.md` (those are the human's own notes) and never any transcript.
 
@@ -246,7 +249,7 @@ defmodule Core.UserLog do
 
         ---
         date: <TARGET-DATE>
-        type: dream
+        type: voyage
         ---
 
         # <TARGET-DATE> · <Weekday>
