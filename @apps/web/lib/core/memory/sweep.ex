@@ -64,6 +64,17 @@ defmodule Core.Memory.Sweep do
     end
   end
 
+  @doc "The shared one-line sweep summary body; call sites add their own prefix and terminator."
+  def summary_line(report) do
+    inbox = report.inbox
+
+    "#{length(report.queue)} queued · #{report.considered} considered · " <>
+      "#{length(report.results)} dissolved-or-tried · " <>
+      "#{report.trivial} trivial · #{report.deferred} deferred · " <>
+      "inbox #{inbox.committed}✓/#{inbox.dropped}✗/#{inbox.kept}… · " <>
+      "#{length(report.consolidated)} bank(s) consolidated"
+  end
+
   defp lock_path, do: Path.join(Memory.memory_root(), ".sweep.lock")
 
   defp acquire_lock do

@@ -2,6 +2,7 @@ defmodule Web.MemoriesLive do
   use Web, :live_view
   import Web.UI
   alias Core.{Memory, Transcripts}
+  alias Core.Memory.Sweep
 
   @impl true
   def mount(params, _session, socket) do
@@ -94,7 +95,7 @@ defmodule Web.MemoriesLive do
       description: params["description"],
       name: params["name"],
       replaces: replaces_for(params),
-      source: nz(params["source"]),
+      source: blank_to_nil(params["source"]),
       type: params["type"]
     }
 
@@ -255,15 +256,7 @@ defmodule Web.MemoriesLive do
        assign(socket, busy: "A sweep is already running — nothing started.", sweeping: false)}
 
   def handle_async(:sweep, {:ok, %{} = report}, socket) do
-    inbox = report.inbox
-
-    msg =
-      "Sweep: #{length(report.queue)} queued · #{report.considered} considered · " <>
-        "#{length(report.results)} dissolved-or-tried · " <>
-        "#{report.trivial} trivial · #{report.deferred} deferred · " <>
-        "inbox #{inbox.committed}✓/#{inbox.dropped}✗/#{inbox.kept}… · " <>
-        "#{length(report.consolidated)} bank(s) consolidated."
-
+    msg = "Sweep: " <> Sweep.summary_line(report) <> "."
     {:noreply, socket |> assign(busy: msg, sweeping: false) |> reload()}
   end
 
@@ -310,8 +303,8 @@ defmodule Web.MemoriesLive do
   defp replaces_for(%{"orig_file" => f}) when f not in [nil, ""], do: [f]
   defp replaces_for(_), do: nil
 
-  defp nz(""), do: nil
-  defp nz(v), do: v
+  defp blank_to_nil(""), do: nil
+  defp blank_to_nil(v), do: v
 
   # Updated within the last hour — the session may still be open in a terminal, and a
   # dissolve would consume its transcript out from under it. Confirm, don't forbid.
