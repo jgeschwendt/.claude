@@ -6,7 +6,10 @@ defmodule Core.Feedback do
   """
 
   @doc "Directory holding one Markdown file per feedback submission."
-  def dir, do: Path.join(System.user_home!(), ".claude/@feedback")
+  def dir,
+    do:
+      Application.get_env(:web, :feedback_root) ||
+        Path.join(System.user_home!(), ".claude/@feedback")
 
   @doc """
   Persist a feedback `message`. `meta` is arbitrary request context (remote IP,
