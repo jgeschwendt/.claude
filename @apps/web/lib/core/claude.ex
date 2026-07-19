@@ -26,7 +26,6 @@ defmodule Core.Claude do
     * `:schema` — JSON-schema map; the reply is validated by the CLI and returned
       decoded (the `structured_output`).
     * `:model` — model alias/id, default `#{inspect(@default_model)}`.
-    * `:permission_mode` — pass e.g. `"auto"` for runs that need tools; omitted otherwise.
 
   Returns `{:ok, %{output: output, cost: usd}}` where `output` is the decoded
   structured output (when `:schema` given) or the result text, else
@@ -56,7 +55,6 @@ defmodule Core.Claude do
       ["-p", "--output-format", "json", "--no-session-persistence"] ++
         ["--setting-sources", "''", "--disable-slash-commands"] ++
         ["--model", opts[:model] || @default_model] ++
-        if(opts[:permission_mode], do: ["--permission-mode=#{opts[:permission_mode]}"], else: []) ++
         if(schema, do: ["--json-schema", ~s("$CLAUDE_JSON_SCHEMA")], else: [])
 
     # The schema rides an env var so its quotes never meet the shell; the prompt rides

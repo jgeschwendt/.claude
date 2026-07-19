@@ -31,18 +31,18 @@ defmodule Core.Transcripts do
     projects_dir()
     |> Path.join("*/*.jsonl")
     |> Path.wildcard()
-    |> Enum.flat_map(fn file ->
-      cwd =
-        file
-        |> File.stream!()
-        |> Enum.find_value(fn line ->
-          case Jason.decode(line) do
-            {:ok, %{"cwd" => cwd}} when is_binary(cwd) -> cwd
-            _ -> nil
-          end
-        end)
+    |> Enum.flat_map(fn file -> if c = first_cwd(file), do: [c], else: [] end)
+  end
 
-      if cwd, do: [cwd], else: []
+  @doc "The first `cwd` recorded in a transcript file, or nil if none parses."
+  def first_cwd(file) do
+    file
+    |> File.stream!()
+    |> Enum.find_value(fn line ->
+      case Jason.decode(line) do
+        {:ok, %{"cwd" => cwd}} when is_binary(cwd) -> cwd
+        _ -> nil
+      end
     end)
   end
 

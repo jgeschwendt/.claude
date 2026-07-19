@@ -175,13 +175,7 @@ defmodule Core.Memory.Sweep do
 
       true ->
         result = Memory.distill(%{session | cwd: cwd}, id)
-
-        outcome =
-          cond do
-            result.error -> "error"
-            result.staged > 0 -> "staged"
-            true -> "dissolved"
-          end
+        outcome = outcome_of(result)
 
         finish(e, %{
           outcome: outcome,
@@ -249,15 +243,14 @@ defmodule Core.Memory.Sweep do
   # candidates are safely in the inbox awaiting the next judge) and a clean zero
   # (nothing durable in the conversation). Only an extraction *error* leaves the
   # transcript for retry.
+  # error > staged > dissolved: the permanence ladder for a distill result
+  defp outcome_of(%{error: e}) when not is_nil(e), do: "error"
+  defp outcome_of(%{staged: s}) when s > 0, do: "staged"
+  defp outcome_of(_), do: "dissolved"
+
   defp dissolve(session) do
     result = Memory.distill_session(session.project, session.id)
-
-    outcome =
-      cond do
-        result.error -> "error"
-        result.staged > 0 -> "staged"
-        true -> "dissolved"
-      end
+    outcome = outcome_of(result)
 
     if outcome != "error", do: Transcripts.delete_session(session.project, session.id)
 
