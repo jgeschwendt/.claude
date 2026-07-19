@@ -357,6 +357,8 @@ defmodule Core.Memory do
           description: m["description"] || "",
           file: "",
           name: m["name"],
+          # mirror the serialize guard: a malformed recall value must never flow to commit.
+          recall: (m["recall"] in ~w(pin index mute) && m["recall"]) || nil,
           replaces: m["replaces"],
           source: m["source"],
           staged: true,
@@ -381,6 +383,7 @@ defmodule Core.Memory do
           body: f.body,
           description: f.description,
           name: f.name,
+          recall: f[:recall],
           replaces: f[:replaces],
           source: f[:source],
           type: f.type
@@ -423,7 +426,7 @@ defmodule Core.Memory do
           kept
 
         {kept, rest} ->
-          kept ++ ["- …#{length(rest)} more memories not indexed — consolidate this bank"]
+          kept ++ ["- …#{length(rest)} more memories not indexed — dream this bank"]
       end
 
     head =
@@ -497,7 +500,7 @@ defmodule Core.Memory do
     read_staging() |> Enum.reject(&(&1.bank == bank and &1.name == name)) |> write_staging()
   end
 
-  @doc "Archive (never destroy) a committed memory of a managed bank: moves the file to `_archive/` (recoverable via `restore_memory/2`) and regens the index. Returns `{:error, :not_writable}` for an auto/unsafe bank. Both the consolidation archive op and the dashboard delete button route here."
+  @doc "Archive (never destroy) a committed memory of a managed bank: moves the file to `_archive/` (recoverable via `restore_memory/2`) and regens the index. Returns `{:error, :not_writable}` for an auto/unsafe bank. Both the dream's archive op and the dashboard delete button route here."
   def delete_memory(bank, file) do
     if writable?(bank) and Core.Store.component?(file) do
       archive_file(Path.join(memory_root(), bank), file)
@@ -792,7 +795,7 @@ defmodule Core.Memory do
           {:error, :need_two}
         else
           prompt = """
-          Merge these overlapping memories into ONE consolidated memory. Preserve every [[wikilink]] and keep the most specific detail. #{@shape}
+          Merge these overlapping memories into ONE merged memory. Preserve every [[wikilink]] and keep the most specific detail. #{@shape}
 
           MEMORIES:
           #{Enum.map_join(sources, "\n---\n", &serialize_memory/1)}
@@ -869,7 +872,7 @@ defmodule Core.Memory do
     end
   end
 
-  @doc "Committed memories of one managed bank (full bodies), for the consolidation pass."
+  @doc "Committed memories of one managed bank (full bodies), for the dream pass."
   def bank_memories(bank) do
     if Core.Store.component?(bank), do: read_bank(bank, "").memories, else: []
   end

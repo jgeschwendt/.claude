@@ -43,7 +43,7 @@ flowchart TB
     subgraph sweep["launchd · hourly · mix memory.sweep"]
         SW["Sweep.run — queue first,<br/>then idle sessions"]
         DR["drain_inbox — judge staged entries"]
-        CO["Consolidate.run_due — shrink grown banks"]
+        CO["Dream.run_due — shrink grown banks"]
     end
     Q --> SW
     ARC -->|"parse_archived/1"| SW
@@ -52,16 +52,16 @@ flowchart TB
     CO -->|"merge/rewrite/archive ops"| C
 
     subgraph web["@apps/web dashboard"]
-        UI["MemoriesLive<br/>browse · edit · merge · restore ·<br/>dissolve picker · dream ·<br/>sweep-now · consolidate-now"]
+        UI["MemoriesLive<br/>browse · edit · merge · restore ·<br/>dissolve picker · dream instructions ·<br/>sweep-now · dream-now"]
     end
     UI -->|"distill_session/2"| X
     UI -->|"merge_memories/2 (claude call,<br/>commits directly)"| C
 
-    C --> BANK[("~/.claude/@memory/&lt;bank&gt;/<br/>&lt;type&gt;_&lt;slug&gt;.md · MEMORY.md ·<br/>_archive/ · _consolidation.json")]
+    C --> BANK[("~/.claude/@memory/&lt;bank&gt;/<br/>&lt;type&gt;_&lt;slug&gt;.md · MEMORY.md ·<br/>_archive/ · _dream.json")]
     BANK --> HOOK
     UI --- BANK
 
-    DREAM["_dream.md<br/>(else @default_dream)"] -.->|tunes extraction,<br/>judging & consolidation| X
+    DREAM["_dream.md<br/>(else @default_dream)"] -.->|tunes extraction,<br/>judging & the dream| X
     DREAM -.-> J
     DREAM -.-> CO
     LEDGER[".sweep.jsonl — append-only ledger"] -.-> SW
@@ -83,7 +83,7 @@ stateDiagram-v2
     Inbox --> Candidate: hourly drain_inbox
     Inbox --> Dropped: dashboard discard /<br/>judge drop on drain
     Inbox --> Committed: dashboard commit-now<br/>(explicit, skips the judge)
-    Committed --> Archived: superseded via replaces ·<br/>delete_memory · consolidation archive-op
+    Committed --> Archived: superseded via replaces ·<br/>delete_memory · dream archive-op
     Archived --> Committed: restore_memory/2<br/>(dashboard Archive panel)
     Archived --> [*]: _archive/&lt;stamp&gt;_&lt;file&gt;<br/>(kept forever otherwise)
     note right of Committed
@@ -118,7 +118,7 @@ Bank id = cwd with every non-alphanumeric character replaced by `-` (`sanitize/1
     ├── MEMORY.md                     # regenerated index — never hand-edited, ≤180 entries
     ├── <type>_<slug>.md              # one memory per file
     ├── _archive/<stamp>_<file>       # superseded/deleted memories — recoverable, restorable
-    └── _consolidation.json           # consolidation state {at, count, last_ops}
+    └── _dream.json                   # dream state {at, count, last_ops} (legacy fallback: _consolidation.json)
 ```
 
 Underscore- and dot-prefixed entries are invisible to `read_dir/4` — archives and state
@@ -156,7 +156,7 @@ flowchart TD
     COL -->|no| WR
     SUF --> WR["Store.write! (atomic temp+rename)"]
     WR --> PR["prune same bank+name from .staging.json"]
-    PR --> IX["regen MEMORY.md — sorted, ≤180 entries,<br/>overflow line: '…N more memories not indexed — consolidate this bank'"]
+    PR --> IX["regen MEMORY.md — sorted, ≤180 entries,<br/>overflow line: '…N more memories not indexed — dream this bank'"]
 ```
 
 ## The write paths
@@ -169,7 +169,7 @@ flowchart TD
 | dashboard dissolve    | same (`distill_session/2`)           | same                           | same                       |
 | mid-session staging   | the live session (time of attention) | `drain_inbox` on next sweep    | same                       |
 | dashboard merge       | `claude -p` merge prompt             | none — the click is the review | same, `replaces` = sources |
-| consolidation         | `claude -p` over the whole bank      | op validation (`valid_op?/2`)  | same / `delete_memory/2`   |
+| dream (consolidation) | `claude -p` over the whole bank      | op validation (`valid_op?/2`)  | same / `delete_memory/2`   |
 
 ### Session end — `/dissolve` and `/delete`
 
@@ -224,7 +224,7 @@ flowchart TD
     CAP -->|no| DEF[deferred to next hour]
     CAP -->|yes| D2["distill_session → consume transcript<br/>(only extraction error keeps it)"]
 
-    RUN --> CD["Consolidate.run_due"]
+    RUN --> CD["Dream.run_due"]
 ```
 
 Idle-session contract: the transcript is consumed on **any successful extraction** —
@@ -242,13 +242,17 @@ and extraction is never biased by existing memories. Long conversations are flat
 (tool calls one-lined, subagent sidechains dropped) and capped at 60k chars (head +
 tail kept, middle truncated).
 
-## Sleep-time consolidation
+## The dream (sleep-time consolidation)
+
+Not the diary's _daily dream_ (the page-per-day distiller that turns archived transcripts
+into diary pages) — this is the sleep-time pass that merges, rewrites, and archives to keep
+a grown bank sharp.
 
 ```mermaid
 flowchart TD
-    RD["Consolidate.run_due — every managed bank dir"] --> BASE{"_consolidation.json exists?"}
-    UI3["dashboard 'consolidate' button<br/>(bypasses due-ness)"] --> CALL
-    BASE -->|no| SEED["write baseline {at, count} — never<br/>mass-consolidate a backlog on first sight"]
+    RD["Dream.run_due — every managed bank dir"] --> BASE{"_dream.json exists?"}
+    UI3["dashboard 'dream' button<br/>(bypasses due-ness)"] --> CALL
+    BASE -->|no| SEED["write baseline {at, count} — never<br/>mass-dream a backlog on first sight"]
     BASE -->|yes| DUE{"grown ≥5 memories since last pass<br/>AND ≥20h since last pass?"}
     DUE -->|no| WAIT[skip]
     DUE -->|yes| CALL["ONE claude call: whole bank in,<br/>≤6 ops out — net-non-increasing"]
@@ -302,7 +306,8 @@ Recall latency note: a dissolved session's memories exist only after the next sw
 
 The dashboard shows staged entries with commit-now / discard buttons as an escape hatch to
 _preempt_ the sweep — commit-now explicitly skips the judge. Entry shape mirrors
-`read_staging/0`: `{bank, body, description, name, replaces, source, type}`; malformed
+`read_staging/0`: `{bank, body, description, name, recall, replaces, source, type}` (recall
+optional — `pin | index | mute`); malformed
 entries (no name/bank) are dropped rather than allowed to crash a later commit. Banks that
 exist only in staging still surface in listings.
 
@@ -326,7 +331,7 @@ MemoriesLive is a **viewer/editor with manual triggers** — never an approval s
 - pipeline panel: pending dissolve-queue entries + the recent sweep ledger
 - edit/save any memory (a save is a `commit_memory` with `replaces` = the original file)
 - merge N selected memories (one claude call, commits directly, sources archived)
-- consolidate the active bank on demand; run the whole sweep on demand
+- dream the active bank on demand; run the whole sweep on demand
 - dissolve any conversation from the picker — sessions active within the last hour are
   flagged and confirm first; sessions pre-marked archive-on-exit are excluded outright
 - Archive panel per bank: browse `_archive/`, restore any entry
@@ -341,7 +346,7 @@ flowchart LR
     G --> DRM["diary's daily dream (fuel)"]
     G --> QX["dissolve-queue extraction<br/>(parse_archived/1)"]
     G -.->|"gunzip back into projects/<br/>restores resumability"| T
-    M1["committed memory"] -->|superseded / deleted /<br/>consolidation-archived| A["&lt;bank&gt;/_archive/&lt;stamp&gt;_&lt;file&gt;"]
+    M1["committed memory"] -->|superseded / deleted /<br/>dream-archived| A["&lt;bank&gt;/_archive/&lt;stamp&gt;_&lt;file&gt;"]
     A -->|"restore (dashboard)"| M1
 ```
 

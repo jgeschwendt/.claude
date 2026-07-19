@@ -148,6 +148,44 @@ defmodule Core.MemoryTest do
     refute File.read!(Path.join([root, @bank, "reference_plain_fact.md"])) =~ "recall:"
   end
 
+  test "staging carries recall end-to-end: valid kept, junk nil'd, commit writes it", %{
+    root: root
+  } do
+    staging = [
+      %{
+        bank: @bank,
+        body: "b",
+        description: "d",
+        name: "Pinned staged",
+        recall: "pin",
+        replaces: nil,
+        source: nil,
+        type: "reference"
+      },
+      %{
+        bank: @bank,
+        body: "b",
+        description: "d",
+        name: "Bogus staged",
+        recall: "bogus",
+        replaces: nil,
+        source: nil,
+        type: "reference"
+      }
+    ]
+
+    File.write!(Path.join(root, ".staging.json"), Jason.encode!(staging))
+
+    staged = Memory.read_staging()
+    pinned = Enum.find(staged, &(&1.name == "Pinned staged"))
+    bogus = Enum.find(staged, &(&1.name == "Bogus staged"))
+    assert pinned.recall == "pin"
+    assert bogus.recall == nil
+
+    :ok = Memory.commit_memory(pinned)
+    assert File.read!(Path.join([root, @bank, "reference_pinned_staged.md"])) =~ "recall: pin"
+  end
+
   test "unwritable banks are refused" do
     assert {:error, :not_writable} = commit(%{bank: "auto:whatever"})
     assert {:error, :not_writable} = commit(%{bank: "../escape"})
