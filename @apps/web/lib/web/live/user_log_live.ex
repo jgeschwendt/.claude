@@ -24,11 +24,12 @@ defmodule Web.UserLogLive do
 
   defp load(socket) do
     selected = socket.assigns[:selected] || UserLog.today()
+    sessions = Core.Transcripts.list_sessions()
 
     assign(socket,
-      days: with_today(UserLog.list_days()),
+      days: with_today(UserLog.list_days(sessions)),
       selected: selected,
-      day: UserLog.get_day(selected)
+      day: UserLog.get_day(selected, sessions)
     )
   end
 
@@ -104,7 +105,6 @@ defmodule Web.UserLogLive do
         <form phx-change="search">
           <input
             class="search"
-            style="width: calc(100% - 24px)"
             name="q"
             value={@q}
             placeholder="Search a day…"
@@ -209,20 +209,19 @@ defmodule Web.UserLogLive do
   defp grouped(days, q) do
     needle = String.downcase(q)
 
-    days
-    |> Enum.filter(fn d ->
-      needle == "" or String.contains?(d.date, needle) or
-        String.contains?(String.downcase(d.preview), needle) or
-        String.contains?(String.downcase(d.weekday), needle)
-    end)
-    |> Enum.reduce([], fn d, acc ->
-      label = month_label(d.date)
+    filtered =
+      Enum.filter(days, fn d ->
+        needle == "" or String.contains?(d.date, needle) or
+          String.contains?(String.downcase(d.preview), needle) or
+          String.contains?(String.downcase(d.weekday), needle)
+      end)
 
-      case List.keyfind(acc, label, 0) do
-        {^label, items} -> List.keyreplace(acc, label, 0, {label, items ++ [d]})
-        nil -> acc ++ [{label, [d]}]
-      end
-    end)
+    groups = Enum.group_by(filtered, &month_label(&1.date))
+
+    filtered
+    |> Enum.map(&month_label(&1.date))
+    |> Enum.uniq()
+    |> Enum.map(&{&1, groups[&1]})
   end
 
   defp month_label(<<y::binary-4, "-", m::binary-2, _::binary>>),

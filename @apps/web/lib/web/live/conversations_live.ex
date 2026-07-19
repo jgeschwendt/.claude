@@ -35,11 +35,21 @@ defmodule Web.ConversationsLive do
 
   @impl true
   def handle_info({:session_changed, p, id}, socket) do
-    socket = assign(socket, sessions: Transcripts.list_sessions())
+    updated = Transcripts.get_session(p, id)
+
+    sessions =
+      socket.assigns.sessions
+      |> Enum.reject(&(&1.project == p and &1.id == id))
+      |> then(fn rest ->
+        if updated, do: [Map.delete(updated, :messages) | rest], else: rest
+      end)
+      |> Enum.sort_by(&(&1.updated_at || ""), :desc)
+
+    socket = assign(socket, sessions: sessions)
 
     socket =
       if socket.assigns.selected == {p, id},
-        do: assign(socket, session: Transcripts.get_session(p, id)),
+        do: assign(socket, session: updated),
         else: socket
 
     {:noreply, socket}
@@ -63,7 +73,6 @@ defmodule Web.ConversationsLive do
         <form phx-change="search">
           <input
             class="search"
-            style="width: calc(100% - 24px)"
             name="q"
             value={@q}
             placeholder="Search title or path…"
@@ -77,7 +86,7 @@ defmodule Web.ConversationsLive do
               :for={s <- items}
               class={[
                 "item",
-                (match?({_, _}, @selected) and @selected == {s.project, s.id}) && "active"
+                @selected == {s.project, s.id} && "active"
               ]}
               phx-click="select"
               phx-value-project={s.project}
@@ -140,18 +149,17 @@ defmodule Web.ConversationsLive do
   defp grouped(sessions, q) do
     needle = String.downcase(q)
 
-    sessions
-    |> Enum.filter(fn s ->
-      needle == "" or String.contains?(String.downcase(s.title), needle) or
-        String.contains?(String.downcase(s.cwd), needle)
-    end)
-    |> Enum.reduce([], fn s, acc ->
-      name = project_name(s.cwd)
+    filtered =
+      Enum.filter(sessions, fn s ->
+        needle == "" or String.contains?(String.downcase(s.title), needle) or
+          String.contains?(String.downcase(s.cwd), needle)
+      end)
 
-      case List.keyfind(acc, name, 0) do
-        {^name, items} -> List.keyreplace(acc, name, 0, {name, items ++ [s]})
-        nil -> acc ++ [{name, [s]}]
-      end
-    end)
+    groups = Enum.group_by(filtered, &project_name(&1.cwd))
+
+    filtered
+    |> Enum.map(&project_name(&1.cwd))
+    |> Enum.uniq()
+    |> Enum.map(&{&1, groups[&1]})
   end
 end
