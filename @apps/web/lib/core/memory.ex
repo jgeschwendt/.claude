@@ -278,16 +278,7 @@ defmodule Core.Memory do
 
     Path.join(Transcripts.projects_dir(), "#{project}/*.jsonl")
     |> Path.wildcard()
-    |> Enum.find_value(fallback, fn file ->
-      file
-      |> File.stream!()
-      |> Enum.find_value(fn line ->
-        case Jason.decode(line) do
-          {:ok, %{"cwd" => cwd}} when is_binary(cwd) -> cwd
-          _ -> nil
-        end
-      end)
-    end)
+    |> Enum.find_value(fallback, &Transcripts.first_cwd/1)
   end
 
   defp read_auto_banks do
