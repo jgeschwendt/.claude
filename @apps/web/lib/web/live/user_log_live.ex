@@ -7,12 +7,12 @@ defmodule Web.UserLogLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket), do: Phoenix.PubSub.subscribe(Core.PubSub, "diary")
+    if connected?(socket), do: Phoenix.PubSub.subscribe(Core.PubSub, "log")
 
     {:ok,
      socket
      |> assign(
-       page_title: "Diary",
+       page_title: "Voyage log",
        q: "",
        busy: nil,
        selected: UserLog.today(),
@@ -84,7 +84,7 @@ defmodule Web.UserLogLive do
     do: {:noreply, assign(socket, busy: "Error: #{inspect(reason)}")}
 
   @impl true
-  def handle_info(:diary_changed, socket), do: {:noreply, load(socket)}
+  def handle_info(:log_changed, socket), do: {:noreply, load(socket)}
 
   # ── render ────────────────────────────────────────────────
   @impl true
@@ -97,7 +97,7 @@ defmodule Web.UserLogLive do
 
       <div class="sidebar">
         <header>
-          <h1>Diary</h1>
+          <h1>Voyage log</h1>
           <span class="live"><span class={["dot", @live? && "on"]} />{if @live?,
             do: "live",
             else: "off"}</span>
@@ -150,21 +150,21 @@ defmodule Web.UserLogLive do
         <div class="transcript">
           <div class="thread mem">
             <%!-- the voyage log --%>
-            <div class="diary-section">
-              <div class="diary-label"><.ph name="compass" /> Voyage log</div>
+            <div class="voyage-section">
+              <div class="voyage-label"><.ph name="compass" /> Voyage log</div>
               <%= if @day.voyage == "" do %>
-                <div class="diary-empty">
+                <div class="voyage-empty">
                   No voyage log for this day yet. Press <strong>log this day</strong> to distill its
                   conversations into a page — or it runs nightly via the “Voyage log” routine.
                 </div>
               <% else %>
-                <div class="diary-page text">{strip_fm(@day.voyage)}</div>
+                <div class="voyage-page text">{strip_fm(@day.voyage)}</div>
               <% end %>
             </div>
 
             <%!-- the day's conversations (link out to memory) --%>
-            <div :if={@day.conversations != []} class="diary-section">
-              <div class="diary-label"><.ph name="chats-circle" /> Conversations</div>
+            <div :if={@day.conversations != []} class="voyage-section">
+              <div class="voyage-label"><.ph name="chats-circle" /> Conversations</div>
               <div
                 :for={s <- @day.conversations}
                 class="picker-item"
@@ -185,8 +185,8 @@ defmodule Web.UserLogLive do
             </div>
 
             <%!-- manual notes --%>
-            <div class="diary-section">
-              <div class="diary-label"><.ph name="pencil-simple" /> Notes</div>
+            <div class="voyage-section">
+              <div class="voyage-label"><.ph name="pencil-simple" /> Notes</div>
               <form phx-submit="save_notes" class="editor">
                 <textarea
                   name="text"

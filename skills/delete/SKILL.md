@@ -1,13 +1,13 @@
 ---
 name: delete
-description: Kill the current Claude Code session — stop the background jobs this session started, archive its transcript to the diary immediately (un-resumable), and exit; wrapped sessions respawn a fresh ephemeral fork in the same terminal. No memory extraction; use /dissolve if the session had value. Triggers on "/delete", "delete the session", "kill this session", "wrap up and exit".
+description: Kill the current Claude Code session — stop the background jobs this session started, archive its transcript to the @log archive immediately (un-resumable), and exit; wrapped sessions respawn a fresh ephemeral fork in the same terminal. No memory extraction; use /dissolve if the session had value. Triggers on "/delete", "delete the session", "kill this session", "wrap up and exit".
 ---
 
 # Delete Session
 
-Kill the current session: archive its transcript to the diary **immediately**, make it
+Kill the current session: archive its transcript to the @log archive **immediately**, make it
 un-resumable, and exit. The raw `.jsonl` is gzip-archived under `~/.claude/@log/archive/<date>/`
-(recoverable, fuel for the diary's daily dream) — but `claude --resume` will fail once the
+(recoverable, fuel for the @log archive's daily dream) — but `claude --resume` will fail once the
 live file is finalized away. Use this when the session had **no** lasting value; if it did,
 use `/dissolve` (enqueues the conversation for the memory sweep's extraction, then invokes
 this skill — the archive written here is what the sweep reads).
@@ -38,12 +38,12 @@ one of two paths:
 - **Wrapped sessions** (`shell/claude.zsh` sourced in `.zshrc` sets `CLAUDE_WRAPPER_STATE`)
   additionally **respawn a fresh claude in the same terminal as an ephemeral fork** —
   pre-marked archive-on-exit, so however it ends (even plain `/exit`) its transcript
-  dissolves to the diary. To keep a fork after all:
+  dissolves to the @log archive. To keep a fork after all:
   `rm ~/.claude/@log/.archive-on-exit/$CLAUDE_CODE_SESSION_ID`. Unwrapped sessions don't respawn.
 
 ### Caveats — state them, don't hide them
 
-- **Un-resumable.** Archived to the diary (recoverable there), not erased. Memories already
+- **Un-resumable.** Archived to the @log archive (recoverable there), not erased. Memories already
   staged at the time of attention (CLAUDE.md § Memory) survive — staging is a file, untouched
   by the kill. Only un-staged residue is lost; if that residue has value, use `/dissolve`.
 - **The exit is best-effort.** The signal is sent from inside a running tool call; the CLI may
@@ -53,7 +53,7 @@ one of two paths:
 
 ## Completion
 
-State plainly that the conversation is archived to the diary and not resumable. Do **not**
+State plainly that the conversation is archived to the @log archive and not resumable. Do **not**
 print a resume command — there's nothing to resume.
 
-> Session killed — transcript archived to the diary, not resumable.
+> Session killed — transcript archived to the @log archive, not resumable.

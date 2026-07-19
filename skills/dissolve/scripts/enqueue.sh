@@ -2,7 +2,7 @@
 # enqueue.sh — append THIS session to the dissolve queue
 # (~/.claude/@memory/.dissolve-queue.jsonl). The hourly memory sweep consumes the
 # queue: extract → judge → commit into the cwd's bank, reading the transcript from
-# the diary archive that /delete writes. Fast by design — ending a session must
+# the @log archive that /delete writes. Fast by design — ending a session must
 # never wait on claude calls.
 #
 # Usage: enqueue.sh [title]

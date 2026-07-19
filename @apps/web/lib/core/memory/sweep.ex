@@ -2,7 +2,7 @@ defmodule Core.Memory.Sweep do
   @moduledoc """
   The automatic half of the memory lifecycle: find conversations that ended without a
   manual `/dissolve`, dissolve them through the same extract → judge → commit pipeline,
-  and consume their transcripts (gzip-archive to the diary, then remove — recoverable,
+  and consume their transcripts (gzip-archive to @log, then remove — recoverable,
   not resumable). Driven unattended by the "Memory sweep" routine (launchd), so every
   decision here must be idempotent and fail-safe:
 
@@ -24,7 +24,7 @@ defmodule Core.Memory.Sweep do
   Mid-session inbox entries (`.staging.json`), the **dissolve queue**
   (`.dissolve-queue.jsonl` — sessions a `/dissolve` explicitly enqueued; their
   transcripts are already gzip-archived by `/delete`, so consumption reads from the
-  diary archive) and due dream passes ride the same sweep, so one scheduled
+  @log archive) and due dream passes ride the same sweep, so one scheduled
   entry point drives the whole autonomous lifecycle. Queue entries are explicit user
   intent — they skip the quiescence wait and are served before idle sessions, but
   share the per-run dissolve cap.

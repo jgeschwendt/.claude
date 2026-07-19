@@ -1,7 +1,7 @@
 defmodule Core.UserLog do
   @moduledoc """
-  A day-by-day diary — "what I did" — for looking back across the year. Plain files
-  under `~/.claude/@log`, one page per day, mirroring `Core.Memory`'s habit of
+  The log — "what I did" — a day-by-day record for looking back across the year. Plain
+  files under `~/.claude/@log`, one page per day, mirroring `Core.Memory`'s habit of
   keeping markdown under `~/.claude` and shelling out to `claude` for the hard part.
 
   Each day holds up to two files so the auto and manual halves never clobber each other:
@@ -10,7 +10,7 @@ defmodule Core.UserLog do
       conversations, written by `claude` (on demand here, or nightly via a Routine).
     * `YYYY-MM-DD.notes.md`  — your own notes for the day, edited in the dashboard.
 
-  The voyage log is the diary's sibling to `Memory`'s dissolve: dissolve distills one
+  The voyage log is the log's sibling to `Memory`'s dissolve: dissolve distills one
   conversation into durable memories; the voyage log distills a whole *day* into one page.
   When a session is killed (`/delete` / `/dissolve`), its raw transcript is "compact-deleted"
   — gzip-archived under `archive/YYYY-MM-DD/` rather than removed — so the voyage log still
@@ -22,20 +22,20 @@ defmodule Core.UserLog do
   @weekdays ~w(Monday Tuesday Wednesday Thursday Friday Saturday Sunday)
 
   # ── paths ─────────────────────────────────────────────────
-  # Overridable so tests can run against a tmp diary instead of the live one.
-  def diary_root,
-    do: Application.get_env(:web, :diary_root) || Path.join(System.user_home!(), ".claude/@log")
+  # Overridable so tests can run against a tmp log instead of the live one.
+  def log_root,
+    do: Application.get_env(:web, :log_root) || Path.join(System.user_home!(), ".claude/@log")
 
-  def archive_root, do: Path.join(diary_root(), "archive")
+  def archive_root, do: Path.join(log_root(), "archive")
 
-  defp voyage_path(date), do: Path.join(diary_root(), "#{date}.voyage.md")
-  defp notes_path(date), do: Path.join(diary_root(), "#{date}.notes.md")
+  defp voyage_path(date), do: Path.join(log_root(), "#{date}.voyage.md")
+  defp notes_path(date), do: Path.join(log_root(), "#{date}.notes.md")
 
-  # A diary page key is strictly `YYYY-MM-DD`; anything else is a tampered param and
+  # A log page key is strictly `YYYY-MM-DD`; anything else is a tampered param and
   # must never reach a file path or the voyage prompt (which tells claude what to write).
   defp date?(date), do: is_binary(date) and Regex.match?(~r/^\d{4}-\d{2}-\d{2}$/, date)
 
-  @doc "Today's date as an ISO string (`YYYY-MM-DD`), the diary's page key."
+  @doc "Today's date as an ISO string (`YYYY-MM-DD`), the log's page key."
   def today, do: Date.to_iso8601(Date.utc_today())
 
   def weekday(date) do
@@ -74,7 +74,7 @@ defmodule Core.UserLog do
   end
 
   defp page_dates do
-    case File.ls(diary_root()) do
+    case File.ls(log_root()) do
       {:ok, names} ->
         names
         |> Enum.flat_map(fn name ->
@@ -148,7 +148,7 @@ defmodule Core.UserLog do
   @doc "Persist the day's manual notes. Empty text removes the file."
   def write_notes(date, text) do
     if date?(date) do
-      File.mkdir_p!(diary_root())
+      File.mkdir_p!(log_root())
       text = String.trim(to_string(text))
 
       if text == "",
@@ -189,7 +189,7 @@ defmodule Core.UserLog do
     date = date || today()
 
     if date?(date) do
-      File.mkdir_p!(diary_root())
+      File.mkdir_p!(log_root())
 
       tmp =
         Path.join(System.tmp_dir!(), "claude_voyage_#{System.unique_integer([:positive])}.txt")
@@ -227,8 +227,8 @@ defmodule Core.UserLog do
       if date, do: "**#{date}** (#{weekday(date)})", else: "today (compute it with `date +%F`)"
 
     """
-    You are the VOYAGE LOG — the diary's nightly distiller. Running UNATTENDED: never
-    wait for input or ask questions. Your one job is to write a compact diary page for a
+    You are the VOYAGE LOG — the log's nightly distiller. Running UNATTENDED: never
+    wait for input or ask questions. Your one job is to write a compact log page for a
     single day from that day's Claude Code conversations, then stop.
 
     TARGET DAY: #{target}.

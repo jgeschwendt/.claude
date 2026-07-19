@@ -886,11 +886,11 @@ code {
   font-size: 0.9em;
 }
 
-/* ── diary ─────────────────────────────────────────────────── */
-.diary-section {
+/* ── voyage log ────────────────────────────────────────────── */
+.voyage-section {
   margin-bottom: 30px;
 }
-.diary-label {
+.voyage-label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -902,13 +902,13 @@ code {
   text-transform: uppercase;
   color: var(--muted);
 }
-.diary-label::after {
+.voyage-label::after {
   content: "";
   flex: 1;
   height: 1px;
   background: var(--line);
 }
-.diary-page {
+.voyage-page {
   padding: 15px 17px;
   border: 1px solid var(--line);
   border-radius: var(--r);
@@ -918,7 +918,7 @@ code {
   white-space: pre-wrap;
   word-break: break-word;
 }
-.diary-empty {
+.voyage-empty {
   padding: 15px 17px;
   border: 1px dashed var(--line);
   border-radius: var(--r);

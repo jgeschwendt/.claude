@@ -663,7 +663,7 @@ defmodule Core.Memory do
 
   @doc """
   Distill an already-parsed session map — the shared core of `distill_session/2` and
-  the dissolve-queue consumer (which parses from the diary archive instead of a live
+  the dissolve-queue consumer (which parses from the @log archive instead of a live
   transcript). Same result contract as `distill_session/2`.
   """
   def distill(session, id) do

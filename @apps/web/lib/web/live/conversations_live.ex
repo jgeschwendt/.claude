@@ -128,7 +128,7 @@ defmodule Web.ConversationsLive do
             phx-click="delete"
             phx-value-project={@session.project}
             phx-value-id={@session.id}
-            data-confirm={"Compact-delete “#{@session.title}”? The transcript is gzip-archived to the diary, then removed — the session is no longer resumable."}
+            data-confirm={"Compact-delete “#{@session.title}”? The transcript is gzip-archived to the log, then removed — the session is no longer resumable."}
           >
             <.ph name="trash" /> delete
           </button>

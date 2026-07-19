@@ -73,7 +73,7 @@ fi
 nohup bash "$scripts/archive-transcript.sh" --watch "$sid" "$cli_pid" >/dev/null 2>&1 &
 disown
 
-echo "  ▸ Conversation $sid is archived to the diary and will be un-resumable on exit."
+echo "  ▸ Conversation $sid is archived to the @log archive and will be un-resumable on exit."
 
 # ─── close the session: Ctrl-C twice, escalate to TERM ──────────────────────────
 alive() { kill -0 "$1" 2>/dev/null; }

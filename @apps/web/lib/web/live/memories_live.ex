@@ -195,7 +195,7 @@ defmodule Web.MemoriesLive do
     do: {:noreply, start_dissolve(socket, p, id)}
 
   # Distill the whole conversation, then compact-delete its source transcript
-  # (consume-on-dissolve; the transcript is gzip-archived to the diary, not erased).
+  # (consume-on-dissolve; the transcript is gzip-archived to the @log archive, not erased).
   # Guard first: project/id are client-controlled (URL param, phx-value) so reject path
   # traversal, and a stale list (or a non-persisted dream run) can point at a transcript
   # that's already gone — dissolving that would crash distill_session with "session not
