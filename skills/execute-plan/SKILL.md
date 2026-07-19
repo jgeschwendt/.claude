@@ -232,3 +232,10 @@ skills.
 - Deviations get reported, never silently absorbed — the plan file is the contract.
 - Every `agent()` call pins `model:`; an unpinned call is a bug, not a default.
 - Worktree isolation only for overlapping parallel edits, always paired with a merge stage.
+- Shared-tree parallelism (learned 2026-07-19, realtime-agent P1 — a retry agent wiped two siblings' verified work):
+  - Scope criteria must be phrased per-step ("X untouched BY THIS STEP"), never absolutely ("only X changed") — parallel agents legitimately dirty the shared tree, and verifiers told to check absolute cleanliness fail correct work.
+  - Tell every verifier explicitly: sibling agents' uncommitted changes in other paths are EXPECTED and are not a scope violation.
+  - A verdict that fails ONLY on scope in a shared tree routes to the session reviewer for adjudication — never into the automatic retry path; auto-retry is for substantive failures.
+  - Every brief — retries doubly so — carries: NEVER run git checkout/reset/clean/stash/switch; the working tree is shared with concurrent agents and prior uncommitted deliverables.
+  - Recovery note: implementer file writes are replayable from their transcripts (agent-*.jsonl tool_use blocks) — reconstruct before re-running expensive implementations.
+- Worktree isolation caveat (observed 2026-07-19): `isolation: 'worktree'` created the worktree from the WRONG git root (the user's home dotfiles repo, not the project repo the session cwd was in). Brief every worktree agent to verify the worktree actually contains the project (check for a landmark file) before working, and to self-relocate to a scratchpad copy if not — never to fall back to editing the shared main tree.
