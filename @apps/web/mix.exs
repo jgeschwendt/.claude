@@ -34,13 +34,6 @@ defmodule Web.MixProject do
       {:bandit, "~> 1.5"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:file_system, "~> 1.0"},
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.2.0",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
       {:jason, "~> 1.4"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix, "~> 1.8.8"},
@@ -64,7 +57,8 @@ defmodule Web.MixProject do
         "tailwind web --minify",
         "esbuild web --minify",
         "phx.digest"
-      ]
+      ],
+      precommit: ["compile --warnings-as-errors", "format", "test"]
     ]
   end
 end

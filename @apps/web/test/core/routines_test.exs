@@ -80,6 +80,16 @@ defmodule Core.RoutinesTest do
       assert {:ok, [dict]} = Routines.cron_intervals("* * * * *")
       assert dict == %{}
     end
+
+    test "a fully-constrained named-month expr expands to one dict" do
+      assert {:ok, [%{"Day" => 1, "Hour" => 0, "Minute" => 0, "Month" => 1}]} =
+               Routines.cron_intervals("0 0 1 jan *")
+    end
+
+    test "a step over the minute field expands to each stepped minute" do
+      assert {:ok, dicts} = Routines.cron_intervals("5/15 * * * *")
+      assert Enum.map(dicts, & &1["Minute"]) == [5, 20, 35, 50]
+    end
   end
 
   describe "humanize_schedule/1" do
@@ -98,6 +108,14 @@ defmodule Core.RoutinesTest do
 
     test "unknown shape renders as a dash" do
       assert Routines.humanize_schedule(%{"nope" => true}) == "—"
+    end
+
+    test "a day of seconds renders in days, sub-minute stays in seconds" do
+      assert Routines.humanize_schedule(%{"seconds" => 86_400, "type" => "interval"}) ==
+               "every 1d"
+
+      assert Routines.humanize_schedule(%{"seconds" => 45, "type" => "interval"}) ==
+               "every 45s"
     end
   end
 end

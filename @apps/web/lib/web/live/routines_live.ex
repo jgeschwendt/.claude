@@ -184,11 +184,7 @@ defmodule Web.RoutinesLive do
             launchd runs this on the schedule below, unattended — claude gets <code>--permission-mode=auto</code>.
           </p>
 
-          <form
-            phx-change="draft"
-            phx-submit="save"
-            style="display:flex;flex-direction:column;gap:10px"
-          >
+          <form phx-change="draft" phx-submit="save">
             <input name="name" value={@modal.params["name"]} placeholder="name (e.g. Update tools)" />
 
             <input

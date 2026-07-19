@@ -26,6 +26,26 @@ defmodule Core.Transcripts do
     |> Enum.sort_by(&(&1.updated_at || ""), :desc)
   end
 
+  @doc "Every session's cwd (first cwd seen per transcript) — far cheaper than list_sessions when only cwds are needed."
+  def session_cwds do
+    projects_dir()
+    |> Path.join("*/*.jsonl")
+    |> Path.wildcard()
+    |> Enum.flat_map(fn file ->
+      cwd =
+        file
+        |> File.stream!()
+        |> Enum.find_value(fn line ->
+          case Jason.decode(line) do
+            {:ok, %{"cwd" => cwd}} when is_binary(cwd) -> cwd
+            _ -> nil
+          end
+        end)
+
+      if cwd, do: [cwd], else: []
+    end)
+  end
+
   def get_session(project, id) do
     if Core.Store.component?(project) and Core.Store.component?(id),
       do: parse_session(Path.join([projects_dir(), project, id <> ".jsonl"]), project),

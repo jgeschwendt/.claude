@@ -10,10 +10,6 @@
 /* Required for Tailwind to automatically pick up changes in colocated CSS files in dev */
 @source "../../../../_build/dev/phoenix-colocated/web/*/";
 
-/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
-   The heroicons installation itself is managed by your mix.exs */
-@plugin "../vendor/heroicons";
-
 /* Add variants based on LiveView classes */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
@@ -263,6 +259,7 @@ body::after {
 }
 
 .search {
+  width: calc(100% - 24px);
   margin: 14px 12px 6px;
   padding: 8px 12px;
   border-radius: var(--r-s);
@@ -834,6 +831,11 @@ details[open] .chev {
 }
 .modal.wide-modal {
   width: 680px;
+}
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .modal h3 {
   margin: 0;

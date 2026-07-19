@@ -14,6 +14,9 @@ defmodule Core.Memory do
 
   @types ~w(feedback project reference user)
 
+  @doc "The memory type vocabulary."
+  def types, do: @types
+
   @default_dream """
   Extract only what a fresh session, months from now on an UNRELATED task, would act on differently for having it. The signal is surprise — the fact contradicted a reasonable default, the user had to say it out loud, or no artifact records it. Zero memories is a common, correct outcome — when in doubt, do NOT extract.
 
@@ -152,20 +155,7 @@ defmodule Core.Memory do
         true -> "reference"
       end
 
-    {name, body} =
-      case meta["name"] do
-        nil ->
-          case Regex.run(~r/^#\s+(.+)$/m, body0) do
-            [_, h1] ->
-              {String.trim(h1), body0 |> String.replace(~r/^#\s+.+\n*/, "") |> String.trim()}
-
-            _ ->
-              {Path.basename(file, ".md"), body0}
-          end
-
-        n ->
-          {n, body0}
-      end
+    {name, body} = resolve_name(meta["name"], body0, file)
 
     %{
       bank: bank,
@@ -178,6 +168,18 @@ defmodule Core.Memory do
       type: type,
       updated: meta["updated"]
     }
+  end
+
+  defp resolve_name(name, body0, _file) when is_binary(name), do: {name, body0}
+
+  defp resolve_name(nil, body0, file) do
+    case Regex.run(~r/^#\s+(.+)$/m, body0) do
+      [_, h1] ->
+        {String.trim(h1), body0 |> String.replace(~r/^#\s+.+\n*/, "") |> String.trim()}
+
+      _ ->
+        {Path.basename(file, ".md"), body0}
+    end
   end
 
   defp parse_fm(fm) do
@@ -272,14 +274,7 @@ defmodule Core.Memory do
 
   # Recover a project's real cwd from a session file (auto-memory dir names are lossy).
   defp project_cwd(project) do
-    # Same `--` → `/.` heuristic as label_from_id — a hidden dir like ~/.grove
-    # sanitizes to `--grove`, and a bare `-`→`/` pass would render it `//grove`.
-    fallback =
-      "/" <>
-        (project
-         |> String.replace_prefix("-", "")
-         |> String.replace("--", "-.")
-         |> String.replace("-", "/"))
+    fallback = Transcripts.decode_project(project)
 
     Path.join(Transcripts.projects_dir(), "#{project}/*.jsonl")
     |> Path.wildcard()
@@ -310,9 +305,9 @@ defmodule Core.Memory do
     seed_from_sandman()
 
     cwd_by_bank =
-      Enum.reduce(Transcripts.list_sessions(), %{}, fn s, acc ->
-        san = sanitize(s.cwd)
-        acc |> Map.put(san, s.cwd) |> Map.put(String.downcase(san), s.cwd)
+      Enum.reduce(Transcripts.session_cwds(), %{}, fn cwd, acc ->
+        san = sanitize(cwd)
+        acc |> Map.put(san, cwd) |> Map.put(String.downcase(san), cwd)
       end)
 
     san_home = sanitize(System.user_home!())
@@ -446,6 +441,7 @@ defmodule Core.Memory do
   # tampered request (`bank: "../.."`) can't escape the memory root.
   defp writable?(bank), do: not match?("auto:" <> _, bank) and Core.Store.component?(bank)
 
+  @doc "The single writer of a memory to disk — the canonical frontmatter + `<type>_<slug>.md` format authority. Archives any `replaces` files before writing (archive-over-delete), carries bi-temporal `created` lineage from the oldest superseded file, disambiguates slug collisions with numeric suffixes, clears the matching staging entry, and regens the bank index. Returns `:ok`, or `{:error, :not_writable}` for an auto/unsafe bank."
   def commit_memory(f) do
     if writable?(f.bank) do
       dir = Path.join(memory_root(), f.bank)

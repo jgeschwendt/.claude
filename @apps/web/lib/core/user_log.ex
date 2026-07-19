@@ -51,20 +51,22 @@ defmodule Core.UserLog do
   notes page, archived transcripts, or live conversations. Each entry is a lightweight
   map — `:date`, `:dreamt?`, `:noted?`, `:archived` count, and a one-line `:preview`.
   """
-  def list_days do
+  def list_days(sessions \\ Transcripts.list_sessions()) do
     file_days = page_dates() |> MapSet.union(archive_dates())
-    conv_days = session_dates()
+    conv_days = session_dates(sessions)
 
     (MapSet.to_list(file_days) ++ MapSet.to_list(conv_days))
     |> Enum.uniq()
     |> Enum.sort(:desc)
     |> Enum.map(fn date ->
+      dream = read_dream(date)
+
       %{
         archived: archived_count(date),
         date: date,
-        dreamt?: File.exists?(dream_path(date)),
-        noted?: File.regular?(notes_path(date)) and read_notes(date) != "",
-        preview: preview(date),
+        dreamt?: dream != "",
+        noted?: read_notes(date) != "",
+        preview: preview_of(dream),
         weekday: weekday(date)
       }
     end)
@@ -94,8 +96,8 @@ defmodule Core.UserLog do
     end
   end
 
-  defp session_dates do
-    Transcripts.list_sessions()
+  defp session_dates(sessions) do
+    sessions
     |> Enum.map(&day_of/1)
     |> Enum.reject(&is_nil/1)
     |> MapSet.new()
@@ -105,9 +107,7 @@ defmodule Core.UserLog do
   defp day_of(%{updated_at: ts}) when is_binary(ts) and ts != "", do: String.slice(ts, 0, 10)
   defp day_of(_), do: nil
 
-  defp preview(date) do
-    body = read_dream(date)
-
+  defp preview_of(body) do
     body
     |> String.split("\n", trim: true)
     |> Enum.find("", fn line ->
@@ -119,11 +119,11 @@ defmodule Core.UserLog do
 
   # ── a single day ──────────────────────────────────────────
   @doc "Everything needed to render one day: its dream, notes, and the day's conversations."
-  def get_day(date) do
+  def get_day(date, sessions \\ Transcripts.list_sessions()) do
     if date?(date) do
       %{
         archived: list_archived(date),
-        conversations: conversations_on(date),
+        conversations: conversations_on(date, sessions),
         date: date,
         dream: read_dream(date),
         notes: read_notes(date),
@@ -161,8 +161,8 @@ defmodule Core.UserLog do
   end
 
   @doc "Live (un-killed) sessions whose last activity fell on `date`, newest first."
-  def conversations_on(date) do
-    Transcripts.list_sessions() |> Enum.filter(&(day_of(&1) == date))
+  def conversations_on(date, sessions \\ Transcripts.list_sessions()) do
+    Enum.filter(sessions, &(day_of(&1) == date))
   end
 
   # ── compact-delete archive ────────────────────────────────

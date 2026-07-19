@@ -3,8 +3,6 @@ defmodule Web.MemoriesLive do
   import Web.UI
   alias Core.{Memory, Transcripts}
 
-  @types ~w(feedback project reference user)
-
   @impl true
   def mount(params, _session, socket) do
     if connected?(socket), do: Phoenix.PubSub.subscribe(Core.PubSub, "memory")
@@ -204,7 +202,7 @@ defmodule Web.MemoriesLive do
   # leaves it in place for retry — same contract as Core.Memory.Sweep.
   defp start_dissolve(socket, project, id) do
     cond do
-      not (path_component?(project) and path_component?(id)) or
+      not (Core.Store.component?(project) and Core.Store.component?(id)) or
           is_nil(Transcripts.get_session(project, id)) ->
         assign(socket,
           busy:
@@ -231,28 +229,9 @@ defmodule Web.MemoriesLive do
 
   # ── async (slow claude calls) ─────────────────────────────
   @impl true
-  def handle_async(:distill, {:ok, %{bank: bank, memories: memories} = result}, socket) do
-    msg =
-      cond do
-        result[:error] ->
-          "Extraction failed (#{inspect(result.error)}) — transcript kept; the sweep will retry."
-
-        result[:staged] && result.staged > 0 ->
-          "Judge unavailable — #{result.staged} candidate(s) staged for review."
-
-        memories == [] ->
-          "No durable memories found in that conversation."
-
-        true ->
-          "#{length(memories)} #{(length(memories) == 1 && "memory") || "memories"} committed" <>
-            if(result[:dropped] && result.dropped > 0,
-              do: " · #{result.dropped} dropped by the judge.",
-              else: "."
-            )
-      end
-
-    {:noreply, socket |> assign(busy: msg, active_id: bank) |> reload()}
-  end
+  def handle_async(:distill, {:ok, result}, socket),
+    do:
+      {:noreply, socket |> assign(busy: distill_msg(result), active_id: result.bank) |> reload()}
 
   def handle_async(:merge, {:ok, result}, socket) do
     msg =
@@ -302,6 +281,26 @@ defmodule Web.MemoriesLive do
   def handle_async(_, {:exit, reason}, socket),
     do: {:noreply, assign(socket, busy: "Error: #{inspect(reason)}", sweeping: false)}
 
+  defp distill_msg(result) do
+    cond do
+      result[:error] ->
+        "Extraction failed (#{inspect(result.error)}) — transcript kept; the sweep will retry."
+
+      result[:staged] && result.staged > 0 ->
+        "Judge unavailable — #{result.staged} candidate(s) staged for review."
+
+      result.memories == [] ->
+        "No durable memories found in that conversation."
+
+      true ->
+        "#{length(result.memories)} #{(length(result.memories) == 1 && "memory") || "memories"} committed" <>
+          if(result[:dropped] && result.dropped > 0,
+            do: " · #{result.dropped} dropped by the judge.",
+            else: "."
+          )
+    end
+  end
+
   @impl true
   def handle_info(:memory_changed, socket), do: {:noreply, reload(socket)}
 
@@ -313,9 +312,6 @@ defmodule Web.MemoriesLive do
 
   defp nz(""), do: nil
   defp nz(v), do: v
-
-  defp path_component?(s),
-    do: is_binary(s) and s != "" and Path.basename(s) == s and not String.contains?(s, "..")
 
   # Updated within the last hour — the session may still be open in a terminal, and a
   # dissolve would consume its transcript out from under it. Confirm, don't forbid.
@@ -331,7 +327,14 @@ defmodule Web.MemoriesLive do
   # ── render ────────────────────────────────────────────────
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, active: active_bank(assigns))
+    active = active_bank(assigns)
+
+    assigns =
+      assign(assigns,
+        active: active,
+        active_staged: (active && staged(active)) || [],
+        active_committed: (active && committed(active)) || []
+      )
 
     ~H"""
     <div class="app">
@@ -403,7 +406,7 @@ defmodule Web.MemoriesLive do
           <span class="tag">{if @active && @active.readonly,
             do: "auto · Claude Code · read-only",
             else: "managed · you steer this"}</span>
-          <span :if={@active} class="tag">{length(committed(@active))} memories</span>
+          <span :if={@active} class="tag">{length(@active_committed)} memories</span>
           <button
             :if={@active && !@active.readonly && MapSet.size(@selected) >= 2}
             class="btn ok"
@@ -413,7 +416,7 @@ defmodule Web.MemoriesLive do
             <.ph name="arrows-merge" /> merge {MapSet.size(@selected)}
           </button>
           <button
-            :if={@active && !@active.readonly && length(committed(@active)) >= 2}
+            :if={@active && !@active.readonly && length(@active_committed) >= 2}
             class="btn"
             phx-click="consolidate"
             title="One claude pass: merge/rewrite/archive ops, never grows the bank"
@@ -425,24 +428,24 @@ defmodule Web.MemoriesLive do
 
         <div class="transcript">
           <div class="thread mem">
-            <div :if={@active && staged(@active) != []} class="stage">
+            <div :if={@active && @active_staged != []} class="stage">
               <div class="stage-label">
-                Inbox · {length(staged(@active))} staged — the hourly sweep judges these; act only to preempt it
+                Inbox · {length(@active_staged)} staged — the hourly sweep judges these; act only to preempt it
               </div>
-              <%= for f <- staged(@active) do %>
+              <%= for f <- @active_staged do %>
                 <.memory_editor :if={editing?(@editing, f, true)} memory={@editing} />
                 <.memory_card :if={!editing?(@editing, f, true)} memory={f} mode={:staged} />
               <% end %>
             </div>
 
-            <div :if={@active && committed(@active) == [] && staged(@active) == []} class="empty-mem">
+            <div :if={@active && @active_committed == [] && @active_staged == []} class="empty-mem">
               {if @active.readonly,
                 do: "This auto-memory bank is empty.",
                 else: "This bank is empty. Dissolve a conversation to populate it."}
             </div>
 
             <%= if @active do %>
-              <%= for f <- committed(@active) do %>
+              <%= for f <- @active_committed do %>
                 <.memory_editor :if={editing?(@editing, f, false)} memory={@editing} />
                 <.memory_card
                   :if={!editing?(@editing, f, false)}
@@ -460,23 +463,7 @@ defmodule Web.MemoriesLive do
               </button>
               <div :if={@show_archive}>
                 <div :if={@archived == []} class="empty-mem">Nothing archived in this bank.</div>
-                <div :for={a <- @archived} class="memory archived">
-                  <div class="memory-head">
-                    <span class={["badge", a.type]}>{a.type}</span>
-                    <span class="memory-name">{a.name}</span>
-                    <span :if={a.archived_at} class="tag">archived {rel_time(a.archived_at)}</span>
-                    <div class="memory-tools">
-                      <button
-                        class="btn ok"
-                        phx-click="restore"
-                        phx-value-file={a.file}
-                        title="Restore into the bank"
-                      ><.ph name="arrow-counter-clockwise" /></button>
-                    </div>
-                  </div>
-                  <div class="memory-desc">{a.description}</div>
-                  <div class="memory-body">{a.body}</div>
-                </div>
+                <.archived_card :for={a <- @archived} memory={a} />
               </div>
             </div>
           </div>
@@ -489,7 +476,7 @@ defmodule Web.MemoriesLive do
           <p class="hint">
             Guides every dissolve. The whole conversation is always fed — these tune what's kept.
           </p>
-          <form phx-submit="save_dream" style="display:flex;flex-direction:column;gap:10px">
+          <form phx-submit="save_dream">
             <textarea name="text" rows="16">{@dream}</textarea>
             <div class="f-actions">
               <button type="button" class="btn" phx-click="close_dream">cancel</button>
@@ -535,6 +522,30 @@ defmodule Web.MemoriesLive do
   defp editing?(e, f, false), do: e[:staged] != true and e.file == f.file
 
   # ── memory components ───────────────────────────────────────
+  attr :memory, :map, required: true
+
+  defp archived_card(assigns) do
+    ~H"""
+    <div class="memory archived">
+      <div class="memory-head">
+        <span class={["badge", @memory.type]}>{@memory.type}</span>
+        <span class="memory-name">{@memory.name}</span>
+        <span :if={@memory.archived_at} class="tag">archived {rel_time(@memory.archived_at)}</span>
+        <div class="memory-tools">
+          <button
+            class="btn ok"
+            phx-click="restore"
+            phx-value-file={@memory.file}
+            title="Restore into the bank"
+          ><.ph name="arrow-counter-clockwise" /></button>
+        </div>
+      </div>
+      <div class="memory-desc">{@memory.description}</div>
+      <div class="memory-body">{@memory.body}</div>
+    </div>
+    """
+  end
+
   attr :memory, :map, required: true
   attr :mode, :atom, required: true
   attr :selected, :boolean, default: false
@@ -597,7 +608,7 @@ defmodule Web.MemoriesLive do
   attr :memory, :map, required: true
 
   defp memory_editor(assigns) do
-    assigns = assign(assigns, types: @types)
+    assigns = assign(assigns, types: Core.Memory.types())
 
     ~H"""
     <form class="editor" phx-submit="save">
