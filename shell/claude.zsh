@@ -6,7 +6,7 @@
 #     (gzip → ~/.claude/@log/archive, live .jsonl removed → un-resumable)
 #   · if the session asked for a respawn (/delete or /dissolve), relaunches a fresh
 #     claude in the same terminal as an EPHEMERAL FORK: pre-marked archive-on-exit,
-#     so however it ends — even plain /exit — its transcript dissolves to the diary.
+#     so however it ends — even plain /exit — its transcript dissolves to the @log archive.
 #     To keep a fork after all: rm ~/.claude/@log/.archive-on-exit/$CLAUDE_CODE_SESSION_ID
 #
 # Sid injection: for plain interactive launches we pass --session-id ourselves so the
