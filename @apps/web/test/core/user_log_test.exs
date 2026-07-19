@@ -1,5 +1,5 @@
 defmodule Core.UserLogTest do
-  # async: false — the list_days/1 test overrides the :web/:diary_root application env
+  # async: false — the list_days/1 test overrides the :web/:log_root application env
   # (a global), so it cannot run concurrently with other cases touching the same env.
   use ExUnit.Case, async: false
 
@@ -26,8 +26,8 @@ defmodule Core.UserLogTest do
     test "unions voyage pages and session days newest-first, flagging logged? and preview" do
       root = Path.join(System.tmp_dir!(), "user_log_days_#{System.unique_integer([:positive])}")
       File.mkdir_p!(root)
-      Application.put_env(:web, :diary_root, root)
-      on_exit(fn -> Application.delete_env(:web, :diary_root) end)
+      Application.put_env(:web, :log_root, root)
+      on_exit(fn -> Application.delete_env(:web, :log_root) end)
       on_exit(fn -> File.rm_rf!(root) end)
 
       File.write!(Path.join(root, "2026-07-18.voyage.md"), """

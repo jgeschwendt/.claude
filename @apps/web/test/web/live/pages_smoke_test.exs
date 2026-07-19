@@ -1,24 +1,24 @@
 defmodule Web.PagesSmokeTest do
   use Web.ConnCase
 
-  # Point the diary / memory / projects roots at fresh tmp dirs so these smoke tests
+  # Point the log / memory / projects roots at fresh tmp dirs so these smoke tests
   # render against an empty world instead of the live ~/.claude tree (mirrors sweep_test).
   setup do
     base = Path.join(System.tmp_dir!(), "pages_smoke_#{System.unique_integer([:positive])}")
     memory = Path.join(base, "memory")
     projects = Path.join(base, "projects")
-    diary = Path.join(base, "log")
+    log = Path.join(base, "log")
     File.mkdir_p!(memory)
     File.mkdir_p!(projects)
-    File.mkdir_p!(Path.join(diary, "archive"))
+    File.mkdir_p!(Path.join(log, "archive"))
     Application.put_env(:web, :memory_root, memory)
     Application.put_env(:web, :projects_dir, projects)
-    Application.put_env(:web, :diary_root, diary)
+    Application.put_env(:web, :log_root, log)
 
     on_exit(fn ->
       Application.delete_env(:web, :memory_root)
       Application.delete_env(:web, :projects_dir)
-      Application.delete_env(:web, :diary_root)
+      Application.delete_env(:web, :log_root)
       File.rm_rf!(base)
     end)
 

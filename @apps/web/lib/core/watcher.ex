@@ -1,13 +1,13 @@
 defmodule Core.Watcher do
   @moduledoc """
   Watches `~/.claude/projects` (transcripts), `~/.claude/@memory` (banks), and
-  `~/.claude/@log` (diary) and broadcasts coalesced change events over PubSub.
+  `~/.claude/@log` (the log) and broadcasts coalesced change events over PubSub.
   LiveViews subscribe and re-render — no API/fetch/WebSocket glue.
 
   Topics:
     * `"transcripts"` → `{:session_changed, project, id}`
     * `"memory"`      → `:memory_changed`
-    * `"diary"`       → `:diary_changed`
+    * `"log"`         → `:log_changed`
   """
   use GenServer
 
@@ -21,7 +21,7 @@ defmodule Core.Watcher do
   def init(:ok) do
     dirs =
       Enum.filter(
-        [Transcripts.projects_dir(), Memory.memory_root(), UserLog.diary_root()],
+        [Transcripts.projects_dir(), Memory.memory_root(), UserLog.log_root()],
         &File.dir?/1
       )
 
@@ -48,8 +48,8 @@ defmodule Core.Watcher do
       :memory_changed ->
         Phoenix.PubSub.broadcast(Core.PubSub, "memory", :memory_changed)
 
-      :diary_changed ->
-        Phoenix.PubSub.broadcast(Core.PubSub, "diary", :diary_changed)
+      :log_changed ->
+        Phoenix.PubSub.broadcast(Core.PubSub, "log", :log_changed)
     end)
 
     {:noreply, %{state | pending: MapSet.new(), timer: nil}}
@@ -68,8 +68,8 @@ defmodule Core.Watcher do
           _ -> nil
         end
 
-      String.ends_with?(path, ".md") and String.starts_with?(path, UserLog.diary_root()) ->
-        :diary_changed
+      String.ends_with?(path, ".md") and String.starts_with?(path, UserLog.log_root()) ->
+        :log_changed
 
       String.ends_with?(path, ".md") and String.starts_with?(path, Memory.memory_root()) ->
         :memory_changed

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # archive-transcript.sh — compact-delete a session's transcript(s): gzip-archive to the
-# diary (~/.claude/@log/archive/<date>/), then remove the live .jsonl so the session is
+# @log archive (~/.claude/@log/archive/<date>/), then remove the live .jsonl so the session is
 # un-resumable. Marker-driven and idempotent — the zsh wrapper (shell/claude.zsh) and the
 # detached watcher fallback can both fire; the mkdir lock makes double-fire harmless.
 #
@@ -29,7 +29,7 @@ transcripts() { # $1=sid — one path per line, empty if none
   shopt -u nullglob
 }
 
-archive_copy() { # $1=transcript path — gzip-copy into today's diary dir
+archive_copy() { # $1=transcript path — gzip-copy into today's @log archive dir
   local dir="$CLAUDE_HOME/@log/archive/$(date +%F)"
   mkdir -p "$dir"
   gzip -c "$1" > "$dir/$(basename "$1").gz"

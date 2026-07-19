@@ -10,22 +10,22 @@ defmodule Core.Memory.SweepTest do
     base = Path.join(System.tmp_dir!(), "sweep_test_#{System.unique_integer([:positive])}")
     memory = Path.join(base, "memory")
     projects = Path.join(base, "projects")
-    diary = Path.join(base, "log")
+    log = Path.join(base, "log")
     File.mkdir_p!(memory)
     File.mkdir_p!(projects)
-    File.mkdir_p!(Path.join(diary, "archive"))
+    File.mkdir_p!(Path.join(log, "archive"))
     Application.put_env(:web, :memory_root, memory)
     Application.put_env(:web, :projects_dir, projects)
-    Application.put_env(:web, :diary_root, diary)
+    Application.put_env(:web, :log_root, log)
 
     on_exit(fn ->
       Application.delete_env(:web, :memory_root)
       Application.delete_env(:web, :projects_dir)
-      Application.delete_env(:web, :diary_root)
+      Application.delete_env(:web, :log_root)
       File.rm_rf!(base)
     end)
 
-    %{projects: projects, diary: diary, memory: memory}
+    %{projects: projects, log: log, memory: memory}
   end
 
   defp write_session(projects, id, messages, at) do
@@ -102,8 +102,8 @@ defmodule Core.Memory.SweepTest do
   # Same claude-spend rule as above: no queue fixture may be both archived and
   # non-trivial unless the run is capped to max: 0.
 
-  defp write_archive(diary, id, messages) do
-    dir = Path.join([diary, "archive", "2026-07-13"])
+  defp write_archive(log, id, messages) do
+    dir = Path.join([log, "archive", "2026-07-13"])
     File.mkdir_p!(dir)
 
     lines =
@@ -132,8 +132,8 @@ defmodule Core.Memory.SweepTest do
   end
 
   test "queued trivial sessions are consumed from the archive without a claude call",
-       %{diary: diary} do
-    write_archive(diary, "qtiny", ["hi"])
+       %{log: log} do
+    write_archive(log, "qtiny", ["hi"])
     enqueue("qtiny")
 
     report = Sweep.run()
@@ -165,10 +165,10 @@ defmodule Core.Memory.SweepTest do
   end
 
   test "queue entries count against the shared dissolve cap", %{
-    diary: diary,
+    log: log,
     projects: projects
   } do
-    write_archive(diary, "qreal", ["a", "b", "c", "d", "e"])
+    write_archive(log, "qreal", ["a", "b", "c", "d", "e"])
     enqueue("qreal")
     write_session(projects, "idle", ["a", "b", "c", "d", "e"], iso_hours_ago(72))
 

@@ -53,7 +53,7 @@ defmodule Core.Transcripts do
   end
 
   @doc """
-  Compact-delete a session's transcript: gzip-archive it under the diary's
+  Compact-delete a session's transcript: gzip-archive it under the
   `@log/archive/YYYY-MM-DD/` (recoverable, fuel for the voyage log — same contract as
   `/delete`), then remove the live file and notify subscribers. The live file is only
   removed once the archive is safely written; returns `:ok` or `{:error, reason}`.
@@ -88,7 +88,7 @@ defmodule Core.Transcripts do
   defp project_of(file), do: file |> Path.relative_to(projects_dir()) |> Path.split() |> hd()
 
   @doc """
-  Parse a session from its newest gzip archive in the diary — how the dissolve-queue
+  Parse a session from its newest gzip archive in the @log archive — how the dissolve-queue
   consumer reads transcripts that `/delete` already archived. Returns nil when no
   archive exists yet (the session may still be finalizing) or it doesn't parse.
   """
