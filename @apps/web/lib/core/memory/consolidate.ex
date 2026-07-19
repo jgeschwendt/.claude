@@ -109,15 +109,45 @@ defmodule Core.Memory.Consolidate do
     memories = Memory.bank_memories(bank)
 
     prompt = """
-    You are the CONSOLIDATION pass for a personal memory bank — an autonomous rewrite with no human review. Propose at most #{@max_ops} ops that make the bank SMALLER and SHARPER; when nothing clearly qualifies, return zero ops. Never invent facts — every output memory must be derivable from the inputs.
+    You are the CONSOLIDATION pass over one bank of a personal memory store — an
+    autonomous rewrite with no human review; every op you return is applied to disk
+    directly. Your job is a smaller, sharper bank; zero ops is a common, correct outcome.
 
-    Ops:
-    - merge: 2+ overlapping memories → files + one consolidated "memory" (keep the most specific detail, preserve every [[wikilink]])
-    - rewrite: 1 memory whose name/description is too vague to trigger recall → files=[that file] + sharpened "memory" (body may only be clarified, never extended)
-    - archive: 1 memory that is stale, superseded, or ephemeral-in-hindsight → files=[that file], no "memory"
+    THE DREAM — the user's standing curation guidance; it defines what deserves to
+    remain a memory:
+    #{Memory.get_dream()}
 
-    BANK "#{bank}" (#{length(memories)} memories):
+    BANK "#{bank}" (#{length(memories)} memories, full bodies):
     #{Enum.map_join(memories, "\n===\n", &"FILE #{&1.file}\nname: #{&1.name}\ndescription: #{&1.description}\ntype: #{&1.type}\ncreated: #{&1.created}\n#{&1.body}")}
+
+    ## Phase 1 — Orient
+    Read the whole bank above before judging any single memory. Look for its shape:
+    clusters restating one idea, names or descriptions too vague to trigger recall,
+    facts that events have outrun.
+
+    ## Phase 2 — Weigh each memory against the bars
+    durable (useful in a future, unrelated session) · non-derivable (not recoverable
+    from the project's code/git/artifacts) · one idea per memory · description
+    specific enough to trigger recall — all read under the dream. The created/updated
+    stamps are the timeline: when two memories disagree, the newer fact wins.
+
+    ## Phase 3 — Propose at most #{@max_ops} ops
+    - merge — 2+ memories carrying ONE idea between them → "files" + one consolidated
+      "memory". Keep the most specific detail from every source; preserve every
+      [[wikilink]]; a merge that loses a fact is worse than no merge.
+    - rewrite — 1 memory whose name or description would fail to trigger recall →
+      "files" = [that file] + the sharpened "memory". Clarify only; never add facts
+      the source doesn't carry.
+    - archive — 1 memory that is stale, superseded, or ephemeral-in-hindsight →
+      "files" = [that file], no "memory".
+
+    Hard rules — an op violating any of these is discarded unapplied:
+    - Every "files" entry is a filename from the bank above, verbatim.
+    - A consolidation never grows the bank.
+    - Never invent: every sentence you output must be derivable from the inputs.
+
+    When in doubt, do nothing. A skipped merge costs one redundant recall; a wrong op
+    silently corrupts the user's memory.
     """
 
     case Core.Claude.run(prompt, schema: @ops_schema) do

@@ -94,6 +94,7 @@ defmodule Web.MemoriesLive do
       body: params["body"],
       description: params["description"],
       name: params["name"],
+      recall: recall_for(params["recall"]),
       replaces: replaces_for(params),
       source: blank_to_nil(params["source"]),
       type: params["type"]
@@ -305,6 +306,9 @@ defmodule Web.MemoriesLive do
 
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(v), do: v
+
+  defp recall_for(r) when r in ~w(pin index mute), do: r
+  defp recall_for(_), do: nil
 
   # Updated within the last hour — the session may still be open in a terminal, and a
   # dissolve would consume its transcript out from under it. Confirm, don't forbid.
@@ -564,6 +568,7 @@ defmodule Web.MemoriesLive do
         <span :if={@memory[:replaces] not in [nil, []]} class="badge merge-b">merges {length(
           @memory.replaces
         )}</span>
+        <span :if={@memory[:recall]} class="tag">recall: {@memory.recall}</span>
         <div class="memory-tools">
           <button
             :if={@mode == :staged}
@@ -618,6 +623,10 @@ defmodule Web.MemoriesLive do
       <input name="description" value={@memory.description} placeholder="one-line recall summary" />
       <select name="type">
         <option :for={t <- @types} selected={t == @memory.type}>{t}</option>
+      </select>
+      <select name="recall">
+        <option value="default" selected={@memory[:recall] not in ~w(pin index mute)}>default</option>
+        <option :for={r <- ~w(pin index mute)} selected={r == @memory[:recall]}>{r}</option>
       </select>
       <textarea name="body" rows="9">{@memory.body}</textarea>
       <div class="f-actions">

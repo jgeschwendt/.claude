@@ -20,7 +20,7 @@ const ROOT = join(homedir(), ".claude", "@memory");
 
 const sanitize = (/** @type {string} */ p) => p.replace(/[^a-zA-Z0-9]/g, "-");
 
-/** @returns {{name:string,description:string,type:string,updated:string,body:string,file:string}|null} */
+/** @returns {{name:string,description:string,type:string,recall:string,updated:string,body:string,file:string}|null} */
 function parseMemory(/** @type {string} */ raw, /** @type {string} */ file) {
   const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   const fm = {};
@@ -36,6 +36,9 @@ function parseMemory(/** @type {string} */ raw, /** @type {string} */ file) {
     description: fm.description ?? "",
     file,
     name: fm.name ?? file.replace(/\.md$/, ""),
+    // recall steers rendering independent of type: pin | index | mute (anything else /
+    // absent = type policy). Values outside the trio degrade to "" (type policy).
+    recall: ["index", "mute", "pin"].includes(fm.recall) ? fm.recall : "",
     type: fm.type ?? "reference",
     updated: fm.updated ?? fm.created ?? "",
   };
@@ -51,11 +54,14 @@ function bankMemories(/** @type {string} */ bank) {
       if (mem) out.push(mem);
     } catch {}
   }
-  // user/feedback carry behavioral rules — surface them first, newest first within type
+  // user/feedback carry behavioral rules — surface them first, newest first within type;
+  // recall:pin outranks every type, recall:mute drops the memory entirely.
   const rank = { user: 0, feedback: 1, project: 2, reference: 3 };
-  return out.sort(
-    (a, b) => (rank[a.type] ?? 4) - (rank[b.type] ?? 4) || b.updated.localeCompare(a.updated),
-  );
+  const rankOf = (/** @type {{type:string,recall:string}} */ m) =>
+    m.recall === "pin" ? -1 : (rank[m.type] ?? 4);
+  return out
+    .filter((m) => m.recall !== "mute")
+    .sort((a, b) => rankOf(a) - rankOf(b) || b.updated.localeCompare(a.updated));
 }
 
 function compose(/** @type {string} */ cwd) {
@@ -84,16 +90,25 @@ function compose(/** @type {string} */ cwd) {
       const label = exact ? "this directory's bank" : "ancestor bank";
       const full = (m) => `### ${m.name} (${m.type})\n${m.body}`;
       const index = (m) => `- ${m.name} (${m.type}) — ${m.description}  [${bank}/${m.file}]`;
+      // recall wins over type: pin → always full, index → always index line; else type policy.
+      const fullMode = (m) =>
+        m.recall === "pin"
+          ? full(m)
+          : m.recall === "index"
+            ? index(m)
+            : ["user", "feedback"].includes(m.type)
+              ? full(m)
+              : index(m);
+      // In degraded (index) mode a pinned memory keeps its full body above the index lines.
+      const indexMode = (m) => (m.recall === "pin" ? full(m) : index(m));
       return {
         bank,
         full:
           `## Memories · ${label} · ~/.claude/@memory/${bank}/\n` +
-          memories
-            .map((m) => (["user", "feedback"].includes(m.type) ? full(m) : index(m)))
-            .join("\n"),
+          memories.map(fullMode).join("\n"),
         index:
           `## Memory index · ${label} · ~/.claude/@memory/${bank}/\n` +
-          memories.map(index).join("\n"),
+          memories.map(indexMode).join("\n"),
       };
     })
     .filter(Boolean);
