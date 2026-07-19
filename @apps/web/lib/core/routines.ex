@@ -44,16 +44,16 @@ defmodule Core.Routines do
     }
   ]
 
-  # Built at runtime so the "Daily dream" carries `Core.UserLog`'s live prompt — the
+  # Built at runtime so the voyage log carries `Core.UserLog`'s live prompt — the
   # same one the dashboard's "dream now" button runs. launchd fires it nightly, unattended.
   defp default_routines do
     @default_routines ++
       [
         %{
-          "name" => "Daily dream",
-          "prompt" => Core.UserLog.dream_prompt(),
+          "name" => "Voyage log",
+          "prompt" => Core.UserLog.voyage_prompt(),
           "schedule" => %{"expr" => "30 23 * * *", "type" => "cron"},
-          "slug" => "daily-dream"
+          "slug" => "voyage-log"
         }
       ]
   end
@@ -507,7 +507,7 @@ defmodule Core.Routines do
 
   # Command routines run the shell line as-is; prompt routines run unattended claude.
   # --no-session-persistence: unattended runs shouldn't leave transcripts cluttering
-  # the human's Conversations view (and the daily-dream must not summarize its own run).
+  # the human's Conversations view (and the voyage log must not summarize its own run).
   defp run_line(_slug, %{"command" => command}) when is_binary(command), do: command
 
   defp run_line(slug, _r),

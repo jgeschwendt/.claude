@@ -17,23 +17,23 @@ defmodule Core.UserLogTest do
 
   describe "get_day/1" do
     test "a path-traversal key returns the empty day shape" do
-      assert %{archived: [], conversations: [], dream: "", notes: "", weekday: ""} =
+      assert %{archived: [], conversations: [], notes: "", voyage: "", weekday: ""} =
                UserLog.get_day("../../etc/passwd")
     end
   end
 
   describe "list_days/1" do
-    test "unions dream pages and session days newest-first, flagging dreamt? and preview" do
+    test "unions voyage pages and session days newest-first, flagging logged? and preview" do
       root = Path.join(System.tmp_dir!(), "user_log_days_#{System.unique_integer([:positive])}")
       File.mkdir_p!(root)
       Application.put_env(:web, :diary_root, root)
       on_exit(fn -> Application.delete_env(:web, :diary_root) end)
       on_exit(fn -> File.rm_rf!(root) end)
 
-      File.write!(Path.join(root, "2026-07-18.dream.md"), """
+      File.write!(Path.join(root, "2026-07-18.voyage.md"), """
       ---
       date: 2026-07-18
-      type: dream
+      type: voyage
       ---
       # heading
       The prose line.
@@ -43,12 +43,12 @@ defmodule Core.UserLogTest do
 
       assert Enum.map(days, & &1.date) == ["2026-07-18", "2026-07-17"]
 
-      dream_day = Enum.find(days, &(&1.date == "2026-07-18"))
-      assert dream_day.dreamt? == true
-      assert dream_day.preview == "The prose line."
+      voyage_day = Enum.find(days, &(&1.date == "2026-07-18"))
+      assert voyage_day.logged? == true
+      assert voyage_day.preview == "The prose line."
 
       session_day = Enum.find(days, &(&1.date == "2026-07-17"))
-      assert session_day.dreamt? == false
+      assert session_day.logged? == false
     end
   end
 end

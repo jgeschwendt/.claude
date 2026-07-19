@@ -244,7 +244,7 @@ tail kept, middle truncated).
 
 ## The dream (sleep-time consolidation)
 
-Not the diary's _daily dream_ (the page-per-day distiller that turns archived transcripts
+Not the diary's _voyage log_ (the page-per-day distiller that turns archived transcripts
 into diary pages) — this is the sleep-time pass that merges, rewrites, and archives to keep
 a grown bank sharp.
 
@@ -343,7 +343,7 @@ MemoriesLive is a **viewer/editor with manual triggers** — never an approval s
 ```mermaid
 flowchart LR
     T["projects/&lt;proj&gt;/&lt;sid&gt;.jsonl<br/>(live transcript)"] -->|"/dissolve · /delete ·<br/>dashboard dissolve · hourly sweep"| G["@log/archive/&lt;date&gt;/&lt;sid&gt;.jsonl.gz"]
-    G --> DRM["diary's daily dream (fuel)"]
+    G --> DRM["diary's voyage log (fuel)"]
     G --> QX["dissolve-queue extraction<br/>(parse_archived/1)"]
     G -.->|"gunzip back into projects/<br/>restores resumability"| T
     M1["committed memory"] -->|superseded / deleted /<br/>dream-archived| A["&lt;bank&gt;/_archive/&lt;stamp&gt;_&lt;file&gt;"]
