@@ -1,6 +1,6 @@
 defmodule Core.Claude do
   @moduledoc """
-  Shared runner for the unattended server-side `claude` CLI calls of the memory pipeline (extraction, judging, merge, consolidation).
+  Shared runner for the unattended server-side `claude` CLI calls of the memory pipeline (extraction, judging, merge, the dream).
 
   Every run is `-p --output-format json --no-session-persistence` so pipeline runs
   never leave transcripts for the pipeline to later dissolve. `CLAUDE_MEMORY_PIPELINE=1`

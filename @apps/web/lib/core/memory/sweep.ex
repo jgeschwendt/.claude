@@ -24,7 +24,7 @@ defmodule Core.Memory.Sweep do
   Mid-session inbox entries (`.staging.json`), the **dissolve queue**
   (`.dissolve-queue.jsonl` — sessions a `/dissolve` explicitly enqueued; their
   transcripts are already gzip-archived by `/delete`, so consumption reads from the
-  diary archive) and due consolidation passes ride the same sweep, so one scheduled
+  diary archive) and due dream passes ride the same sweep, so one scheduled
   entry point drives the whole autonomous lifecycle. Queue entries are explicit user
   intent — they skip the quiescence wait and are served before idle sessions, but
   share the per-run dissolve cap.
@@ -45,7 +45,7 @@ defmodule Core.Memory.Sweep do
 
   @doc """
   One sweep: drain the inbox, consume the dissolve queue, dissolve up to `max` due
-  idle sessions (queue entries count against `max`), run due consolidations. Returns
+  idle sessions (queue entries count against `max`), run due dreams. Returns
   a report map (also printed by the mix task), or `:locked` when another sweep is
   already running — the launchd run and the dashboard's "Sweep now" may overlap, and
   two concurrent queue rewrites could resurrect a consumed entry.
@@ -72,7 +72,7 @@ defmodule Core.Memory.Sweep do
       "#{length(report.results)} dissolved-or-tried · " <>
       "#{report.trivial} trivial · #{report.deferred} deferred · " <>
       "inbox #{inbox.committed}✓/#{inbox.dropped}✗/#{inbox.kept}… · " <>
-      "#{length(report.consolidated)} bank(s) consolidated"
+      "#{length(report.dreamt)} bank(s) dreamt"
   end
 
   defp lock_path, do: Path.join(Memory.memory_root(), ".sweep.lock")
@@ -124,7 +124,7 @@ defmodule Core.Memory.Sweep do
 
     %{
       considered: length(due) + length(trivial),
-      consolidated: Core.Memory.Consolidate.run_due(),
+      dreamt: Core.Memory.Dream.run_due(),
       deferred: max(length(due) - idle_max, 0),
       inbox: Memory.drain_inbox(),
       queue: queue_results,

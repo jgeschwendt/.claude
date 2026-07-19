@@ -157,13 +157,13 @@ defmodule Web.MemoriesLive do
      |> start_async(:sweep, fn -> Core.Memory.Sweep.run() end)}
   end
 
-  def handle_event("consolidate", _, socket) do
+  def handle_event("dream", _, socket) do
     bank = active_bank(socket.assigns)
 
     {:noreply,
      socket
-     |> assign(busy: "Consolidating #{bank.label} via claude…")
-     |> start_async(:consolidate, fn -> Core.Memory.Consolidate.consolidate(bank.id) end)}
+     |> assign(busy: "Dreaming #{bank.label} via claude…")
+     |> start_async(:dream, fn -> Core.Memory.Dream.run(bank.id) end)}
   end
 
   def handle_event("open_dream", _, socket),
@@ -261,12 +261,12 @@ defmodule Web.MemoriesLive do
     {:noreply, socket |> assign(busy: msg, sweeping: false) |> reload()}
   end
 
-  def handle_async(:consolidate, {:ok, result}, socket) do
+  def handle_async(:dream, {:ok, result}, socket) do
     msg =
       cond do
-        result.error -> "Consolidation failed (#{inspect(result.error)}) — nothing changed."
-        result.ops == [] -> "Consolidation: no ops — the bank is already sharp."
-        true -> "Consolidation: #{length(result.ops)} op(s) applied."
+        result.error -> "Dream failed (#{inspect(result.error)}) — nothing changed."
+        result.ops == [] -> "Dream: no ops — the bank is already sharp."
+        true -> "Dream: #{length(result.ops)} op(s) applied."
       end
 
     {:noreply, socket |> assign(busy: msg) |> reload()}
@@ -419,10 +419,10 @@ defmodule Web.MemoriesLive do
           <button
             :if={@active && !@active.readonly && length(@active_committed) >= 2}
             class="btn"
-            phx-click="consolidate"
+            phx-click="dream"
             title="One claude pass: merge/rewrite/archive ops, never grows the bank"
           >
-            <.ph name="arrows-in-line-vertical" /> consolidate
+            <.ph name="arrows-in-line-vertical" /> dream
           </button>
         </div>
         <div :if={@busy} class="banner">{@busy}</div>

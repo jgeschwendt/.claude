@@ -16,12 +16,12 @@ Why: in-session compliance evaporates at session end; only the encoded rule pers
 
 ## Memory
 
-Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (sweep, judge, dissolve queue, consolidation) are documented in `@apps/web/lib/core/memory.md` and the `/dissolve`·`/delete` skills—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
+Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (sweep, judge, dissolve queue, the dream) are documented in `@apps/web/lib/core/memory.md` and the `/dissolve`·`/delete` skills—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
 
 A session owes the system three behaviors:
 
 - **Recall is injected:** a SessionStart hook feeds the cwd's bank plus ancestor banks into every session. Hook-free fallback (some work sessions): read the matching bank's `MEMORY.md` yourself (case-insensitive cwd match). Either way, memories are point-in-time observations—verify before asserting.
-- **Write at the time of attention:** the moment a durable memory surfaces, append `{bank, body, description, name, replaces, source, type}` to `~/.claude/@memory/.staging.json`, replacing any entry with the same `bank`+`name`. Never defer to session end—not every ending extracts.
+- **Write at the time of attention:** the moment a durable memory surfaces, append `{bank, body, description, name, recall, replaces, source, type}` to `~/.claude/@memory/.staging.json`, replacing any entry with the same `bank`+`name`. Never defer to session end—not every ending extracts.
 - **Never hand-edit** committed bank files or `MEMORY.md`; every write flows through the pipeline, and the dashboard is a viewer/editor, not a gate. Durable _instructions_ still route through the Golden Rule—artifacts for rules, memory for observations. Don't stage what belongs in a SKILL.md.
 
 ## Rules

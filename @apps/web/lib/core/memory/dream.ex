@@ -1,13 +1,14 @@
-defmodule Core.Memory.Consolidate do
+defmodule Core.Memory.Dream do
   @moduledoc """
-  The sleep-time pass: between sessions, spend compute making each bank *smaller and
-  sharper* rather than waiting for recall to fail. (Offline consolidation is the
-  best-evidenced quality axis for a personal memory bank — see
-  `~/.claude/@research/claude-memory-system/report.md`.)
+  The dream: the sleep-time pass — between sessions, spend compute making each bank
+  *smaller and sharper* rather than waiting for recall to fail. (Offline consolidation
+  is the best-evidenced quality axis for a personal memory bank — see
+  `~/.claude/@research/claude-memory-system/report.md`.) (The memory pass formerly
+  labeled consolidation; distinct from the diary's daily dream.)
 
   A bank is due when it has gained `@growth_trigger`+ memories since its last pass and
   the last pass is `@min_interval_hours`+ old (state in the bank's
-  `_consolidation.json`). One `claude` call reads the whole bank (they're small by
+  `_dream.json`). One `claude` call reads the whole bank (they're small by
   design) and proposes a capped set of ops; each op is applied through
   `Core.Memory.commit_memory`/`delete_memory`, so consolidation inherits every
   safety property of a normal commit — archive-over-delete, collision suffixes,
@@ -51,7 +52,7 @@ defmodule Core.Memory.Consolidate do
     "required" => ["ops"]
   }
 
-  @doc "Run consolidation on every due managed bank. Returns a list of per-bank reports."
+  @doc "Run the dream on every due managed bank. Returns a list of per-bank reports."
   def run_due do
     case File.ls(Memory.memory_root()) do
       {:ok, dirs} ->
@@ -59,7 +60,7 @@ defmodule Core.Memory.Consolidate do
         |> Enum.reject(&(String.starts_with?(&1, ".") or String.starts_with?(&1, "_")))
         |> Enum.filter(&File.dir?(Path.join(Memory.memory_root(), &1)))
         |> Enum.filter(&(baseline!(&1) and due?(&1)))
-        |> Enum.map(&consolidate/1)
+        |> Enum.map(&run/1)
 
       _ ->
         []
@@ -78,14 +79,40 @@ defmodule Core.Memory.Consolidate do
     end
   end
 
-  defp state_path(bank), do: Path.join([Memory.memory_root(), bank, "_consolidation.json"])
+  defp state_path(bank), do: Path.join([Memory.memory_root(), bank, "_dream.json"])
 
+  defp legacy_state_path(bank),
+    do: Path.join([Memory.memory_root(), bank, "_consolidation.json"])
+
+  # Migration: read the new `_dream.json`; when only a pre-rename `_consolidation.json`
+  # is present, adopt it verbatim (its count preserves the growth delta) and move it to
+  # `_dream.json`, so no bank loses its baseline across the rename (a lost baseline
+  # re-triggers baseline-on-first-sight — safe but counter-less). Idempotent: once
+  # `_dream.json` exists this is a plain read.
   defp read_state(bank) do
-    with {:ok, txt} <- File.read(state_path(bank)),
+    case decode_state(state_path(bank)) do
+      :error ->
+        case decode_state(legacy_state_path(bank)) do
+          :error ->
+            %{}
+
+          map ->
+            Core.Store.write!(state_path(bank), Jason.encode!(map, pretty: true))
+            File.rm(legacy_state_path(bank))
+            map
+        end
+
+      map ->
+        map
+    end
+  end
+
+  defp decode_state(path) do
+    with {:ok, txt} <- File.read(path),
          {:ok, map} when is_map(map) <- Jason.decode(txt) do
       map
     else
-      _ -> %{}
+      _ -> :error
     end
   end
 
@@ -104,12 +131,12 @@ defmodule Core.Memory.Consolidate do
     memories != [] and grown and rested
   end
 
-  @doc "Consolidate one bank now (also used by the dashboard's manual trigger)."
-  def consolidate(bank) do
+  @doc "Run the dream on one bank now (also used by the dashboard's manual trigger)."
+  def run(bank) do
     memories = Memory.bank_memories(bank)
 
     prompt = """
-    You are the CONSOLIDATION pass over one bank of a personal memory store — an
+    You are the DREAM pass over one bank of a personal memory store — an
     autonomous rewrite with no human review; every op you return is applied to disk
     directly. Your job is a smaller, sharper bank; zero ops is a common, correct outcome.
 
@@ -211,5 +238,6 @@ defmodule Core.Memory.Consolidate do
     }
 
     Core.Store.write!(state_path(bank), Jason.encode!(state, pretty: true))
+    File.rm(legacy_state_path(bank))
   end
 end
