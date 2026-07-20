@@ -16,7 +16,7 @@ Why: in-session compliance evaporates at session end; only the encoded rule pers
 
 ## Memory
 
-Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (sweep, judge, dissolve queue, the dream) are documented in `@apps/web/lib/core/memory.md` and the `/dissolve`·`/delete` skills—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
+Committed session memory lives in per-directory banks under `~/.claude/@memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (sweep, judge, dissolve queue, the dream) are documented in orrery's `lib/orrery/memory.md` (github.com/jgeschwendt/orrery, cloned locally) and the `/dissolve`·`/delete` skills—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
 
 A session owes the system three behaviors:
 
@@ -28,6 +28,7 @@ A session owes the system three behaviors:
 
 - Edit over create—question if new files add value
 - Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
+- House rules (`rules/*.md`) govern code authored for this machine—in a repo with its own convention (work, third-party), the surrounding code wins.
 - Premium models never implement—in a Fable (or other premium-model) session, implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below; agents inherit the session model by default, so an unpinned agent is a rule violation. The session model decomposes, orchestrates, judges, and reviews—it never types the code.
 - Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
 - Scripts under `~/.claude` are bash (+jq)—never python
@@ -41,9 +42,10 @@ A session owes the system three behaviors:
 
 - Alpha-sort declarations where order is arbitrary (imports, object keys, union members, etc.). Exception: when order encodes meaning—dependency order, most-common-first enums, pipeline stages.
 - Assume auto-formatting via tooling—prioritize logic over style
+- Extract magic numbers into named `UPPER_CASE` constants—`-1`, `0`, `1`, `2` exempt; the name carries what the bare literal doesn't. (since 2026-07-19 · @jlg/eslint no-magic-numbers; ra's Rust consts)
 - Inline single-use variables—compose at point of use. Exception: when the binding name carries meaning the expression doesn't.
 - Local fixes over site-wide configuration changes—loosening shared config (eslint, tsconfig) to clear one case has a blast radius far beyond the fix
-- The **`✻`** sigil marks in-code notes surfaced during code scans (see per-language `rules/*.md` for syntax).
+- The **`✻`** sigil marks in-code notes surfaced during code scans (see `rules/comments.md` for syntax).
 
 ## Thinking Philosophies
 

@@ -4,6 +4,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -51,8 +52,8 @@
   "theme": "auto",
   "editorMode": "normal",
   "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
-  },
-  "model": "claude-fable-5[1m]"
+  }
 }

@@ -17,7 +17,7 @@ when_to_use: >
 
 Ending a session must be **instant**: `/dissolve` does no extraction itself. It appends
 this session to the dissolve queue and invokes the delete skill; the hourly memory sweep
-(`Core.Memory.Sweep` — `@apps/web/lib/core/memory/sweep.ex`) consumes the queue: it reads
+(`Orrery.Memory.Sweep` — `orrery lib/orrery/memory/sweep.ex`) consumes the queue: it reads
 the gzip-archived transcript from the @log archive, extracts candidates, judge-verifies them, and
 commits survivors into `~/.claude/@memory/<sanitized-cwd>/` through `Core.Memory` — the
 single format authority. No human review anywhere; the dashboard is a viewer/editor.
@@ -32,20 +32,7 @@ should already be staged at the time of attention (CLAUDE.md § Memory). Double-
 anything durable and urgent that isn't in an artifact or `.staging.json` yet — stage it.
 Usually this is a silent skip.
 
-## 2. Drain the coding-standards queue
-
-Read `~/.claude/rules/learn-code.md`. If no unchecked entries sit below `<!-- captures below -->`,
-skip silently. Otherwise promote each entry that clears the bar — tool-encoded (names config +
-rule), a tool default (the default is the universality evidence — verify against the tool's
-docs/source), judgment-bearing (not style already delegated to auto-formatting), net-zero
-(overlaps an existing rule → merge, don't add) — into `~/.claude/rules/<lang>.md` in house
-style, stamped `(since <date> · <tool:rule>)`, each edit shown as a diff. Check off promoted
-entries (`- [x]`); strike rejects with a one-line reason (a bespoke override → route it to that
-repo's `.claude/`, then strike). Never promote one repo's bespoke rule globally.
-
-This is the one judgment task that must stay in-session — the sweep has no skill context.
-
-## 3. Enqueue
+## 2. Enqueue
 
 ```
 bash ~/.claude/skills/dissolve/scripts/enqueue.sh "<one-line session title>"
@@ -55,15 +42,16 @@ Give a title that will make sense in the dashboard's queue panel (what the sessi
 about, ≤80 chars). The entry records `{id, cwd, title, queued_at}`; the sweep resolves the
 bank from the transcript's own cwd (queue cwd is the fallback).
 
-## 4. Summary, then kill via /delete
+## 3. Summary, then kill via /delete
 
 State the one-line summary:
 
 > queued for dissolve — the hourly sweep will extract and commit; transcript archives to the @log archive
 
-Then **invoke the delete skill** (Skill tool, `delete`) — it stops this session's background
-jobs, archives the transcript (that archive is exactly what the sweep will read), and kills
-the session. Do not call its script directly; the kill lives in one place.
+Then **invoke the delete skill** (Skill tool, `delete`) in its **default (soft/archive) mode —
+never `/delete hard`** — it stops this session's background jobs, archives the transcript (that
+archive is exactly what the sweep will read; hard would erase it and the sweep would extract
+nothing), and kills the session. Do not call its script directly; the kill lives in one place.
 
 **Human checkpoint**: none. Invoking `/dissolve` IS the go-ahead for enqueue and kill.
 

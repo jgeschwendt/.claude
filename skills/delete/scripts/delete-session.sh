@@ -16,9 +16,16 @@
 # the same terminal. Unwrapped: a detached watcher finalizes; no respawn is possible.
 # Finally we signal the CLI to exit (Ctrl-C twice, escalating to SIGTERM).
 #
-# Usage: delete-session.sh [scratchpad_dir]
+# --hard erases the transcript outright: the marker is written with content `hard` (vs the
+# soft mode's empty marker), the --now archive copy is SKIPPED, and finalize rm's the live
+# .jsonl WITHOUT a @log archive copy — unrecoverable. /dissolve must NEVER pass --hard (the
+# archive is what the sweep reads). (since 2026-07-19 · /delete hard)
+#
+# Usage: delete-session.sh [--hard] [scratchpad_dir]
 set -u
 
+hard=0
+[ "${1:-}" = "--hard" ] && { hard=1; shift; }
 scratchpad="${1:-}"
 sid="${CLAUDE_CODE_SESSION_ID:-}"
 scripts="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,8 +63,13 @@ fi
 
 # ─── archive NOW, mark for post-exit finalize ───────────────────────────────────
 mkdir -p "$markers"
-: > "$markers/$sid"
-bash "$scripts/archive-transcript.sh" --now "$sid"
+if [ "$hard" = 1 ]; then
+  # hard: marker content `hard` tells finalize to erase WITHOUT archiving; skip the --now copy
+  printf 'hard' > "$markers/$sid"
+else
+  : > "$markers/$sid"
+  bash "$scripts/archive-transcript.sh" --now "$sid"
+fi
 
 if [ -n "${CLAUDE_WRAPPER_STATE:-}" ] && [ -d "$CLAUDE_WRAPPER_STATE" ]; then
   # tell the wrapper which sid we actually killed (covers /clear rotating the sid)
@@ -73,7 +85,11 @@ fi
 nohup bash "$scripts/archive-transcript.sh" --watch "$sid" "$cli_pid" >/dev/null 2>&1 &
 disown
 
-echo "  ▸ Conversation $sid is archived to the @log archive and will be un-resumable on exit."
+if [ "$hard" = 1 ]; then
+  echo "  ▸ Conversation $sid will be ERASED outright on exit — not archived, not recoverable."
+else
+  echo "  ▸ Conversation $sid is archived to the @log archive and will be un-resumable on exit."
+fi
 
 # ─── close the session: Ctrl-C twice, escalate to TERM ──────────────────────────
 alive() { kill -0 "$1" 2>/dev/null; }
