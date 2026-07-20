@@ -4,11 +4,17 @@
 # un-resumable. Marker-driven and idempotent — the zsh wrapper (skills/delete/claude.zsh) and the
 # detached watcher fallback can both fire; the mkdir lock makes double-fire harmless.
 #
+# The marker's CONTENT selects finalize behavior: empty = soft (archive, then rm — recoverable);
+# `hard` (written by `/delete hard`) = erase the live .jsonl WITHOUT a @log archive copy,
+# unrecoverable. (since 2026-07-19 · /delete hard)
+#
 # Modes:
 #   --now <sid>              gzip-copy NOW, CLI still alive (no rm — the live file would
-#                            just be recreated; --finalize supersedes this copy later)
-#   --finalize <sid>         CLI dead: re-gzip (captures the final flush), rm live .jsonl,
-#                            rm handoff, rm marker. No-op without a marker.
+#                            just be recreated; --finalize supersedes this copy later).
+#                            /delete hard skips this call entirely — nothing is ever archived.
+#   --finalize <sid>         CLI dead: soft marker → re-gzip (captures the final flush) then
+#                            rm live .jsonl; `hard` marker → rm live .jsonl with NO archive copy.
+#                            Either way rm handoff + marker. No-op without a marker.
 #   --watch <sid> <cli_pid>  poll until the CLI dies, then finalize (unwrapped fallback;
 #                            caller detaches via `nohup … & disown`)
 #   --sweep-stale            finalize markers >60 min old whose transcripts are quiet
@@ -45,14 +51,15 @@ now() { # $1=sid
 }
 
 finalize() { # $1=sid — requires marker; lock guards concurrent finalizers
-  local sid="$1" marker="$MARKERS/$1" lock="$MARKERS/$1.lock"
+  local sid="$1" marker="$MARKERS/$1" lock="$MARKERS/$1.lock" mode
   [ -f "$marker" ] || return 0
+  mode="$(cat "$marker" 2>/dev/null)" # `hard` = erase without archiving; empty = archive first
   mkdir "$lock" 2>/dev/null || return 0
   trap 'rmdir "$lock" 2>/dev/null' EXIT
   local t
   while IFS= read -r t; do
     [ -n "$t" ] || continue
-    archive_copy "$t" && rm -f "$t"
+    if [ "$mode" = hard ]; then rm -f "$t"; else archive_copy "$t" && rm -f "$t"; fi
   done <<< "$(transcripts "$sid")"
   rm -f "$HANDOFFS/$sid.md" "$marker"
   rmdir "$lock" 2>/dev/null

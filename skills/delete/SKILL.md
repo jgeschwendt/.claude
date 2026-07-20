@@ -1,6 +1,6 @@
 ---
 name: delete
-description: Kill the current Claude Code session — stop the background jobs this session started, archive its transcript to the @log archive immediately (un-resumable), and exit; wrapped sessions respawn a fresh ephemeral fork in the same terminal. No memory extraction; use /dissolve if the session had value. Triggers on "/delete", "delete the session", "kill this session", "wrap up and exit".
+description: Kill the current Claude Code session — stop the background jobs this session started, archive its transcript to the @log archive immediately (un-resumable), and exit; wrapped sessions respawn a fresh ephemeral fork in the same terminal. No memory extraction; use /dissolve if the session had value. "/delete hard" erases the transcript outright instead of archiving (unrecoverable). Triggers on "/delete", "/delete hard", "delete the session", "hard delete this session", "kill this session", "wrap up and exit".
 ---
 
 # Delete Session
@@ -28,10 +28,19 @@ bash ~/.claude/skills/delete/scripts/delete-session.sh "$CLAUDE_SCRATCHPAD_DIR"
 
 (If `$CLAUDE_SCRATCHPAD_DIR` isn't set, omit the arg to skip scratchpad cleaning.)
 
+When the user said **"/delete hard"** / "hard delete this session", pass `--hard` first (flag
+before the scratchpad arg): the transcript is **erased outright** — no @log archive copy,
+unrecoverable.
+
+```
+bash ~/.claude/skills/delete/scripts/delete-session.sh --hard "$CLAUDE_SCRATCHPAD_DIR"
+```
+
 The script: cleans the scratchpad → resolves **this session's** CLI process (ancestor-only,
-never a sibling) → archives the transcript(s) NOW (`archive-transcript.sh --now`) → writes
-the archive-on-exit marker → exits the CLI (Ctrl-C twice, escalating to SIGTERM). Post-exit
-finalize (re-archive the final flush, remove the live `.jsonl` + handoff + marker) happens by
+never a sibling) → archives the transcript(s) NOW (`archive-transcript.sh --now`; **skipped
+under `--hard`**) → writes the archive-on-exit marker → exits the CLI (Ctrl-C twice, escalating
+to SIGTERM). Post-exit finalize (soft: re-archive the final flush then remove the live `.jsonl`;
+`--hard`: remove it with no archive copy — plus handoff + marker either way) happens by
 one of two paths:
 
 - A detached `nohup` watcher always finalizes after the CLI dies (idempotent via lock).
@@ -46,6 +55,11 @@ one of two paths:
 - **Un-resumable.** Archived to the @log archive (recoverable there), not erased. Memories already
   staged at the time of attention (CLAUDE.md § Memory) survive — staging is a file, untouched
   by the kill. Only un-staged residue is lost; if that residue has value, use `/dissolve`.
+- **`--hard` erases outright.** The transcript is **not** in the @log archive, **not** recoverable,
+  and **never feeds the voyage log**. Everything else (kill sequence, wrapper respawn, staged
+  memories surviving) is identical to soft delete. **`/dissolve` must NEVER use `--hard`** — the
+  archive is exactly what the hourly sweep reads, so a hard dissolve would extract nothing.
+  (since 2026-07-19 · /delete hard)
 - **The exit is best-effort.** The signal is sent from inside a running tool call; the CLI may
   absorb the first interrupt as a turn-cancel. If the script reports "still running," tell the
   user to type `/exit` — the marker guarantees the transcript finalizes however the CLI exits.

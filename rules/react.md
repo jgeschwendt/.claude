@@ -5,4 +5,8 @@ paths:
 
 # React
 
-- **Prefer `cond && <X />` over `cond ? <X /> : undefined` for conditional JSX rendering.** Ternaries are only justified when both branches render real elements (`cond ? <A /> : <B />`). If one branch is `undefined` / `null` / `false`, short-circuit with `&&` (or `!cond && <X />` to invert).
+## Conditional rendering
+
+- **Short-circuit with `cond && <X />` instead of `cond ? <X /> : undefined/null`, boolean-izing any numeric condition first (`items.length > 0 && …`).** Reserve the ternary for two real elements (`cond ? <A /> : <B />`); `!cond && <X />` inverts. A bare falsy number doesn't skip the render — it renders a literal `0`. (since 2026-07-19 · @jlg/eslint react/jsx-no-leaked-render: error)
+
+Why: a ternary whose else-branch renders nothing is indirection for a guard `&&` states directly — and the guard must be boolean, or `&&` leaks falsy numbers into the DOM.
