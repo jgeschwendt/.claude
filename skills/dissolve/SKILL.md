@@ -1,25 +1,25 @@
 ---
 name: dissolve
-description: End a session that HAD value — enqueue the whole conversation for memory extraction (the hourly sweep extracts, judges, and commits autonomously), then kill the session via the delete skill (transcript archived to the @log archive, un-resumable). Fast — no claude calls at session end. Triggers on "dissolve", "dissolve the session", "capture this session", "/dissolve".
+description: End a session that HAD value — enqueue the whole conversation for memory extraction (the orrery pipeline worker extracts, judges, and commits promptly; hourly sweep as backstop), then kill the session via the delete skill (transcript archived to the archive, un-resumable). Fast — no claude calls at session end. Triggers on "dissolve", "dissolve the session", "capture this session", "/dissolve".
 allowed-tools: Bash(bash:*), Bash(kill:*), Bash(ls:*), Bash(pwd), Bash(rm:*), Edit, Glob, Grep, Read, Skill, Write
 when_to_use: >
   Use at the END of a session that HAD value. It enqueues the conversation into
-  ~/.claude/@memory/.dissolve-queue.jsonl and kills the session; the hourly memory
-  sweep (mix memory.sweep) later extracts durable memories from the archived
+  ~/.orrery/memory/.dissolve-queue.jsonl and kills the session; the orrery pipeline
+  worker (hourly sweep backstop) then extracts durable memories from the archived
   transcript, judge-verifies them, and commits them into the cwd's bank — the user is
   NOT involved at any point. Trigger phrases: "dissolve", "dissolve the session",
   "dissolve this into memory", "capture this session", "/dissolve". This ALWAYS ends
-  the session (transcript gzip-archived to the @log archive, not resumable). If the session
+  the session (transcript gzip-archived to the archive, not resumable). If the session
   had no value, use /delete instead (kill without enqueueing).
 ---
 
 # Dissolve Session → Queued for Memory
 
 Ending a session must be **instant**: `/dissolve` does no extraction itself. It appends
-this session to the dissolve queue and invokes the delete skill; the hourly memory sweep
+this session to the dissolve queue and invokes the delete skill; the orrery pipeline worker (hourly sweep backstop)
 (`Orrery.Memory.Sweep` — `orrery lib/orrery/memory/sweep.ex`) consumes the queue: it reads
-the gzip-archived transcript from the @log archive, extracts candidates, judge-verifies them, and
-commits survivors into `~/.claude/@memory/<sanitized-cwd>/` through `Core.Memory` — the
+the gzip-archived transcript from the archive, extracts candidates, judge-verifies them, and
+commits survivors into `~/.orrery/memory/<sanitized-cwd>/` through `Orrery.Memory` — the
 single format authority. No human review anywhere; the dashboard is a viewer/editor.
 
 Run the steps **in order**.
@@ -46,7 +46,7 @@ bank from the transcript's own cwd (queue cwd is the fallback).
 
 State the one-line summary:
 
-> queued for dissolve — the hourly sweep will extract and commit; transcript archives to the @log archive
+> queued for dissolve — the orrery worker extracts and commits promptly; transcript archives to the archive
 
 Then **invoke the delete skill** (Skill tool, `delete`) in its **default (soft/archive) mode —
 never `/delete hard`** — it stops this session's background jobs, archives the transcript (that
@@ -63,7 +63,7 @@ nothing), and kills the session. Do not call its script directly; the kill lives
   `staged`, `trivial` (<4 messages), and `lost` (no archive after 24 h) are consumed.
   Outcomes land in the sweep ledger (`.sweep.jsonl`) and the dashboard's pipeline panel.
 - **Resumability**: once /delete finalizes, the live `.jsonl` is gone — un-resumable. The
-  gzip in `~/.claude/@log/archive/<date>/` is recoverable by hand (gunzip back into
+  gzip in `~/.orrery/archive/<date>/` is recoverable by hand (gunzip back into
   `~/.claude/projects/<project>/` restores resumability) and is what the sweep reads.
 - `/dissolve` always kills the session — no extract-only mode. To kill without enqueueing,
   use `/delete`. To dissolve an already-dead conversation, use the dashboard's picker.

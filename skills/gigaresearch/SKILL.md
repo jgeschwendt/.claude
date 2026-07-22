@@ -35,7 +35,7 @@ On heavy runs, show the plan in a few lines after Phase 1 (question, sub-questio
 
 ## Workspace
 
-`$WS` = `~/.claude/@research/<topic-slug>/` — one bank per standing question, kebab-case slug. Persistent and gitignored: workspaces must survive the session (resume, recurring runs), so never create them in the cwd or the session scratchpad.
+`$WS` = `~/.claude/skills/gigaresearch/workspaces/<topic-slug>/` — one bank per standing question, kebab-case slug. Persistent and gitignored: workspaces must survive the session (resume, recurring runs), so never create them in the cwd or the session scratchpad.
 
 ```
 $WS/

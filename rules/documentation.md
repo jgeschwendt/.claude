@@ -5,7 +5,7 @@ paths:
 
 # Documentation
 
-Out of scope: pipeline-owned markdown (`~/.claude/@memory/` banks, their `MEMORY.md`) — never hand-edited; route changes through the pipeline (CLAUDE.md § Memory).
+Out of scope: pipeline-owned markdown (`~/.orrery/memory/` banks, their `MEMORY.md`) — never hand-edited; route changes through the pipeline (CLAUDE.md § Memory).
 
 ## Machine portability
 

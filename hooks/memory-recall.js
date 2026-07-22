@@ -16,7 +16,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 const BUDGET = 9000;
-const ROOT = join(homedir(), ".claude", "@memory");
+const ROOT = join(homedir(), ".orrery", "memory");
 
 const sanitize = (/** @type {string} */ p) => p.replace(/[^a-zA-Z0-9]/g, "-");
 
@@ -104,10 +104,10 @@ function compose(/** @type {string} */ cwd) {
       return {
         bank,
         full:
-          `## Memories · ${label} · ~/.claude/@memory/${bank}/\n` +
+          `## Memories · ${label} · ~/.orrery/memory/${bank}/\n` +
           memories.map(fullMode).join("\n"),
         index:
-          `## Memory index · ${label} · ~/.claude/@memory/${bank}/\n` +
+          `## Memory index · ${label} · ~/.orrery/memory/${bank}/\n` +
           memories.map(indexMode).join("\n"),
       };
     })

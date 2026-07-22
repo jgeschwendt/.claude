@@ -18,7 +18,7 @@
 #
 # --hard erases the transcript outright: the marker is written with content `hard` (vs the
 # soft mode's empty marker), the --now archive copy is SKIPPED, and finalize rm's the live
-# .jsonl WITHOUT a @log archive copy — unrecoverable. /dissolve must NEVER pass --hard (the
+# .jsonl WITHOUT a archive copy — unrecoverable. /dissolve must NEVER pass --hard (the
 # archive is what the sweep reads). (since 2026-07-19 · /delete hard)
 #
 # Usage: delete-session.sh [--hard] [scratchpad_dir]
@@ -29,7 +29,7 @@ hard=0
 scratchpad="${1:-}"
 sid="${CLAUDE_CODE_SESSION_ID:-}"
 scripts="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-markers="$HOME/.claude/@log/.archive-on-exit"
+markers="$HOME/.orrery/archive/.archive-on-exit"
 
 # ─── clean scratchpad (session-isolated — safe to rm) ───────────────────────────
 if [ -n "$scratchpad" ] && [ -d "$scratchpad" ] && printf '%s' "$scratchpad" | grep -q '/scratchpad$'; then
@@ -57,7 +57,8 @@ cli_pid="$(resolve_cli_pid || true)"
 
 if [ -z "$cli_pid" ]; then
   echo "  ✻ Could not identify this session's CLI process safely — nothing killed."
-  echo "    Type /exit to close, then archive manually: archive-transcript.sh --finalize $sid"
+  echo "    Interactive: type /exit to close. Background job: the operator must stop it"
+  echo "    (kill its claude pid). Then archive manually: archive-transcript.sh --finalize $sid"
   exit 0
 fi
 
@@ -88,11 +89,22 @@ disown
 if [ "$hard" = 1 ]; then
   echo "  ▸ Conversation $sid will be ERASED outright on exit — not archived, not recoverable."
 else
-  echo "  ▸ Conversation $sid is archived to the @log archive and will be un-resumable on exit."
+  echo "  ▸ Conversation $sid is archived to the archive and will be un-resumable on exit."
 fi
 
 # ─── close the session: Ctrl-C twice, escalate to TERM ──────────────────────────
+# Background sessions (no controlling TTY, e.g. claude -p / background jobs)
+# absorb these signals as turn-cancels (2026-07-21 work-machine report) — for
+# them, don't pretend: report plainly that the operator must end the job. The
+# archive + marker above already secured the transcript either way.
 alive() { kill -0 "$1" 2>/dev/null; }
+cli_tty=$(ps -o tty= -p "$cli_pid" 2>/dev/null | tr -d ' ')
+if [ -z "$cli_tty" ] || [ "$cli_tty" = "??" ]; then
+  echo "  ✻ Background session (CLI pid $cli_pid, no TTY) — in-session signals cannot"
+  echo "    close it. The operator must stop the job (kill $cli_pid). Transcript is"
+  echo "    archived; the marker finalizes it whenever the process exits."
+  exit 0
+fi
 echo "  Closing session (CLI pid $cli_pid)…"
 kill -INT "$cli_pid" 2>/dev/null; sleep 0.4
 kill -INT "$cli_pid" 2>/dev/null; sleep 0.6

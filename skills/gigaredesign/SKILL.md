@@ -1,10 +1,10 @@
 ---
-name: gigarearchitect
+name: gigaredesign
 description: Full-comprehension re-architecture of a codebase — map every component, reimagine the structure it should have, commit to one whole design, and rebuild through an always-green staged migration. External behavior preserved; internal structure is the work-product.
 when_to_use: >
   Use when the structure itself is the problem — the user wants a codebase
   understood whole and rebuilt better: components added, removed, merged,
-  rearranged. Trigger phrases: "gigarearchitect", "/gigarearchitect",
+  rearranged. Trigger phrases: "gigaredesign", "/gigaredesign",
   "rearchitect this", "redesign this codebase", "this grew wrong — rebuild
   it", "reimagine how this should be structured". Distinct from /gigarefine,
   which polishes within the existing structure and treats structural change
@@ -25,7 +25,7 @@ allowed-tools:
   - Write
 ---
 
-# Gigarearchitect
+# Gigaredesign
 
 $ARGUMENTS
 
@@ -84,7 +84,7 @@ in the turn it's noticed, stamped with portable provenance.
 WITH per-item coverage — every enumerated behavior maps to ≥1 test/probe in
 the boundary suite (coverage table in the ledger; enumerated-but-untested is
 exactly where a fully-green migration breaks the contract); boundary suite
-green. Open a durable workspace at `~/.claude/plans/gigarearchitect-<slug>/`
+green. Open a durable workspace at `~/.claude/plans/gigaredesign-<slug>/`
 (`map.md`, `design.md`, `ledger.md`) — NOT the session scratchpad: on the
 unattended path map + design are the sole deliverable and scratchpad dies
 with the session.
@@ -172,7 +172,7 @@ criteria, scope triad (files owned · files owned by sibling stages ·
 shared read-only context) — and each stage's brief ends with its checkpoint
 commit: invoking this skill authorizes per-stage commits, and a rollback
 floor promised only in a reference file the executor never reads does not
-exist. Write to `~/.claude/plans/gigarearchitect-<slug>.md`. Include a
+exist. Write to `~/.claude/plans/gigaredesign-<slug>.md`. Include a
 final stage wiring the chosen design's rules as fitness functions
 (`references/metrics.md` §2), then negative-probing each guard — introduce
 a known violation, confirm the guard fails, revert; a guard that exits 0 on

@@ -439,7 +439,7 @@ The same structural thinking reappears when you decompose software. These are th
 
 ## §14 — File systems & directories (personal → project → repo)
 
-The oldest IA problem, and the one with the best empirical record. Two knowledge bases: measured human behavior (PIM research) and convergent layout standards. All findings below are sourced; fuller research trail in the personal machine's `@research/ia-filesystem-data` workspace only (2026-07).
+The oldest IA problem, and the one with the best empirical record. Two knowledge bases: measured human behavior (PIM research) and convergent layout standards. All findings below are sourced; fuller research trail in the personal machine's `skills/gigaresearch/workspaces/ia-filesystem-data` workspace only (2026-07).
 
 ### 14.1 The empirical ground — how people actually retrieve files
 

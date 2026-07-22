@@ -1,9 +1,9 @@
 ---
-name: gigaaudit
+name: gigasweep
 description: Proactive whole-codebase hunt for real defects — correctness, security, robustness — with deterministic-first verification and adversarial refutation before anything is reported. Read-only by construction — produces a ranked findings report, never edits.
 when_to_use: >
   Use when the user wants an existing codebase hunted for problems without
-  a specific symptom — "audit this repo", "gigaaudit", "find bugs/security
+  a specific symptom — "audit this repo", "gigasweep", "find bugs/security
   holes in X", "how safe is this before I expose it", due diligence on
   unfamiliar code. Distinct from /gigareview (this session's work-product),
   /code-review (a diff), /security-review (pending branch changes), and
@@ -23,7 +23,7 @@ allowed-tools:
   - Write
 ---
 
-# Gigaaudit
+# Gigasweep
 
 $ARGUMENTS
 
@@ -52,7 +52,7 @@ finding-by-finding.
 - Restate the stakes as the bar ("exposing it to the LAN tomorrow" ≠
   curiosity) — it sets severity thresholds and how much PLAUSIBLE is worth
   the reader's time.
-- Open a durable workspace at `~/.claude/plans/gigaaudit-<slug>/`
+- Open a durable workspace at `~/.claude/plans/gigasweep-<slug>/`
   (`ledger.md`, `report.md`) — the report must outlive the session.
 
 **Success criteria**: scope resolved, bar stated in one line, workspace

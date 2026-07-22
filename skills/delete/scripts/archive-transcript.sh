@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # archive-transcript.sh — compact-delete a session's transcript(s): gzip-archive to the
-# @log archive (~/.claude/@log/archive/<date>/), then remove the live .jsonl so the session is
+# archive (~/.orrery/archive/<date>/), then remove the live .jsonl so the session is
 # un-resumable. Marker-driven and idempotent — the zsh wrapper (skills/delete/claude.zsh) and the
 # detached watcher fallback can both fire; the mkdir lock makes double-fire harmless.
 #
 # The marker's CONTENT selects finalize behavior: empty = soft (archive, then rm — recoverable);
-# `hard` (written by `/delete hard`) = erase the live .jsonl WITHOUT a @log archive copy,
+# `hard` (written by `/delete hard`) = erase the live .jsonl WITHOUT an archive copy,
 # unrecoverable. (since 2026-07-19 · /delete hard)
 #
 # Modes:
@@ -14,7 +14,7 @@
 #                            /delete hard skips this call entirely — nothing is ever archived.
 #   --finalize <sid>         CLI dead: soft marker → re-gzip (captures the final flush) then
 #                            rm live .jsonl; `hard` marker → rm live .jsonl with NO archive copy.
-#                            Either way rm handoff + marker. No-op without a marker.
+#                            Either way rm the marker. No-op without a marker.
 #   --watch <sid> <cli_pid>  poll until the CLI dies, then finalize (unwrapped fallback;
 #                            caller detaches via `nohup … & disown`)
 #   --sweep-stale            finalize markers >60 min old whose transcripts are quiet
@@ -25,8 +25,7 @@ set -u
 
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 PROJECTS="$CLAUDE_HOME/projects"
-MARKERS="$CLAUDE_HOME/@log/.archive-on-exit"
-HANDOFFS="$CLAUDE_HOME/@handoffs"
+MARKERS="$HOME/.orrery/archive/.archive-on-exit"
 
 transcripts() { # $1=sid — one path per line, empty if none
   shopt -s nullglob
@@ -35,8 +34,8 @@ transcripts() { # $1=sid — one path per line, empty if none
   shopt -u nullglob
 }
 
-archive_copy() { # $1=transcript path — gzip-copy into today's @log archive dir
-  local dir="$CLAUDE_HOME/@log/archive/$(date +%F)"
+archive_copy() { # $1=transcript path — gzip-copy into today's archive dir (~/.orrery/archive)
+  local dir="$HOME/.orrery/archive/$(date +%F)"
   mkdir -p "$dir"
   gzip -c "$1" > "$dir/$(basename "$1").gz"
 }
@@ -61,7 +60,7 @@ finalize() { # $1=sid — requires marker; lock guards concurrent finalizers
     [ -n "$t" ] || continue
     if [ "$mode" = hard ]; then rm -f "$t"; else archive_copy "$t" && rm -f "$t"; fi
   done <<< "$(transcripts "$sid")"
-  rm -f "$HANDOFFS/$sid.md" "$marker"
+  rm -f "$marker"
   rmdir "$lock" 2>/dev/null
   trap - EXIT
 }
