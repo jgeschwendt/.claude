@@ -138,7 +138,7 @@ const IMPL = {
     verification: {
       type: "string",
       description:
-        "the verification you EXECUTED and its output — a done-claim without executed verification is invalid; 'blocked — see clarify' on a clarify return",
+        "the verification you EXECUTED and its output — a done-claim without executed verification is invalid; 'blocked — see clarify' on a clarify return. PLAIN TEXT, under 3000 chars, no angle brackets or backslash escapes; every required key present in the SAME call (2026-07-20 · stele run: an implementer finished its work, then lost the whole report to 5 failed StructuredOutput attempts — omitted a required key while fighting escaping; the tree held the work but the workflow crashed)",
     },
   },
 };

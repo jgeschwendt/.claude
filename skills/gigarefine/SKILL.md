@@ -12,7 +12,7 @@ when_to_use: >
   multi-agent, stops on evidence. Natural follow-on to /execute-plan or a
   gigareview GO when the work should now be made excellent, not just correct.
   When the structure ITSELF is the problem — components need adding,
-  removing, rearranging — use /gigarearchitect instead.
+  removing, rearranging — use /gigaredesign instead.
 argument-hint: "[target + optional intent — e.g. 'src/parser/ readability', 'skills/foo/SKILL.md']"
 allowed-tools:
   - Agent
@@ -51,7 +51,7 @@ can see WHY it stopped.
   Resolve to a concrete file list. An intent word in `$ARGUMENTS`
   ("readability", "efficiency") narrows the step-3 lens set; absent, run all.
   Intent gate first: an ask naming structural outcomes — components split,
-  moved, merged, removed — routes to /gigarearchitect NOW; "refactor" in the
+  moved, merged, removed — routes to /gigaredesign NOW; "refactor" in the
   wild usually means restructure, and a polish pass is the wrong deliverable
   for it. Unattended (headless/scheduled, no human to answer), an explicit
   target is required — the "ask" rung can't fire, and autonomously picking a
@@ -183,7 +183,7 @@ why it stopped, from this report alone.
 - The invariant outranks every axis. An improvement requiring a behavior,
   truth, or contract change is out of scope — report it, don't apply it,
   unless the user's stated intent explicitly asked for redesign. Structural
-  wants that keep surfacing escalate to /gigarearchitect, not into scope.
+  wants that keep surfacing escalate to /gigaredesign, not into scope.
 - Every `agent()` call pins `model:` — an unpinned call is a bug, not a
   default. The session model judges, maps, and reports; it never types
   implementation (trivial one-liners excepted).

@@ -6,10 +6,10 @@ when_to_use: >
   failing test, a production error, wrong output, "worked yesterday".
   Trigger phrases: "gigadebug", "/gigadebug", "hunt this bug down", "find
   the root cause", "why is this failing". The escalation target for bugs
-  /gigarefine and /gigarearchitect report-and-leave. Distinct from
-  /gigaaudit (no symptom — proactive sweep), /code-review (a diff), and
+  /gigarefine and /gigaredesign report-and-leave. Distinct from
+  /gigasweep (no symptom — proactive sweep), /code-review (a diff), and
   /gigareview (this session's work). Needs a symptom: no observed failure →
-  /gigaaudit is the hunt without one.
+  /gigasweep is the hunt without one.
 argument-hint: "[symptom — error text, failing test, repro steps, 'X broke after Y']"
 allowed-tools:
   - Agent

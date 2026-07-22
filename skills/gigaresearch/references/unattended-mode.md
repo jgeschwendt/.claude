@@ -8,7 +8,7 @@ An unattended run needs its brief pre-specified in the routine's configuration: 
 
 ## Scheduling on Claude Code
 
-Create the routine with the `schedule` skill (cloud/cron routines; one-shots too) — put the run contract verbatim in the routine's prompt, plus: "invoke the `gigaresearch` skill in unattended mode; workspace `~/.claude/@research/<slug>/`". Headless runs may lack agent-browser and interactively-authenticated MCP servers — the WebSearch/WebFetch stack is the dependable baseline, so a lead that needed browser escalation gets marked `blocked`, not silently dropped. Where PushNotification is available, alert per the alert policy below; otherwise the status header is the alert.
+Create the routine with the `schedule` skill (cloud/cron routines; one-shots too) — put the run contract verbatim in the routine's prompt, plus: "invoke the `gigaresearch` skill in unattended mode; workspace `~/.claude/skills/gigaresearch/workspaces/<slug>/`". Headless runs may lack agent-browser and interactively-authenticated MCP servers — the WebSearch/WebFetch stack is the dependable baseline, so a lead that needed browser escalation gets marked `blocked`, not silently dropped. Where PushNotification is available, alert per the alert policy below; otherwise the status header is the alert.
 
 ## The decisions log
 
@@ -43,7 +43,7 @@ Someone triaging ten scheduled reports reads only this block unless it demands a
 
 ## Recurring runs — the schedule's real payoff
 
-- The workspace (`$WS` under `~/.claude/@research/`) persists between runs by design — reload the previous run's `claims.md` and `report.md` at start.
+- The workspace (`$WS` under `~/.claude/skills/gigaresearch/workspaces/`) persists between runs by design — reload the previous run's `claims.md` and `report.md` at start.
 - Link ledger claims causally (`supersedes:` / `depends-on:`), not only by topic — similarity recall over past findings measurably underperforms causal structure for standing questions (+11pts AMA-Bench, arXiv 2602.22769; 2026-07-14 · `references/evidence.md`).
 - **Lead with the delta**: new findings, claims that changed status, contradictions of the prior report. A status downgrade on a load-bearing claim (`established` → `contested`) is the highest-value alert a recurring routine can produce.
 - Don't re-verify stable `established` claims every run; do re-verify volatile facts whose "as of" date has aged past what their volatility warrants.

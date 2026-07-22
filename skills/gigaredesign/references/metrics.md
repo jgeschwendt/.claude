@@ -31,7 +31,7 @@ Score all three candidates on these axes from the SAME map data. The map already
 
 - **Distance from the main sequence D = |A + I − 1|** — perpendicular distance from the ideal line A + I = 1; 0 = on the sequence, 1 = worst (per https://en.wikipedia.org/wiki/Software_package_metrics, verified 2026-07-15).
   - Note: Martin's canonical form is `|A + I − 1|`; some tools (e.g. pdepend) normalize to `|A + I − 1| ÷ √2` — state which you use and stay consistent across candidates.
-  - **read it as** high D flags the two pain zones — the *zone of pain* (A≈0, I≈0: concrete AND depended-upon, rigid to change) and the *zone of uselessness* (A≈1, I≈1: abstract AND nothing uses it). A candidate whose components cluster near the main sequence beats one with outliers in either zone.
+  - **read it as** high D flags the two pain zones — the _zone of pain_ (A≈0, I≈0: concrete AND depended-upon, rigid to change) and the _zone of uselessness_ (A≈1, I≈1: abstract AND nothing uses it). A candidate whose components cluster near the main sequence beats one with outliers in either zone.
   - **gaming risk** chasing D=0 everywhere manufactures pointless abstraction in leaf components that should just be concrete.
 
 - **Module cohesion** — do a component's files change together and reference each other?
@@ -74,7 +74,7 @@ Score all three candidates on these axes from the SAME map data. The map already
 
 ## Fitness functions
 
-Encode the CHOSEN design's rules as CI-run tests so the architecture can't silently rot (evolutionary architecture — Ford, Parsons & Kua, *Building Evolutionary Architectures*, O'Reilly). A rule that isn't executable is a comment; these must fail the build.
+Encode the CHOSEN design's rules as CI-run tests so the architecture can't silently rot (evolutionary architecture — Ford, Parsons & Kua, _Building Evolutionary Architectures_, O'Reilly). A rule that isn't executable is a comment; these must fail the build.
 
 - **Forbidden-dependency tests** — assert the allowed dependency edges between components; any import crossing a disallowed boundary fails CI.
   - JS/TS — eslint-plugin-boundaries (`boundaries/dependencies` with an allow/disallow policy over element types — the current rule name; `element-types` and `entry-point` are deprecated aliases; per https://www.jsboundaries.dev/docs/rules/, verified 2026-07-15) or dependency-cruiser `forbidden` rules (per https://github.com/sverweij/dependency-cruiser, verified 2026-07-15) — pick one, don't run both.
@@ -92,7 +92,7 @@ Encode the CHOSEN design's rules as CI-run tests so the architecture can't silen
 
 - **Churn watch** — after the rebuild, track where hotspots recur.
   - **compute by** periodically re-run the cross-boundary co-change procedure on post-rebuild history (same `git log` walk, restricted to commits since the rebuild landed).
-  - **read it as** a hotspot recurring in the SAME component is normal maturation → hand to /gigarefine for polish; a hotspot recurring ACROSS component boundaries means the boundary is wrong → the design failed its core promise, escalate back into /gigarearchitect.
+  - **read it as** a hotspot recurring in the SAME component is normal maturation → hand to /gigarefine for polish; a hotspot recurring ACROSS component boundaries means the boundary is wrong → the design failed its core promise, escalate back into /gigaredesign.
   - This is the one fitness function that judges the architecture itself, not just conformance to it — the others check that code obeys the design; this checks whether the design was right.
 
 ## Using these
