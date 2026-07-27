@@ -6,9 +6,8 @@ when_to_use: >
   verified. Trigger phrases: "gigarefine", "/gigarefine", "gigarefactor",
   "refactor this properly", "make this the best version of itself", "polish
   until diminishing returns", "keep refining". Distinct from /gigareview
-  (verifies session work, GO/NO-GO), /code-review (diff bug hunt), /simplify
-  (single-pass diff cleanups), and the refine:* commands (single-pass,
-  single-file, no orchestration) — this is the giga tier: multi-pass,
+  (verifies session work, GO/NO-GO), /code-review (diff bug hunt), and
+  /simplify (single-pass diff cleanups) — this is the giga tier: multi-pass,
   multi-agent, stops on evidence. Natural follow-on to /execute-plan or a
   gigareview GO when the work should now be made excellent, not just correct.
   When the structure ITSELF is the problem — components need adding,
@@ -79,7 +78,7 @@ can see WHY it stopped.
   "restore to the last green checkpoint" — without one, revert is undefined
   and destroys whatever uncommitted work preceded this run. Each green pass
   ends by advancing the checkpoint.
-- **Axes** (from the refine:* criteria + repo conventions): code — coherent ·
+- **Axes** (per artifact class + repo conventions): code — coherent ·
   efficient · maintainable · readable · tested; docs/prompts — actionable ·
   coherent · focused · succinct · unambiguous.
 

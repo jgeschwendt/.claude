@@ -4,7 +4,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -26,6 +25,44 @@
             "type": "command",
             "command": "~/.claude/hooks/format.js",
             "statusMessage": "formatting..."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/dissolve/hooks/pre-compact-confirm.sh",
+            "timeout": 10,
+            "statusMessage": "checking the compact gate..."
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/dissolve/hooks/post-compact-snapshot.sh",
+            "timeout": 30,
+            "statusMessage": "routing the pre-compact conversation..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/skills/dissolve/hooks/session-end-clear.sh",
+            "timeout": 30,
+            "statusMessage": "routing the cleared context..."
           }
         ]
       }
@@ -55,5 +92,6 @@
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
-  }
+  },
+  "model": "claude-fable-5[1m]"
 }
