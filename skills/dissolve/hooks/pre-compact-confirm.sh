@@ -7,7 +7,7 @@
 #   "PreCompact": [{"matcher": "manual", "hooks": [{"type": "command",
 #     "command": "bash ~/.claude/skills/dissolve/hooks/pre-compact-confirm.sh"}]}]
 #
-# Three probe findings shape this script (planning/hook-probe-2026-07-27.md, 2026-07-27):
+# Three probe findings shape this script (live hook probe, 2026-07-27; see orrery git history, 2026-07-27):
 #
 #   * `exit 2` genuinely BLOCKS compaction, the session survives, and this script's stderr
 #     reaches the user verbatim (§3.4). A hook has no tty, so it cannot ASK — the

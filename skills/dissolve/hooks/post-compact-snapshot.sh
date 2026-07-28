@@ -9,7 +9,7 @@
 #   "PostCompact": [{"matcher": "manual", "hooks": [{"type": "command",
 #     "command": "bash ~/.claude/skills/dissolve/hooks/post-compact-snapshot.sh"}]}]
 #
-# Why PostCompact and not PreCompact (planning/hook-probe-2026-07-27.md §3.6, §4 — the
+# Why PostCompact and not PreCompact (live hook probe, 2026-07-27; see orrery git history §3.6, §4 — the
 # probe amended atlas D8 on exactly this point): PreCompact fires SPECULATIVELY. It fires
 # when there is too little to compact, it fires again on the auto path every turn, and in
 # neither case does a compaction follow — so a snapshot taken there mints a pointer for a

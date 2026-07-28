@@ -7,6 +7,10 @@ paths:
 
 Out of scope: pipeline-owned markdown (`~/.orrery/memory/` banks, their `MEMORY.md`) — never hand-edited; route changes through the pipeline (CLAUDE.md § Memory).
 
+## Present tense only
+
+- **Living docs describe what exists today.** Migrations, predecessors, retired designs, and the decision process live in git history and plans — never in documentation. A "what X was, and where it went" section is a deletion, not a record. (since 2026-07-27 · orrery atlas recut — "Remove anything about the migration … that's git history.")
+
 ## Machine portability
 
 - **Tracked `~/.claude` files sync to every machine — write them machine-neutral.** No host-local facts: bound addresses/ports, cron/launchd wiring, clone paths, absolute paths outside `~/.claude`. Point at the owning repo (portable name or URL) and let its docs carry the machine wiring. (since 2026-07-20 · README.md hardcoded the orrery dashboard address + hourly sweep coupling)

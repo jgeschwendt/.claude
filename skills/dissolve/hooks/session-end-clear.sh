@@ -12,7 +12,7 @@
 # clear · resume · logout · prompt_input_exit · other · bypass_permissions_disabled — so
 # "not prompt_input_exit" would route crash-shaped endings (`other`) and logouts as if the
 # user had asked for it. Ruling ⑧: /exit routes nothing.
-# (verified 2026-07-27 · planning/hook-probe-2026-07-27.md §1, §4 R2)
+# (verified 2026-07-27 · live hook probe, 2026-07-27; see orrery git history §1, §4 R2)
 #
 # COPY, not consume: ORRERY_BUFFER_KEEP_LIVE=1 leaves the live `.jsonl` in place. The
 # probe found that /clear retires the session id and mints a NEW transcript file, so a

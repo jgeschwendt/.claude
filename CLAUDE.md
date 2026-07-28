@@ -30,7 +30,7 @@ A session owes the system these behaviors:
 - Edit over create—question if new files add value
 - Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
 - House rules (`rules/*.md`) govern code authored for this machine—in a repo with its own convention (work, third-party), the surrounding code wins.
-- Premium models never implement—in a Fable (or other premium-model) session, implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below; agents inherit the session model by default, so an unpinned agent is a rule violation. The session model decomposes, orchestrates, judges, and reviews—it never types the code.
+- Premium models plan and review, never implement the non-trivial—in a Fable (or other premium-model) session, the session model decomposes, plans, orchestrates, judges, and reviews; any non-trivial implementation is delegated, and implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—agents inherit the session model by default, so an unpinned agent is a rule violation. Trivial changes (a rename, a one-line fix, a config value) may be made directly; when in doubt, delegate. (refined 2026-07-28 · triviality carve-out)
 - Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
 - Scripts under `~/.claude` are bash (+jq)—never python
 - Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
