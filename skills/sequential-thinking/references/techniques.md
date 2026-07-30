@@ -1,8 +1,10 @@
 # Critical-Thinking Toolbox
 
-Reach for these when a protocol phase stalls. Each entry says when to use it and how to express it as thoughts in the chain. Don't run techniques for their own sake — a technique earns its place by producing a hypothesis, killing one, sharpening the frame, or forcing a decision.
+Reach for these when a protocol phase stalls. Don't run techniques for their own sake — a technique earns its place by producing a hypothesis, killing one, sharpening the frame, or forcing a decision. Each entry says when to use it and how to express it as thoughts in the chain.
 
 ## Contents
+
+Numbers are stable addresses — `SKILL.md` and #15 below cite them (`#3`, `#11`). This list is not alphabetical and is exempt from house alpha-sort: append new entries, never renumber.
 
 1. Five Whys — shallow cause, need the deep one
 2. Fault Tree — many possible causes, need coverage
@@ -24,7 +26,7 @@ Reach for these when a protocol phase stalls. Each entry says when to use it and
 
 ## 1. Five Whys
 
-**When**: you found *a* cause but it feels proximate — fixing it wouldn't prevent recurrence.
+**When**: you found _a_ cause but it feels proximate — fixing it wouldn't prevent recurrence.
 
 Ask "why did that happen?" repeatedly (usually 3–5 layers) until you hit a cause that is actionable at the process or design level. Stop when the answer becomes "because physics" or leaves your control.
 
@@ -36,7 +38,7 @@ As thoughts: a chain of `evidence`/`hypothesis` thoughts, each one layer deeper.
 
 Start from the failure, split into disjoint causal categories (e.g., input / code / config / infra / timing), then split each until leaves are individually testable. Prune branches with evidence; whatever survives is the suspect list.
 
-As thoughts: one `decompose` thought drawing the tree, then `evidence` thoughts pruning leaves. The tree's value is proving the *pruned* branches dead, so cite the observation that killed each one.
+As thoughts: one `decompose` thought drawing the tree, then `evidence` thoughts pruning leaves. The tree's value is proving the _pruned_ branches dead, so cite the observation that killed each one.
 
 ## 3. ACH Grid (Analysis of Competing Hypotheses)
 
@@ -44,9 +46,9 @@ As thoughts: one `decompose` thought drawing the tree, then `evidence` thoughts 
 
 Build a small grid: hypotheses as columns, pieces of evidence as rows, each cell marked consistent (+), inconsistent (−), or neutral (0). Two rules carry the value: judge the winner by **least inconsistency**, not most consistency (a hypothesis compatible with everything has explained nothing), and weight **diagnostic** evidence — rows that split the columns — over rows that mark every column the same.
 
-Honesty note (see `evidence.md` #9): controlled studies of the classic ACH ritual are unflattering — the matrix did not measurably reduce confirmation bias, and its verdicts are sensitive to small changes in how evidence is rated. The *principles* above are standard Bayesian practice and belong in every Ground phase; the grid is bookkeeping that makes them visible. Treat its output as a lens on the evidence, never as a verdict, and never let filling cells substitute for running the probe that would actually discriminate.
+Honesty note (see `evidence.md` #9): controlled studies of the classic ACH ritual are unflattering — the matrix did not measurably reduce confirmation bias, and its verdicts are sensitive to small changes in how evidence is rated. The _principles_ above are standard Bayesian practice and belong in every Ground phase; the grid is bookkeeping that makes them visible. Treat its output as a lens on the evidence, never as a verdict, and never let filling cells substitute for running the probe that would actually discriminate.
 
-As thoughts: one `synthesize` thought containing the grid, one identifying which *missing* row would be most diagnostic — that row is your next probe.
+As thoughts: one `synthesize` thought containing the grid, one identifying which _missing_ row would be most diagnostic — that row is your next probe.
 
 ```
                         H1 index   H2 volume   H3 infra
@@ -59,7 +61,7 @@ EXPLAIN: seq scan          +           0          −
 
 **When**: the leading hypothesis has survived confirmation and needs a harder test — or a rival needs honest pruning.
 
-Enumerate the traces the hypothesis *predicts should exist* if true — log lines, metrics movement, correlated failures, a config value — then go look for each. Expected evidence that is absent counts against, but only if you searched where it would live; failing to trip over something is not the same as its absence.
+Enumerate the traces the hypothesis _predicts should exist_ if true — log lines, metrics movement, correlated failures, a config value — then go look for each. Expected evidence that is absent counts against, but only if you searched where it would live; failing to trip over something is not the same as its absence.
 
 As thoughts: a `challenge` thought listing predicted traces, then `evidence` thoughts reporting present/absent for each. This is also the honest way to prune a rival: "if H3 were true, the change log would show X in the window; it shows nothing" beats "H3 seems unlikely."
 
@@ -75,7 +77,7 @@ As thoughts: a `challenge` thought listing 3–5 guaranteed-failure conditions, 
 
 **When**: a decision is nearly made and everyone (including you) has stopped questioning it.
 
-Assume it's 12 months later and the decision *has already failed* — write the story of *why*: specific, causal, plausible. The certainty framing is the active ingredient, not decoration: imagining an outcome as an accomplished fact produces roughly 30% more reasons and about twice as many concrete, action-based ones than asking "what could go wrong?", and cuts overconfidence about twice as much as pros/cons-style review (Mitchell, Russo & Pennington 1989; Veinott et al. 2010 — see `evidence.md` #8). "Any concerns?" invites vague unease; "it failed — explain it" produces mechanisms.
+Assume it's 12 months later and the decision _has already failed_ — write the story of _why_: specific, causal, plausible. The certainty framing is the active ingredient, not decoration: imagining an outcome as an accomplished fact produces roughly 30% more reasons and about twice as many concrete, action-based ones than asking "what could go wrong?", and cuts overconfidence about twice as much as pros/cons-style review (Mitchell, Russo & Pennington 1989; Veinott et al. 2010 — see `evidence.md` #8). "Any concerns?" invites vague unease; "it failed — explain it" produces mechanisms.
 
 As thoughts: one `challenge` thought per distinct failure story. Any story that survives scrutiny becomes a caveat or a mitigation in the verdict.
 
@@ -93,7 +95,7 @@ As thoughts: one `evidence` thought showing the arithmetic, ending with which in
 
 Ask: across all cases like this one, what usually turns out to be true? "It's probably not a compiler bug" is a base rate. "Most performance regressions are the most recent change" is a base rate. Start from the reference class, then let case-specific evidence move you off it.
 
-As thoughts: a `hypothesis` thought stating the base-rate prior, then `evidence` thoughts updating it. Deviating far from the base rate demands proportionally strong evidence — say so explicitly if you do. For plans and estimates this is not optional garnish: across 258 infrastructure projects in 20 nations, roughly 90% ran over cost with no accuracy improvement across 70 years of data, and the draft plan itself becomes the anchor for every later estimate — which is why starting from the reference class ("what did similar efforts actually take?") is mandated for major UK and Danish public projects, and why Kahneman called the outside view the single most important advice for forecasting accuracy. Treat the reference class as the prior, not the verdict; some project classes show the opposite bias.
+As thoughts: a `hypothesis` thought stating the base-rate prior, then `evidence` thoughts updating it. Deviating far from the base rate demands proportionally strong evidence — say so explicitly if you do. For plans and estimates this is not optional garnish: the draft plan itself becomes the anchor for every later estimate, which is why public-project guidance mandates starting from the reference class ("what did similar efforts actually take?") — see `evidence.md` #26 for the overrun data and the counter-evidence. Treat the reference class as the prior, not the verdict; some project classes show the opposite bias.
 
 ## 9. MECE Decomposition
 
@@ -117,11 +119,11 @@ As thoughts: one `synthesize` thought with the table, one `challenge` thought on
 
 Three moves, in order of preference:
 
-- **Dominance**: eliminate any option that is worse than another under *every* live hypothesis. Sometimes only one survives.
-- **Least regret**: for each option, ask "how bad is this if the *other* hypothesis is true?" Pick the option whose worst case is most tolerable — especially when one branch is irreversible.
-- **Cheap probe as the recommendation**: design the smallest safe action that discriminates between the live hypotheses, and recommend *that* ("feature-flag it for one region for a day"). Acting to learn beats guessing confidently.
+- **Dominance**: eliminate any option that is worse than another under _every_ live hypothesis. Sometimes only one survives.
+- **Least regret**: for each option, ask "how bad is this if the _other_ hypothesis is true?" Pick the option whose worst case is most tolerable — especially when one branch is irreversible.
+- **Cheap probe as the recommendation**: design the smallest safe action that discriminates between the live hypotheses, and recommend _that_ ("feature-flag it for one region for a day"). Acting to learn beats guessing confidently.
 
-As thoughts: a `synthesize` thought mapping options × hypotheses, then a `verdict` that names which of the three moves it used. Never dress this situation up as high confidence — the honesty *is* the value.
+As thoughts: a `synthesize` thought mapping options × hypotheses, then a `verdict` that names which of the three moves it used. Never dress this situation up as high confidence — the honesty _is_ the value.
 
 ## 12. Toulmin Analysis
 
@@ -155,12 +157,12 @@ As thoughts: a `synthesize` thought containing the novice explanation. If writin
 
 **When**: writing any verdict.
 
-Confidence tracks the *weakest load-bearing link*, not the average strength of the reasoning:
+Confidence tracks the _weakest load-bearing link_, not the average strength of the reasoning:
 
 - **High (~85%+)**: every load-bearing claim verified at rung 2–3 of the ladder; rivals pruned on evidence, not preference; kill conditions actually tested.
 - **Medium (~60–85%)**: mechanism is sound but at least one load-bearing assumption is unverified — name it.
 - **Low (<60%)**: choosing between rivals on plausibility because the discriminating evidence is unavailable — say what that evidence would be, and consider Robust Choice (#11) instead of a bare pick.
 
-Then correct for a measured bias: verbalized confidence runs systematically high — calibration error around ten points even for strong models, nominal 99% ranges covering the truth only about two-thirds of the time, and the gap widest exactly where familiarity is thinnest (see `evidence.md` #7). Practical rules: widen ranges past what feels comfortable; treat unfamiliar territory as the highest-overconfidence zone, not a place to hedge less; and let the ladder set the tier, not the fluency of the chain.
+Then correct for a measured bias: verbalized confidence runs systematically high — calibration error around ten points even for strong models, nominal 99% ranges covering the truth only about two-thirds of the time, and the gap widest exactly where familiarity is thinnest (see `evidence.md` #7). And treat unfamiliar territory as the highest-overconfidence zone, not a place to hedge less.
 
-Rough numbers beat bare words for consequential calls: "likely" means 55% to one reader and 90% to another; "~75%" transmits. When confidence in the mechanism and in the recommendation differ, state both. The user acts on the label, not the prose.
+The user acts on the label, not the prose: state rough odds on consequential calls, and when confidence in the mechanism differs from confidence in the recommendation, state both.

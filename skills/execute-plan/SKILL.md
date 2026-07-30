@@ -5,9 +5,8 @@ when_to_use: >
   Use when a plan exists (approved in plan mode this session, or a file in
   ~/.claude/plans/) and the user wants it carried out. Trigger phrases:
   "/execute-plan", "execute the plan", "run the plan", "carry out the plan",
-  "ultracode the plan", "build it". Replaces the old two-session pattern
-  (premium-model plans → separate opus+ultracode session executes): execution happens
-  in-session, with the model split pushed into the workflow agents.
+  "ultracode the plan", "build it". Execution happens in-session, with the
+  model split pushed into the workflow agents.
 argument-hint: "[plan file — defaults to newest in ~/.claude/plans/]"
 allowed-tools:
   - Agent
@@ -28,15 +27,8 @@ $ARGUMENTS
 
 Carry out an approved plan with the cost split enforced: the session model
 plans, orchestrates, judges, and reviews — it NEVER types implementation code.
-Every implementing agent is
-pinned to `model: 'opus'` (or cheaper). Runs inline — the reviewer needs the
-planner's context.
-
-## Goal
-
-The plan carried out exactly by pinned opus-or-cheaper agents, deviations surfaced
-(never silently absorbed), the result reviewed in-session by the model that
-wrote the plan, and a report the user can accept without re-reading the diff.
+Pin every implementing agent to `model: 'opus'` (or cheaper). Runs inline —
+the reviewer needs the planner's context.
 
 ## Hard rule: the model split
 
@@ -48,8 +40,6 @@ stage relies on inheritance. `effort: 'low'` additionally on mechanical stages
 at decompose and review, lower through the mechanical middle; uniform maximum
 loses under wall-clock limits (2026-07-14 · LangChain harness-engineering,
 Terminal-Bench 2.0).
-The session model spends tokens only on resolving, decomposing, orchestrating,
-reviewing, and reporting — never on implementation.
 
 ## Steps
 
@@ -60,7 +50,7 @@ reviewing, and reporting — never on implementation.
 - Resolve a relative `$ARGUMENTS` against the cwd to an absolute path before
   reading. If all three sources miss (no arg, no session plan, empty
   `~/.claude/plans/`), stop and ask — never proceed with an empty plan path.
-- Read it fully. Confirm the target repo/cwd matches the plan's assumptions,
+- Read the plan fully. Confirm the target repo/cwd matches the plan's assumptions,
   and spot-check plan-vs-reality drift (files moved, APIs changed since the
   plan was written) before spawning anything.
 
@@ -111,7 +101,7 @@ stages: free-prose reports invite exactly the charitable reading the verifier
 is told to refuse, and a closed-world `pass` boolean is what makes failure
 routable. Scaffold (API — `pipeline`, `opts.phase`, `opts.effort`, `schema`,
 `meta.phases[].model` — verified against the live Workflow tool contract
-2026-07-14; the `meta.phases` model key is display metadata, the per-agent
+2026-07-30; the `meta.phases` model key is display metadata, the per-agent
 `model:` pin is what routes):
 
 ```js
@@ -156,7 +146,7 @@ const results = await pipeline(
   A.steps, // [{brief, mechanical, name, successCriteria}]
   (s) =>
     agent(s.brief, {
-      ...(s.mechanical ? { effort: "low" } : {}), // renames, mass edits, boilerplate
+      ...(s.mechanical ? { effort: "low" } : {}),
       label: `implement:${s.name}`,
       model: "opus",
       phase: "Implement",
@@ -175,12 +165,11 @@ const results = await pipeline(
 return results;
 ```
 
-**Success criteria**: Workflow completes; every step has an implementer
-report and a `pass: true` verdict. Steps that come back `pass: false` get re-dispatched once with the verifier's
+Steps that come back `pass: false` get re-dispatched once with the verifier's
 evidence appended to the brief; a `died` step (no verdict exists — the
 implementer produced nothing to verify) is re-dispatched once on the original
-brief. A second failure is reported as unimplemented — never counted as
-done, and a reproducible failure nobody can explain is /gigadebug material. A `clarify` return gets its question answered from the plan (or the
+brief. Report a second failure as unimplemented, never as done; a reproducible
+failure nobody can explain is /gigadebug material. A `clarify` return gets its question answered from the plan (or the
 user) and the unit re-dispatched. Repair locally: hold passed units' results
 and re-dispatch only the failed node and its dependents — never re-derive the
 whole decomposition for one failure. For a genuinely high-uncertainty node,
@@ -189,6 +178,9 @@ roughly doubles hard-task success at N× cost — gate behind the same stakes
 trigger as the gigareview escalation). For serial pipelines (dependent
 steps), checkpoint-commit after each green step so a later failure rolls back
 to the last good state; for parallel fan-outs, commit once after the step-4 review passes.
+
+**Success criteria**: Workflow completes; every step has an implementer
+report and a `pass: true` verdict.
 
 ### 4. Review in-session
 
@@ -221,12 +213,12 @@ cd <target-repo> && claude -p --model opus --permission-mode acceptEdits \
 ```
 
 Run via Bash with `run_in_background: true`; review here (step 4) when it
-exits. Step 1 (repo confirmation) still runs first, and both pins are
-mandatory: the absolute plan path and the `cd` to the confirmed repo —
-`acceptEdits` auto-accepts file edits with no human present, so a wrong cwd
-means unattended edits in the wrong repository. Headless runs use the CLI's
-configured default model — not any pin from this session — so the
-`--model opus` pin is mandatory. Unlike unattended sweeps,
+exits. Step 1 (repo confirmation) still runs first, and three things in the
+command are mandatory: the absolute plan path, the `cd` to the confirmed repo,
+and `--model opus`. `acceptEdits` auto-accepts file edits with no human
+present, so a wrong cwd means unattended edits in the wrong repository;
+headless runs use the CLI's configured default model, not any pin from this
+session. Unlike unattended sweeps,
 do NOT strip settings sources — the executor needs project permissions and
 skills.
 
@@ -234,11 +226,10 @@ skills.
 
 - Deviations get reported, never silently absorbed — the plan file is the contract.
 - Every `agent()` call pins `model:`; an unpinned call is a bug, not a default.
-- Worktree isolation only for overlapping parallel edits, always paired with a merge stage.
-- Shared-tree parallelism (learned 2026-07-19, realtime-agent P1 — a retry agent wiped two siblings' verified work):
+- Shared-tree parallelism (since 2026-07-19 · realtime-agent P1 — a retry agent wiped two siblings' verified work):
   - Scope criteria must be phrased per-step ("X untouched BY THIS STEP"), never absolutely ("only X changed") — parallel agents legitimately dirty the shared tree, and verifiers told to check absolute cleanliness fail correct work.
   - Tell every verifier explicitly: sibling agents' uncommitted changes in other paths are EXPECTED and are not a scope violation.
-  - A verdict that fails ONLY on scope in a shared tree routes to the session reviewer for adjudication — never into the automatic retry path; auto-retry is for substantive failures.
+  - A verdict that fails ONLY on scope in a shared tree routes to the session model for adjudication — never into the automatic retry path; auto-retry is for substantive failures.
   - Every brief — retries doubly so — carries: NEVER run git checkout/reset/clean/stash/switch; the working tree is shared with concurrent agents and prior uncommitted deliverables.
   - Recovery note: implementer file writes are replayable from their transcripts (agent-*.jsonl tool_use blocks) — reconstruct before re-running expensive implementations.
 - Worktree isolation caveat (observed 2026-07-19): `isolation: 'worktree'` created the worktree from the WRONG git root (the user's home dotfiles repo, not the project repo the session cwd was in). Brief every worktree agent to verify the worktree actually contains the project (check for a landmark file) before working, and to self-relocate to a scratchpad copy if not — never to fall back to editing the shared main tree.

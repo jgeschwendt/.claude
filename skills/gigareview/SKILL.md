@@ -29,11 +29,6 @@ Runs inline — the reviewer needs full session context. Verification vocabulary
 sequential-thinking's ladder: rung 3 = external observation (run it, read it, probe
 it), rung 2 = blind re-derivation, rung 1 = re-reading. Cite rungs in findings.
 
-## Goal
-
-An honest GO/NO-GO the user can act on: findings hunted at the stated stakes,
-confirmed at rung 3 before any fix, fixed, regressed, residual risks named.
-
 ## Steps
 
 ### 1. Inventory + bar
@@ -81,7 +76,7 @@ Three verifications, all at rung 3:
 
 - **Findings, deterministic first**: route each finding through deterministic
   evidence before any manual probe — compiler, type-checker, existing test,
-  static analyzer; 94–98% of LLM false positives die at this gate (2026-07-14 ·
+  static analyzer; 94–98% of LLM false positives die at this gate (verified 2026-07-14 ·
   LLM4FPM, arXiv 2411.03079). Then reproduce what determinism can't:
   run the trigger, hit the path. Reproduced → CONFIRMED; argued only from
   reading → PLAUSIBLE, reported but never fixed on faith. A false positive that
@@ -120,16 +115,16 @@ risks accepted (with likelihood and blast radius), a plain GO or NO-GO against t
 bar from step 1, and one "would change my mind" line — the observation that would
 flip the verdict. For unattended or production bars, add an unanchored second
 opinion first: a fresh pinned-opus agent gets the artifacts and the bar — never the
-findings or the chain — and its independent verdict is compared; divergence is a
+findings or the chain — then compare its verdict against yours; divergence is a
 gate failure to resolve, not a footnote.
 
 **Success criteria**: The user can decide to rely on the work from this summary alone.
 
-**Rules**:
+**Rules** — whole-skill, not step 5. Ordered by what breaks worst when violated; order encodes meaning here, exempt from house alpha-sort (CLAUDE.md § Code):
 
 - Never soften a NO-GO — an unresolved CONFIRMED finding at the stated stakes blocks the GO.
 - Findings in artifacts you didn't build this session get reported, not silently fixed — an observed failure among them routes to /gigadebug.
-- PLAUSIBLE findings are reported, never fixed — a fix without a reproduced failure is a regression risk taken on faith.
-- When judging between candidates (severities, competing fixes, borderline GO), swap presentation order and re-judge — position/verbosity/authority biases are large and reverse sign on test-related judging; order-swap is the one validated control (2026-07-14 · arXiv 2604.16790).
+- PLAUSIBLE findings are reported, never fixed.
+- When judging between candidates (severities, competing fixes, borderline GO), swap presentation order and re-judge — position/verbosity/authority biases are large and reverse sign on test-related judging; order-swap is the one validated control (verified 2026-07-14 · arXiv 2604.16790).
 - A finding class the user judges noise in a repo encodes into that repo's `.claude/` as a suppress rule at the moment of the judgment — never re-litigated per run; retire the rule if it starts eating real findings.
 - Periodically audit the reviewer itself: plant a known defect and check the hunt catches it — mutation score, not coverage, is the reliable quality signal for a review process.

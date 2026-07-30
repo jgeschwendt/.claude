@@ -5,11 +5,11 @@ description: A corpus of information-architecture structures — organization sc
 
 # Information Architecture
 
-A reference to pick from — not a methodology to follow. The full corpus lives in `references/playbook.md` (~600 lines, 18 sections). Do not read it whole: route with the axes and decision guide below, then read only the sections that match — locate a section with `rg -n '^## §4' ${CLAUDE_SKILL_DIR}/references/playbook.md` and Read from that line offset.
+A reference to pick from — not a methodology to follow. The full corpus lives in `references/playbook.md` (~600 lines, 18 sections). Do not read it whole: route with the axes and decision guide below, then read only the sections that match — locate a section with `rg -n '^## §4' ${CLAUDE_SKILL_DIR}/references/playbook.md` and Read from that line offset. Subsection headings carry no §: match the number instead (`rg -n '^### 14\.3'`).
 
 ## The decision axes
 
-Every IA problem is choices on these axes. Identify which axis the current problem sits on, then read that section of the playbook:
+Every IA problem is choices on these axes. Identify every axis the current problem sits on:
 
 1. **By what principle do I group things?** → §2 Organization schemes (LATCH, exact vs ambiguous)
 2. **What overall shape does the grouping take?** → §3 Organization structures (hierarchy, sequence, matrix, network, faceted, hub-and-spoke, database)
@@ -27,13 +27,13 @@ Substrate-specific sections — read these when the problem IS the substrate:
 11. **Laying out or naming files/directories?** → §14 File systems (PIM evidence, FHS/XDG axes, Bryan naming, reference layouts)
 12. **Organizing or publishing a set of data?** → §15 Datasets (tidy data, README/data dictionary, FAIR, Data Package, metadata-standards stack)
 13. **Data at lake/warehouse/catalog scale?** → §16 Analytics-scale (zone contracts, partitioning, modeling schools, mesh, catalogs)
-14. **Structuring an LLM agent's own context — skills, memory, references?** → §12 agent-context structures (progressive disclosure, router-over-read, atomic memory)
+14. **Structuring an LLM agent's own context — skills, memory, references?** → §12's Agent-context structures (progressive disclosure, router-over-read, atomic memory)
 
 Also: §1 foundational frames (Three Circles, Five Planes, ontology/taxonomy/choreography), §12 personal/networked knowledge (PARA, Zettelkasten, Johnny.Decimal), §13 bridges to software/data/enterprise architecture (DDD, C4, ERM, event sourcing), §17 decision guide, §18 the canon.
 
 ## Quick decision guide (problem → structure)
 
-Mirror of playbook §17 — this copy is the always-loaded router; a row added there is added here too.
+Mirror of playbook §17 — this copy is the always-loaded router; a row added there is added here too. Row order (structures → methods → substrates) is content, exempt from house alpha-sort.
 
 | If the problem is…                                           | Reach for…                                                          |
 | ------------------------------------------------------------ | ------------------------------------------------------------------- |
@@ -72,7 +72,7 @@ Mirror of playbook §17 — this copy is the always-loaded router; a row added t
 - **User language beats internal jargon.** Source labels from what users actually type, not org vocabulary.
 - **Structure is a hypothesis until tested** — card sort to discover, tree test to validate.
 - **Structure migrations are one-way doors** — once habits, links, and tooling build on a layout, reversal is costly; run the commit decision through sequential-thinking's gate (stakes × reversibility) before migrating, not after.
-- **At personal/project scale, optimize navigation, not search** — measured: search is 4–15% of file retrievals and better engines never changed that. At catalog scale (thousands of assets) the reverse: the namespace stops being the IA and metadata/search takes over.
+- **At personal/project scale, optimize navigation, not search** — search is 4–15% of file retrievals (Bergman et al. 2008; Fitchett & Cockburn 2015 · references/playbook.md) and better engines never changed that. At catalog scale (thousands of assets) the reverse: the namespace stops being the IA and metadata/search takes over.
 - **Partition by lifecycle first** — raw/immutable vs derived, config vs cache vs state. The volatility axis is the most load-bearing grouping principle for files and data.
 
 ## Worked traversal (the routing behavior, demonstrated)

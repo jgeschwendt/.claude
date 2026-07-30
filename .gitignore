@@ -30,6 +30,7 @@ teams/
 telemetry/
 todos/
 usage-data/
+worktrees/
 
 daemon*
 
@@ -44,6 +45,4 @@ settings.json.*
 stats-cache.json
 
 *.log
-
-# macOS
 .DS_Store

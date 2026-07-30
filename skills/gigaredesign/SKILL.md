@@ -35,13 +35,6 @@ Nothing is reimagined until every component's responsibility, dependencies,
 and reason-for-being are mapped. The session model synthesizes, designs, and
 judges; pinned opus agents do all sweeping and rebuilding.
 
-## Goal
-
-A codebase rebuilt to a design chosen for what the system IS — not how it
-accreted — external contract intact, migrated in stages that each end green,
-with the map and design surviving as artifacts the user approved before a
-line moved.
-
 ## Reference library
 
 Domain knowledge lives in `${CLAUDE_SKILL_DIR}/references/` — the steps below
@@ -147,9 +140,9 @@ skill exists for.
   inputs, not color: the chosen design names, per smell, the disposition
   that resolves it or an explicit acceptance — a design that leaves the
   map's worst finding intact was chosen by aspiration, not evidence. Swap presentation order and re-judge before
-  committing (order bias is validated; 2026-07-14 · arXiv 2604.16790).
-- **Checkpoint — the one-way door**: present winner, runner-up, and the null
-  case via AskUserQuestion. Unattended → stop here: map + design ARE the
+  committing (verified 2026-07-14 · arXiv 2604.16790).
+- **Human checkpoint — the one-way door**: present winner, runner-up, and the
+  null case via AskUserQuestion. Unattended → stop here: map + design ARE the
   deliverable; a rebuild never launches without approval.
 
 **Success criteria**: `design.md` holds the chosen design with a total
@@ -197,6 +190,9 @@ design enforced by tests that have each failed once on purpose.
 the report alone.
 
 ## Rules
+
+Ordered by what breaks worst when violated — order encodes meaning here,
+exempt from house alpha-sort (CLAUDE.md § Code).
 
 - The external contract is the invariant. Internal tests pinning demolished
   structure are deleted WITH that structure and logged in the ledger.

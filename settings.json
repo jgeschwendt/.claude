@@ -4,6 +4,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -29,26 +30,13 @@
         ]
       }
     ],
-    "PreCompact": [
-      {
-        "matcher": "manual",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/skills/dissolve/hooks/pre-compact-confirm.sh",
-            "timeout": 10,
-            "statusMessage": "checking the compact gate..."
-          }
-        ]
-      }
-    ],
     "PostCompact": [
       {
         "matcher": "manual",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/skills/dissolve/hooks/post-compact-snapshot.sh",
+            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" snapshot || exit 0",
             "timeout": 30,
             "statusMessage": "routing the pre-compact conversation..."
           }
@@ -60,13 +48,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/skills/dissolve/hooks/session-end-clear.sh",
+            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" route || exit 0",
             "timeout": 30,
-            "statusMessage": "routing the cleared context..."
+            "statusMessage": "routing the ended session..."
           }
         ]
       }
     ]
+  },
+  "worktree": {
+    "baseRef": "fresh",
+    "bgIsolation": "none"
   },
   "statusLine": {
     "type": "command",
@@ -78,7 +70,8 @@
     "typescript-lsp@claude-plugins-official": true,
     "vercel@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "askUserQuestionTimeout": "never",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
@@ -88,10 +81,14 @@
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "editorMode": "normal",
+  "verbose": false,
+  "preferredNotifChannel": "auto",
+  "switchModelsOnFlag": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
-  },
-  "model": "claude-fable-5[1m]"
+  }
 }

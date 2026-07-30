@@ -10,6 +10,7 @@ Diagnose from evidence, not vibes: get the transcript, or the exact misbehavior 
 - **Rationalizes exceptions ("surely not for THIS one").** The trivial tempting cases aren't named → enumerate them: _"Even for 'hi'. Even for 'thanks'."_ (→ techniques §Voice).
 - **Ban honored, but the behavior resurfaces via another channel.** Prohibition without channel coverage → forbid across every output channel, and close the world to remove the motive (→ techniques §Leak Boundaries; §Precondition, Ordering & Cardinality Gates).
 - **Obeys one rule while violating its sibling; behavior flips between runs.** The prompt contradicts itself and placement doesn't arbitrate — instruction hierarchy is unreliable → find the conflict and eliminate it in the text (→ techniques §Framing the Judgment: "Eliminate rule conflicts").
+- **Refuses or stalls when told to show its reasoning ("I can't share internal reasoning").** The prompt frames a deliverable as externalized internal reasoning ("write your thinking in the response", "not only internal reasoning") — the `reasoning_extraction` refusal category on Claude 5-generation models → reframe the deliverable as composed work product written fresh (a numbered chain, a rationale section) and ban transcription of thinking blocks explicitly. (since 2026-07-29 · sequential-thinking /tighten M-1 flag)
 
 ## Triggering & routing
 

@@ -29,18 +29,10 @@ allowed-tools:
 
 $ARGUMENTS
 
-Repeated refinement passes over a named target until the evidence says stop.
 Improvement hunt, not bug hunt — bugs found en route get reported to the
 user with their reproducing evidence and routed to /gigadebug (an observed
 failure is its charter), never silently blended into refinement. Runs inline: the judge
-needs session context; the typing is delegated.
-
-## Goal
-
-The target measurably better on its class's quality axes, an invariant never
-broken (green after every pass), a stop decided by evidence — a dry pass or
-churn — not fatigue, and a report showing the diminishing curve so the user
-can see WHY it stopped.
+needs session context.
 
 ## Steps
 
@@ -76,15 +68,14 @@ can see WHY it stopped.
   checkpoint commits, repo conventions govern form; or a stash-ref noted in
   the ledger when the tree holds unrelated work). Every later "revert" means
   "restore to the last green checkpoint" — without one, revert is undefined
-  and destroys whatever uncommitted work preceded this run. Each green pass
-  ends by advancing the checkpoint.
+  and destroys whatever uncommitted work preceded this run.
 - **Axes** (per artifact class + repo conventions): code — coherent ·
   efficient · maintainable · readable · tested; docs/prompts — actionable ·
   coherent · focused · succinct · unambiguous.
 
 **Success criteria**: file list, invariant named and green, axes stated in
 one line. Open a ledger (scratchpad `gigarefine-<slug>.md`) — passes, proposals,
-verdicts, reversals live there, not in conversation memory.
+dispositions, reversals live there, not in conversation memory.
 
 ### 2. Chiastic map
 
@@ -111,23 +102,26 @@ Each pass, until step 4 says stop:
   **naming/clarity** · **efficiency** · **idiom/consistency** ·
   **coverage** (tests the refactor makes cheap). Docs/prompts: the step-1
   axes as lenses; prompts additionally get craft-prompt's refinement
-  checklist as the brief's checklist (copy it from
-  `~/.claude/skills/craft-prompt/SKILL.md` §Refinement checklist — a cold
-  brief can't cite what it never loaded).
+  checklist as the brief's checklist, and the succinct axis briefs
+  /tighten's desk tests (copy from
+  `~/.claude/skills/craft-prompt/SKILL.md` §Refinement checklist and
+  `~/.claude/skills/tighten/references/catalog.md` — a cold brief can't
+  cite what it never loaded).
 - **Judge** (session model, inline — judging needs whole-run context and
   is never delegated): accept or reject each proposal against the invariant and
   the axes. Proposals arrive as claims, not evidence (premise inheritance).
   Reject blends — a proposal serving two axes poorly loses to one serving
   either well (CLAUDE.md · Compromise). Two proposals for the same location:
   swap presentation order and re-judge before picking (order bias is real
-  and validated; 2026-07-14 · arXiv 2604.16790). Every rejection gets a
+  and validated; verified 2026-07-14 · arXiv 2604.16790). Every rejection gets a
   recorded reason in the ledger — rejected-with-reason is never re-litigated
   in a later pass.
 - **Apply**: group accepted proposals by file — one agent owns ALL of a
   file's proposals, agents on disjoint files may run in parallel, same-file
   work never splits (two agents read-modify-writing one file lose the
-  earlier write, and the ledger still records both as applied). Each agent
-  carries the execute-plan executor contract (DONE requires executed
+  earlier write, and the ledger still records both as applied). Each agent,
+  pinned `model: 'opus'` (CLAUDE.md model split), carries the execute-plan
+  executor contract (DONE requires executed
   verification with output in the return — read
   `~/.claude/skills/execute-plan/SKILL.md` step 2 when briefing) with
   verification scoped to its OWN edit (compile / targeted probe); the FULL suite belongs to the
@@ -140,7 +134,8 @@ Each pass, until step 4 says stop:
   claim the pass touched against the live system, and re-run the prompt's
   regression cases where they exist — a class whose check cannot fire ends
   the run NO-VERDICT, never green-by-vacuity. Red → restore to the last
-  green checkpoint or fix within this pass; a pass NEVER ends red.
+  green checkpoint or fix within this pass; a pass NEVER ends red. Each
+  green pass ends by advancing the checkpoint.
 - **Ledger**: append pass number, proposals seen/accepted/rejected, reversals.
 
 **Success criteria**: pass ends green with every proposal dispositioned in
@@ -192,6 +187,4 @@ why it stopped, from this report alone.
   on that surface; the invariant check can't see them.
 - Bugs discovered mid-pass: CONFIRMED-reproducible ones may be fixed as their
   own dispositioned proposals; anything needing investigation is reported and
-  routed to /gigadebug — this skill improves working artifacts, it doesn't
-  debug broken ones.
-- Never carry red forward, never start on red.
+  routed to /gigadebug.

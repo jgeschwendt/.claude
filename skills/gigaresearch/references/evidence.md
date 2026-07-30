@@ -13,7 +13,7 @@ Rule → measured source. Added 2026-07-12 from a heavy-mode self-audit run (aud
 - **Viewpoint-conditioned synthesis** — Diverge (arXiv 2602.00238, ICML 2025): retrieval diversity alone does not survive into answers (models homogenize); viewpoint-conditioning restores 2.1–2.7× semantic diversity at ~0.04/5 quality cost.
 - **Corroborated as-designed** (no change needed): claims ledger with contradictions/gaps (Dossier, ACM CAIS 2026: +23pp BrowseComp-Plus vs ReAct); compression at every stage boundary and schema-forced subagent returns (universal across production systems); restorable-over-lossy compression — keep the URL, drop the page (Manus 2025-07); scripted resume protocol (Anthropic harnesses 2025-11).
 
-Added 2026-07-14 from the skill-gap-analysis pass (wave-2 verified against primaries; audit workspace `skills/gigaresearch/workspaces/skill-gap-analysis-2026`, personal machine only):
+Added 2026-07-14 from the skill-gap-analysis pass (wave-2 verified against primaries — the primary sources below are the portable record; audit workspace `skills/gigaresearch/workspaces/skill-gap-analysis-2026`, machine-local, not tracked):
 
 - **VoI action selection** — Inference-Time Budget Control (arXiv 2605.05701): ranking Search/Decompose/Answer by marginal value per remaining budget: relative F1 +5.7–18.4% across four multi-hop benchmarks, −27.2% wall time; gains concentrate at low/mid budgets.
 - **Retriever quality over query volume** — BrowseComp-Plus (arXiv 2508.06600, ACL 2026): GPT-5 55.9→70.1% from a retriever swap, with fewer search calls; compensating for weak retrieval with more queries is measurably inferior.

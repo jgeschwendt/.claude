@@ -1,8 +1,18 @@
 # Evidence Base
 
-> Citations audited against live sources 2026-07-12 (six-agent fan-out): every cited source resolves with matching title/authors; abstract-verifiable numbers match verbatim. Corrections applied then: entry 25's "deliberation time" cut, entry 16's unguided-slot figure precised, entry 27's GEAR labeled abductive. Body-only figures remain unverified-at-abstract-depth, not disputed.
+> Citations audited against live sources (verified 2026-07-12 · six-agent fan-out): every cited source resolves with matching title/authors; abstract-verifiable numbers match verbatim. Corrections applied then: entry 25's "deliberation time" cut, entry 16's unguided-slot figure precised, entry 27's GEAR labeled abductive. Body-only figures remain unverified-at-abstract-depth, not disputed.
 
-What the research says, and which rule in this skill it produced. Each entry: the finding, the source, the design consequence. This file exists so the rules can be trusted, bent intelligently, or challenged — a skill about critical thinking should survive its own gate.
+What the research says, and which rule in this skill it produced. Each entry: the finding, the source, the design consequence. When the evidence for a technique is weak, the technique gets downgraded — the policy behind #9's demotion and the `Design consequence: none` entries.
+
+## Contents
+
+Entry numbers are stable addresses — `SKILL.md` and `techniques.md` cite them (`#31`, `#9`). This list is not alphabetical and is exempt from house alpha-sort: append new entries, never renumber.
+
+- **Round 1 · 1–10** — 1 self-correction without new information · 2 factored verification · 3 reasoning as rationalization · 4 independent convergence · 5 search vs longer chains · 6 overthinking and underthinking · 7 verbalized overconfidence · 8 prospective hindsight · 9 the ACH grid · 10 persisted lessons · then Intellectual lineage (pre-LLM)
+- **Round 2 · 11–19** — 11 unfaithful chains under RL · 12 sycophancy · 13 consider-the-opposite · 14 authentic dissent · 15 premature closure · 16 the guided thinking slot · 17 confidence elicitation · 18 premise critique · 19 second opinions vs staged debate
+- **Round 3 · 20–27** — 20 verdicts flip under pressure · 21 underthinking as thrashing · 22 anchoring · 23 unacted-on ambiguity · 24 decomposition · 25 judgment practice compounds · 26 plans anchor on themselves · 27 corroboration round
+- **Round 4 · 28–30** — 28 chains launder early errors · 29 citation converts hypothesis to fact · 30 models favor their own outputs
+- **Round 5 · 31–35** — 31 inverse scaling in test-time compute · 32 reasoning degrades abstention · 33 consistency-weighting repairs calibration · 34 debate fails, convergence stands · 35 monitor-before-generate (not adopted)
 
 ## 1. Intrinsic self-correction fails without new information
 
@@ -14,7 +24,7 @@ What the research says, and which rule in this skill it produced. Each entry: th
 
 **Finding**: Having a model generate verification questions about its own draft and answer them _without the draft in context_ ("factored" CoVe) reduces hallucination; verification questions are individually answered more accurately than the same facts inside a long generation. Yes/no-format verification performs worse — models tend to agree with stated facts whether right or wrong.
 **Source**: Dhuliawala et al., "Chain-of-Verification Reduces Hallucination in Large Language Models," Findings of ACL 2024 (arXiv:2309.11495).
-**Design consequence**: the gate's factored-verification step (atomic open-form questions answered from evidence, not the draft), the "leading the witness" anti-pattern, and the blind-subagent prompt discipline (observations and question only, never the conclusion).
+**Design consequence**: the gate's factored-verification step, rung 2's open-form phrasing rule — atomic open questions answered from evidence, never leading yes/no — and the blind-subagent prompt discipline (observations and question only, never the conclusion).
 
 ## 3. Stated reasoning can rationalize, not explain
 
@@ -56,7 +66,7 @@ What the research says, and which rule in this skill it produced. Each entry: th
 
 **Finding**: Empirical tests of Heuer's Analysis of Competing Hypotheses are sparse and unflattering to the ritual itself: the classic matrix did not reduce confirmation bias in controlled studies, its conclusions are sensitive to small changes in evidence ratings, and in one study a transposed layout helped while the canonical one didn't. The underlying _principles_ — enumerate alternatives, weight diagnostic evidence, judge by least inconsistency — remain standard Bayesian practice.
 **Sources**: Dhami et al., Applied Cognitive Psychology 2019; Dhami et al., Cognitive Research: Principles & Implications 2024.
-**Design consequence**: diagnosticity and least-inconsistency live in the core Ground phase; the grid itself is demoted to optional bookkeeping ("a lens, not a verdict"). This skill practices what it preaches: when the evidence for a technique is weak, the technique gets downgraded.
+**Design consequence**: diagnosticity and least-inconsistency live in the core Ground phase; the grid itself is demoted to optional bookkeeping ("a lens, not a verdict").
 
 ## 10. Lessons persisted across attempts improve later attempts
 
@@ -134,13 +144,13 @@ The chain's spine borrows from traditions with long track records rather than no
 
 **Finding**: In the FlipFlop experiment across 9–10 models, LLMs flipped their answers 46% of the time on average when challenged with utterances like "Are you sure?", with accuracy dropping about 17% from first answer to final — the challenge carries no information, yet it moves the verdict.
 **Sources**: Laban et al. 2024 (arXiv:2311.08596); quantification as reported in arXiv:2510.22866.
-**Design consequence**: the "When the verdict is challenged" protocol — bare pushback triggers one factored re-check, never a re-read-and-reaffirm and never a capitulation — and the "pressure response" anti-pattern.
+**Design consequence**: the "When the verdict is challenged" protocol — bare pushback triggers one factored re-check, never a re-read-and-reaffirm and never a capitulation.
 
 ## 21. Underthinking is thought-thrashing, and it's measurable
 
 **Finding**: In o1-like reasoning traces, incorrect responses consumed 225% more tokens with 418% more frequent switching between thoughts than correct ones; most incorrect responses contained at least one correct thought that was abandoned; penalizing switch tokens (e.g., "alternatively") at decode time improved accuracy on hard math without fine-tuning.
 **Source**: Wang et al., "Thoughts Are All Over the Place," 2025 (arXiv:2501.18585).
-**Design consequence**: the minimum-development rule — every hypothesis earns a checkable claim or a tested kill condition before switching, switches are announced with what was established or what killed the thought, and "alternatively" is treated as a checkpoint.
+**Design consequence**: Explore's "develop before you switch" thrash guard, and the checkpoint treatment of "alternatively".
 
 ## 22. Anchoring is measured in LLMs — and naming it isn't enough
 
@@ -200,7 +210,7 @@ The chain's spine borrows from traditions with long track records rather than no
 **Source**: Panickssery, Bowman & Feng, "LLM Evaluators Recognize and Favor Their Own Generations," NeurIPS 2024 (arXiv:2404.13076).
 **Design consequence**: the turn→turn inheritance rule — re-cite your past self at the rung it earned then, not the confidence it acquired by sitting in the transcript.
 
-# Round 5 findings (2026-07-14 skill-gap-analysis pass — wave-2 verified against primaries; sources per entry. Fuller audit trail in the personal machine's `skills/gigaresearch/workspaces/skill-gap-analysis-2026` workspace only)
+# Round 5 findings (verified 2026-07-14 · skill-gap-analysis pass, wave-2 against primaries; sources per entry. Fuller audit trail in the gigaresearch report "What the 2025–2026 state of the art has that the five skills don't" — machine-local workspace, not tracked)
 
 ## 31. Inverse scaling in test-time compute
 

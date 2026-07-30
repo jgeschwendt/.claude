@@ -9,17 +9,11 @@ when_to_use: "Use when a feature branch is ready to become a PR and should be dr
 
 # Submit
 
-Open a PR for the current branch, then watch CI and drive it to green — fixing the failures that are this branch's fault, skipping the ones that aren't, and surfacing review feedback. Self-contained: only `git` and `gh`, no sibling skills.
+Self-contained: only `git` and `gh`, no sibling skills.
 
 Only two interactive pauses by design: the dirty-tree decision (step 1) and review handling (step 7). Everything else runs straight through.
 
-## Inputs
-
 - `$ARGUMENTS` — optional `--draft`, passed to `gh pr create` in step 4. Later steps key off the PR's live `isDraft`, never off `$ARGUMENTS` — a resumed run may adopt a PR whose draft state differs.
-
-## Goal
-
-A PR open on the current branch with all _required_ checks green (advisory / pre-existing failures called out, not chased) and review feedback addressed or replied to — reached without hand-holding.
 
 ## Steps
 
@@ -143,7 +137,7 @@ If the PR is a draft (`isDraft`), omit the Review line and read status `Draft`. 
 
 ## Learning
 
-No capture queue. The moment a run goes off the documented playbook, encode the fix directly into its destination (Golden Rule, CLAUDE.md), backed by a concrete artifact (PR #, SHA, check name, reviewer handle): a general defect in these steps → this SKILL.md · a repo-specific fact → that repo's `.claude/` · the user's personal style → user memory (`/dissolve` at session end). Stamp the edit `(since <date> · <artifact>)`. Net-zero — an overlap with an existing trigger or table row merges into that line, never adds one.
+No capture queue. The moment a run goes off the documented playbook, encode the fix directly into its destination (Golden Rule, CLAUDE.md), backed by a concrete artifact (PR #, SHA, check name, reviewer handle): a general defect in these steps → this SKILL.md · a repo-specific fact → that repo's `.claude/` · the user's personal style → user memory (`attend.sh` sidecar — CLAUDE.md § Memory). Stamp the edit `(since <date> · <artifact>)`. Net-zero — an overlap with an existing trigger or table row merges into that line, never adds one.
 
 ## Rules
 

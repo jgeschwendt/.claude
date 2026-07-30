@@ -6,10 +6,11 @@ when_to_use: >
   failing test, a production error, wrong output, "worked yesterday".
   Trigger phrases: "gigadebug", "/gigadebug", "hunt this bug down", "find
   the root cause", "why is this failing". The escalation target for bugs
-  /gigarefine and /gigaredesign report-and-leave. Distinct from
-  /gigasweep (no symptom — proactive sweep), /code-review (a diff), and
-  /gigareview (this session's work). Needs a symptom: no observed failure →
-  /gigasweep is the hunt without one.
+  the giga siblings report instead of fixing — /gigarefine, /gigaredesign,
+  /gigasweep, /gigareview. Distinct from /gigasweep (no symptom —
+  proactive sweep), /code-review (a diff), and /gigareview (this
+  session's work). Needs a symptom: no observed failure → /gigasweep is
+  the hunt without one.
 argument-hint: "[symptom — error text, failing test, repro steps, 'X broke after Y']"
 allowed-tools:
   - Agent
@@ -27,20 +28,11 @@ allowed-tools:
 
 $ARGUMENTS
 
-An observed failure in; a root cause, a minimal fix, and a permanent
-regression test out. Sequential-thinking discipline throughout: hypotheses
-are eliminated by rung-3 evidence (the verification ladder — rung 3:
-external observation, run/probe it; rung 2: blind re-derivation; rung 1:
-re-reading), never adopted by plausibility. The
-session model reasons and judges; pinned opus agents run probes and type
-the fix.
-
-## Goal
-
-The failure reproduced on demand, its cause named at the level that
-explains ALL the evidence, fixed minimally at the cause site, the repro
-promoted into the suite, and a report saying why the defect existed and why
-nothing caught it.
+Sequential-thinking discipline throughout: hypotheses are eliminated by
+rung-3 evidence (the verification ladder — rung 3: external observation,
+run/probe it; rung 2: blind re-derivation; rung 1: re-reading), never
+adopted by plausibility. The session model reasons and judges; pinned opus
+agents run probes and type the fix.
 
 ## Steps
 
@@ -51,7 +43,7 @@ nothing caught it.
   rate IS a repro.
 - Can't reproduce → that is the finding: report the missing observability
   (logging, seed capture, state dump) and stop — a fix without a repro
-  can't be verified, and a passing suite proves nothing about it.
+  can't be verified, and a passing suite proves nothing about the bug.
 - Note the suite's status BEFORE touching anything; pre-existing reds are
   context (or the bug's siblings) — record, don't absorb.
 - Unattended with no symptom in `$ARGUMENTS` → stop and report.
@@ -92,8 +84,9 @@ apply) in the ledger.
 - Multiple survivors explaining different parts of the evidence → suspect
   multiple bugs sharing one symptom: split the repro, hunt them separately.
 
-**Success criteria**: exactly one cause per repro, with its observed
-discriminating evidence in the ledger.
+**Success criteria**: exactly one cause per repro, named at the level that
+explains ALL the evidence, with its observed discriminating evidence in
+the ledger.
 
 ### 4. Fix and prove
 
@@ -118,6 +111,9 @@ why nothing caught it (test gap? observability gap? — and where that gap
 got encoded), residual doubts.
 
 ## Rules
+
+Ordered by what breaks worst when violated — order encodes meaning here,
+exempt from house alpha-sort (CLAUDE.md § Code).
 
 - No fix without a repro; no CONFIRMED cause without observed
   discriminating evidence — plausible-and-unfalsified stays PLAUSIBLE and

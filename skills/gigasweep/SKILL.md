@@ -1,6 +1,6 @@
 ---
 name: gigasweep
-description: Proactive whole-codebase hunt for real defects — correctness, security, robustness — with deterministic-first verification and adversarial refutation before anything is reported. Read-only by construction — produces a ranked findings report, never edits.
+description: Proactive whole-codebase hunt for real defects — correctness, security, robustness — with deterministic-first verification and adversarial refutation before anything is reported. Read-only by rule — produces a ranked findings report, never edits.
 when_to_use: >
   Use when the user wants an existing codebase hunted for problems without
   a specific symptom — "audit this repo", "gigasweep", "find bugs/security
@@ -29,16 +29,8 @@ $ARGUMENTS
 
 A fresh-eyes sweep of a codebase, tuned for precision: the best automated
 reviewers run 15–50% precision on real bugs, so the verification gate — not
-the hunt — is what makes this report trustworthy. Read-only by
-construction (no Edit in allowed-tools): the deliverable is a ranked
+the hunt — is what makes this report trustworthy. Read-only by rule: the deliverable is a ranked
 findings report; the target tree is never touched.
-
-## Goal
-
-Every scoped file swept under every lens, each surfaced finding CONFIRMED
-by reproduction or deterministic evidence — or labeled PLAUSIBLE — ranked
-by exploitability × blast radius, in a durable report the user can act on
-finding-by-finding.
 
 ## Steps
 
@@ -92,7 +84,7 @@ findings in the ledger.
 - **Adversarial refutation** per keeper: refute-first briefs; for
   high-severity findings, 3 independent refuters, majority kills.
 - **Attack the set**: duplicates wearing different words, contradictions,
-  severity re-ranked with order-swap (2026-07-14 · arXiv 2604.16790).
+  severity re-ranked with order-swap (verified 2026-07-14 · arXiv 2604.16790).
 
 **Success criteria**: every finding CONFIRMED-with-evidence or
 PLAUSIBLE-with-reason; the set survived its own review.

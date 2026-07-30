@@ -50,6 +50,8 @@ Run `agent-browser skills list` to see everything available on the installed ver
 
 The dashboard runs independently of browser sessions on port 4848 and can also be opened through a proxied or forwarded URL such as `https://dashboard.agent-browser.localhost`. Agents should stay on the dashboard origin: session tabs, status, and stream traffic are proxied internally, so session ports do not need to be exposed.
 
+Vendored from vercel-labs/agent-browser — the body above is byte-synced with upstream (verified 2026-07-29 · first 51 lines identical); propose changes upstream, never edit them here. Upstream source:
+
 ```
 https://raw.githubusercontent.com/vercel-labs/agent-browser/refs/heads/main/skills/agent-browser/SKILL.md
 ```

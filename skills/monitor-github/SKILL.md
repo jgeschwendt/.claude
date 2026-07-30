@@ -12,7 +12,8 @@ snapshot _changes_ into notifications, scoped per conversation.
 Everything uses the GraphQL API (`gh api graphql`) rather than
 `gh pr view --json` or REST, because review conversations - thread grouping,
 `isResolved`, `isOutdated`, unsubmitted pending reviews - only exist in
-GraphQL. `references/review-data-guide.md` explains what lives where;
+GraphQL (unverified 2026-07-30 · not probed this run).
+`references/review-data-guide.md` explains what lives where;
 `references/graphql-fields-reference.md` is the exhaustive, schema-generated
 list of every field on every relevant type (consult it before claiming a data
 point doesn't exist, or when extending the queries);
@@ -30,10 +31,9 @@ bash $SKILL/scripts/gh_dashboard.sh 50     # raise the cap (max 50)
 
 Two API calls (~2s), one JSON object out: `my_prs`, `review_requests`
 (sorted longest-waiting first, so overdue reviews never fall off the end),
-`assigned_issues`, and `mentions` (open Issues+PRs mentioning the user, last
-30 days, not self-authored). Requires the `gh` CLI, authenticated, plus `jq` for
-the daemon. On failure it prints `{"error": ..., "hint": ...}` - relay the
-hint (usually `gh auth login`). GitHub Enterprise: prefix commands with
+`assigned_issues`, and `mentions`. Requires the `gh` CLI, authenticated, plus
+`jq` for the daemon. On failure it prints `{"error": ..., "hint": ...}` - relay
+the hint (usually `gh auth login`). GitHub Enterprise: prefix commands with
 `GH_HOST=github.mycorp.com`.
 
 ### Field glossary
@@ -57,8 +57,8 @@ hint (usually `gh auth login`). GitHub Enterprise: prefix commands with
 | `your_pending_review` (review requests) | bool                                                                      | The user started a review and **never submitted it** - invisible to everyone else until they do                                                                                                                         |
 | `total` vs `items`                      | -                                                                         | If `total` > items shown, say so ("showing 20 of 34") and offer a higher limit                                                                                                                                          |
 
-Thread counts cover the first 50 threads per PR - effectively all real PRs.
-For complete depth on one PR, the drill-down script below paginates.
+Thread counts cover the first 50 threads per PR. For complete depth on one PR,
+the drill-down in § Follow-ups paginates.
 
 ## Triage
 
@@ -66,6 +66,10 @@ Sort every item into three buckets; the user should be able to read only the
 first section and know what to do next.
 
 **● Needs your action**
+
+Rows ordered blocked-on-you first — others waiting on the user, then the user's
+own blockers, then mentions. Order encodes triage priority; exempt from
+alpha-sort. (since 2026-07-30 · F5, ordering principle confirmed by user)
 
 | Signal                                                                  | Suggested action                                                                                            |
 | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -82,11 +86,11 @@ first section and know what to do next.
 When reporting a PR's review state, name who approved / requested changes from
 `latest_reviews` (e.g. "approved by @sara, changes requested by @tom").
 
-**◐ Waiting on others** - open non-draft PRs matching no row above (review
-pending, CI running, `waiting_on_reviewer` threads). Untouched > 7 days →
-flag ⚠ and offer to draft a nudge. `auto_merge` = true → "auto-merge armed,
-will land itself when green" (do **not** tell the user to merge manually).
-`in_merge_queue` = true → "in merge queue".
+**◐ Waiting on others** - open non-draft PRs matching no ● Needs your action
+row (review pending, CI running, `waiting_on_reviewer` threads). Untouched > 7
+days → flag ⚠ and offer to draft a nudge. `auto_merge` = true → "auto-merge
+armed, will land itself when green" (do **not** tell the user to merge
+manually). `in_merge_queue` = true → "in merge queue".
 
 **○ FYI** - drafts, draft review requests, assigned issues, older `mentions`
 (> 2 days). One line each.
@@ -141,9 +145,13 @@ user their scope in plain words.
 - Claims release on `detach` or after 2h without polling (stale sessions are
   pruned so a dead conversation can't silently eat notifications forever).
 
-**Delivery, Monitor mode (recommended in-session — push, zero config).** After
-`attach`, arm a persistent Monitor so events stream into the conversation as
-notifications while you keep working — no settings.json changes:
+**Delivering events** (all three modes below): when events land, surface
+`high` severity briefly but prominently, then continue with the user's actual
+request; relay `info` in passing.
+
+**Delivery, Monitor mode (recommended in-session — push, no settings.json
+changes).** After `attach`, arm a persistent Monitor so events stream into the
+conversation as notifications while you keep working:
 
 ```
 Monitor(
@@ -153,17 +161,16 @@ Monitor(
   description: "github events (<scope>)", persistent: true)
 ```
 
-Polling doubles as the claim heartbeat. When events land, surface high-severity
-ones briefly and keep working; if the user has likely stepped away, also send a
-PushNotification (one line, ≤200 chars, lead with the actionable fact — the
-tool self-suppresses when they're active). On "stop watching": TaskStop the
-monitor, then `detach`.
+Polling doubles as the claim heartbeat. If the user has likely stepped away,
+also send a PushNotification (one line, ≤200 chars, lead with the actionable
+fact — the tool self-suppresses when they're active). On "stop watching":
+TaskStop the monitor, then `detach`.
 
-**Delivery, hook mode (always-on across sessions).** Claude Code
-injects a hook's stdout as conversation context on `UserPromptSubmit` and
-`SessionStart`, so the bundled `scripts/hook_poll.sh` makes events arrive
-automatically with every user message - no asking. Setup (with the user's
-permission):
+**Delivery, hook mode (always-on across sessions).** Claude Code injects a
+hook's stdout as conversation context on `UserPromptSubmit` and `SessionStart`
+(verified 2026-07-15 · monitoring-guide.md § Push delivery: how the Claude Code hook works),
+so the bundled `scripts/hook_poll.sh` makes events arrive automatically with
+every user message - no asking. Setup (with the user's permission):
 
 ```bash
 bash $SKILL/scripts/monitor.sh hook-config   # prints the settings.json snippet
@@ -171,15 +178,16 @@ bash $SKILL/scripts/monitor.sh hook-config   # prints the settings.json snippet
 
 Merge that into `~/.claude/settings.json` (UserPromptSubmit delivers;
 SessionEnd is optional instant cleanup - TTL pruning covers it anyway).
-Claude Code snapshots hooks at session start, so it takes effect in new
-sessions - the user can review it with `/hooks`. Once installed, every
-conversation auto-attaches on its first message, scoped by its cwd under the
-exact routing rule above, and pending events appear as `[github-monitor]`
-context lines. When they do: briefly surface the high-severity items, then
-continue with the user's actual request. Don't also attach manually or
-re-poll - the hook already did both. The hook always exits 0 (a non-zero
-UserPromptSubmit hook can block the user's prompt) and prints nothing when
-there's no news.
+Claude Code snapshots hooks at session start, so the hook takes effect in new
+sessions - the user can review it with `/hooks`
+(verified 2026-07-15 · monitoring-guide.md § Push delivery: how the Claude Code hook works).
+Once installed, every conversation auto-attaches on its first message, scoped
+by its cwd under **The routing rule**, and pending events appear as
+`[github-monitor]` context lines. Don't also attach manually or re-poll - the
+hook already did both. The hook always exits 0 - a non-zero UserPromptSubmit
+hook can block the user's prompt
+(unverified 2026-07-30 · not probed this run) - and prints nothing when there's
+no news.
 
 **Delivery, manual mode (no hook installed).** Run:
 
@@ -190,27 +198,27 @@ bash $SKILL/scripts/monitor.sh poll <session-id>
 when the user asks "anything new?", and opportunistically between long tasks.
 Empty output = no news (say so briefly only if asked). Each event is a JSON
 line: `{ts, repo, key, type, severity, title, url}` - `key` is `"o/r#N"` (or
-null for repo-wide events like releases); relay `high` severity prominently,
-`info` in passing.
+null for repo-wide events like releases).
 
-| Event type                                            | Sev       | Meaning                                                                                   |
-| ----------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------- |
-| `review_requested` / `review_request_cleared`         | high/info | Someone wants (no longer wants) the user's review                                         |
-| `draft_ready`                                         | high      | A PR awaiting the user's review left draft - now reviewable                               |
-| `ci_failed` / `ci_green`                              | high/info | Checks on their PR started failing / recovered (`ci_failed` names up to 3 failing checks) |
-| `changes_requested` / `approved`                      | high      | Review decision changed on their PR                                                       |
-| `merge_conflict`                                      | high      | Their PR now conflicts with base                                                          |
-| `pr_behind`                                           | info      | Base branch moved ahead of their PR - update the branch                                   |
-| `ready_to_merge`                                      | high      | Their PR just went approved + green + mergeable: the "go press merge" moment              |
-| `new_review_comments`                                 | high      | Unresolved comments awaiting their reply increased                                        |
-| `new_conversation_comment`                            | high      | Someone commented on the Conversation tab of their PR (commenter named)                   |
-| `mentioned`                                           | high      | The user was mentioned in an issue/PR by someone else                                     |
-| `pr_merged` / `pr_closed`                             | high      | Their PR left the open set (distinguished by lookup; merged shows "merged ✓")             |
-| `watch_started`                                       | info      | A watched repo baselined (first sighting, silent otherwise)                               |
-| `repo_new_pr` / `repo_new_issue`                      | info      | New PR / issue by someone else in a watched repo                                          |
-| `release_published`                                   | info      | A watched repo published a new latest release                                             |
-| `monitor_degraded` / `monitor_recovered`              | high/info | The daemon lost / regained its connection to GitHub                                       |
-| `issue_assigned`, `own_pr_tracked`, `monitor_started` | high/info | Informational bookkeeping                                                                 |
+| Event type                                    | Sev       | Meaning                                                                                   |
+| --------------------------------------------- | --------- | ----------------------------------------------------------------------------------------- |
+| `review_requested` / `review_request_cleared` | high/info | Someone wants (no longer wants) the user's review                                         |
+| `draft_ready`                                 | high      | A PR awaiting the user's review left draft - now reviewable                               |
+| `ci_failed` / `ci_green`                      | high/info | Checks on their PR started failing / recovered (`ci_failed` names up to 3 failing checks) |
+| `changes_requested` / `approved`              | high      | Review decision changed on their PR                                                       |
+| `merge_conflict`                              | high      | Their PR now conflicts with base                                                          |
+| `pr_behind`                                   | info      | Base branch moved ahead of their PR - update the branch                                   |
+| `ready_to_merge`                              | high      | Their PR just went approved + green + mergeable: the "go press merge" moment              |
+| `new_review_comments`                         | high      | Unresolved comments awaiting their reply increased                                        |
+| `new_conversation_comment`                    | high      | Someone commented on the Conversation tab of their PR (commenter named)                   |
+| `mentioned`                                   | high      | The user was mentioned in an issue/PR by someone else                                     |
+| `pr_merged` / `pr_closed`                     | high      | Their PR left the open set (distinguished by lookup; merged shows "merged ✓")             |
+| `watch_started`                               | info      | A watched repo baselined (first sighting, silent otherwise)                               |
+| `repo_new_pr` / `repo_new_issue`              | info      | New PR / issue by someone else in a watched repo                                          |
+| `release_published`                           | info      | A watched repo published a new latest release                                             |
+| `monitor_degraded` / `monitor_recovered`      | high/info | The daemon lost / regained its connection to GitHub                                       |
+| `issue_assigned`                              | high      | An issue was assigned to you                                                              |
+| `own_pr_tracked`, `monitor_started`           | info      | Informational bookkeeping                                                                 |
 
 Lifecycle: `detach <id>` when the user says stop watching (the daemon keeps
 serving other sessions); `stop` kills the daemon; `status` shows pid,
@@ -253,14 +261,13 @@ bash $SKILL/scripts/monitor.sh unwatch acme/infra
 
 Watching adds one GraphQL query per tick for the whole watch list plus one
 REST (latest-release) call per watched repo. `watch` does **not**
-start the daemon (only `attach`/`start` do) - a running daemon is required for
-watches to fire; the first sighting baselines silently with one "Now watching"
+start the daemon (only `attach`/`start` do) - watches fire only while the
+daemon runs; the first sighting baselines silently with one "Now watching"
 notice. Use this when the user says "watch this repo's issues/releases" rather
 than "watch my stuff" (that's `attach`).
 
 **Degraded mode:** 3 consecutive failed polls broadcast one `monitor_degraded`
-event (check `gh auth status`); recovery broadcasts `monitor_recovered`. The
-monitor never silently goes dark.
+event (check `gh auth status`); recovery broadcasts `monitor_recovered`.
 
 ## Follow-ups
 
@@ -299,11 +306,12 @@ gh search prs --mentions=@me --state=open --limit 20 \
 gh api notifications --jq '.[] | {reason, title: .subject.title, repo: .repository.full_name}'
 ```
 
-**Stay read-only by default.** Merging, commenting, approving, resolving
-threads, or closing anything requires an explicit user instruction. When
+**Stay read-only by default.** Every write to GitHub — merging, commenting,
+approving, resolving threads, closing, and any other mutation (labels,
+assignees, titles, re-requests) — requires an explicit user instruction. When
 asked: `gh pr merge <url> --squash`, `gh pr comment <url> --body "..."`,
 `gh pr review <url> --approve`, and the `resolveReviewThread` mutation (see
-the review-data guide).
+`references/review-data-guide.md`).
 
 ## Fallback
 
@@ -318,6 +326,7 @@ gh search prs --review-requested=@me --state=open --limit 20 \
 ```
 
 Per-PR detail: `gh pr view <url> --json statusCheckRollup,reviewDecision,mergeable`.
-Review-thread state has no CLI or REST equivalent - use the raw GraphQL from
-the reference docs. Missing repos in results usually means token scope or
-SSO authorization: check `gh auth status`.
+Review-thread state has no CLI or REST equivalent
+(unverified 2026-07-30 · not probed this run) - use the raw GraphQL from
+`references/review-data-guide.md`. Missing repos in results usually means token
+scope or SSO authorization: check `gh auth status`.

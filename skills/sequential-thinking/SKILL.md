@@ -7,17 +7,11 @@ description: A structured protocol for working through complex problems as an ex
 
 ## Why this exists
 
-The default failure mode on hard problems is answering in one forward pass: latch onto the first plausible explanation, gather evidence that confirms it, and present it confidently. This protocol counters that by making reasoning **external, numbered, and attackable**. Each thought is a unit of work that later thoughts can cite, test, revise, or overturn.
+The default failure mode on hard problems is answering in one forward pass: latch onto the first plausible explanation, gather evidence that confirms it, and present it confidently. This protocol counters that by making reasoning **external, numbered, and attackable**.
 
 One research finding shapes everything here: a fluent chain is not evidence of a sound conclusion. Models can produce convincing step-by-step justifications for answers actually driven by unstated influences, and re-reading one's own reasoning without new information does not reliably fix it — it sometimes talks the reasoner out of correct answers (see `${CLAUDE_SKILL_DIR}/references/evidence.md` — every `references/…` path below resolves in that directory). So this protocol grades conclusions by their **external anchors** — kill conditions actually tested, observations actually made — never by how persuasive the prose reads.
 
-A second finding explains why this is a _procedure_ and not advice: in the human debiasing literature, instructing judges to "be as fair and unbiased as possible" barely helps, while a specific operation — generate the reasons the opposite could be true — measurably corrects bias. Exhortation fails; procedure works. Every rule below is the procedural form of some way reasoning goes wrong. The chain exists to hold those anchors, not to perform rigor.
-
-Three principles follow:
-
-1. **Sequential**: thoughts build on each other, estimates of how many you need can change, and you may revise or branch at any point.
-2. **Critical**: no conclusion ships until it has survived a deliberate attempt to break it — and the terms of that attempt are set _before_ the evidence comes in.
-3. **Proportional**: thinking costs context, time, and the user's patience, and past a point more of it makes answers _worse_, not better. Depth tracks stakes and reversibility, not intellectual interest.
+A second finding explains why this is a _procedure_ and not advice: in the human debiasing literature, instructing judges to "be as fair and unbiased as possible" barely helps, while a specific operation — generate the reasons the opposite could be true — measurably corrects bias. Exhortation fails; procedure works.
 
 ## Calibrating depth
 
@@ -29,13 +23,13 @@ Depth is a function of **stakes × reversibility**. A two-way door — a choice 
 | Standard | 6–10     | Costly to redo; several constraints or live hypotheses                     |
 | Deep     | 10–20+   | Irreversible or expensive; ambiguous evidence; needs branches or subagents |
 
-At Light depth the protocol compresses to: frame in one thought, two rivals with kill conditions, one discriminating check, verdict. Even the fast path writes kill conditions — that habit is the skill.
+At Light depth the protocol compresses to: frame in one thought, two rivals with kill conditions, one discriminating check, the Challenge gate, verdict. Even the fast path writes kill conditions.
 
 Estimate the count when you frame the problem and say so. The estimate is a scaffold, not a quota — grow it openly when the problem is deeper than it looked, shrink it when the answer arrives early. Never pad: measured returns on longer reasoning diminish and then go negative, with extended rumination associated with abandoning previously correct answers. Gate depth by task class, not only difficulty: on inputs carrying a plausible-but-wrong frame, planted misleading detail, or a bare truthfulness question, longer reasoning measurably hurts — monotonic degradation via distraction, spurious-correlation amplification, framing overfitting, and confabulation (2026-07-14 · `references/evidence.md` #31) — so the move there is a short chain plus a rung-3 check, not more thoughts. If a task turns out to be trivial mid-protocol, say so and answer directly.
 
 ## Thought format
 
-Write load-bearing thoughts where they persist — the visible response or the scratchpad, not only internal reasoning (see "Running this inside Claude Code"). Each thought gets a header:
+Write load-bearing thoughts where they persist — the visible response or the scratchpad (see "Running this inside Claude Code"). The chain is composed work product, written fresh as the work happens — never a transcript or reconstruction of thinking blocks. Each thought gets a header:
 
 ```
 Thought 3/8 [hypothesis]: The 502s correlate with deploys, so the leading
@@ -56,8 +50,8 @@ Conventions:
 - **Label each thought**: `frame`, `decompose`, `hypothesis`, `evidence`, `test`, `challenge`, `revise → #N`, `branch ← #N: "name"`, `merge`, `prune`, `synthesize`, `verdict`, `postmortem`.
 - **Revisions name their target and say why it was wrong.** Silently changing course hides exactly the information the trail exists to preserve.
 - **Branches get a short name** and must end in `merge` or `prune` with the reason stated. No orphaned branches.
-- **Reused claims carry their rung**: when a thought cites `#N`, it imports #N's verification status along with its content — "per #3 (rung 3)" and "per #3 (rung 1)" are different licenses (see "Premise inheritance").
-- **Update the denominator openly**: `Thought 7/8` becoming `Thought 7/12` is the protocol working, not sloppiness.
+- **Reused claims carry their rung**: citing `#N` imports #N's verification status, not just its words (see "Premise inheritance").
+- **Update the denominator openly**: `Thought 7/8` becomes `Thought 7/12` mid-chain.
 
 ## Know what kind of problem this is
 
@@ -74,7 +68,7 @@ The protocol is one spine, but different problem types weight the phases differe
 
 ## The verification ladder
 
-Everything in the Ground and Challenge phases runs on one hierarchy — and it is the house's shared verification vocabulary: sibling skills (gigaresearch, execute-plan) cite rungs by number rather than redefining them. When you need to check a claim, climb as high as the claim's importance demands:
+Everything in the Ground and Challenge phases runs on one hierarchy — and it is the house's shared verification vocabulary: sibling skills (gigaresearch, execute-plan) cite rungs by number. When you need to check a claim, climb as high as the claim's importance demands. The rungs run highest-first; the order encodes strength, and is exempt from house alpha-sort.
 
 - **Rung 3 — External.** New information from outside the chain: run the command, execute the test, measure, read the actual file, ask the user. Nothing below this rung can overturn it.
 - **Rung 2 — Factored.** New computation performed _blind to the draft_: re-derive a key result by a genuinely different method and check agreement (independent convergence is one of the strongest correctness signals available), or pose verification questions and answer them from raw evidence without the draft in view. Phrase verification questions **open-form** — "what indexes exist on `returns`?" — never as leading yes/no, which invites agreeing with whatever your draft already says.
@@ -88,7 +82,7 @@ The ladder assigns a claim its rung; this section is the conservation law: **a c
 
 - **Thought → thought.** Citing `#N` imports #N's rung, not just its words: "per #3 (rung 1, inferred)" and "per #3 (rung 3, observed)" license different weight. A conclusion resting only on inherited rung-1 claims is itself rung 1, however many steps it took getting there — chains launder by length.
 - **Chain → ledger → resumed session.** Hedges are the first casualty of compression. BELIEFS promote to FACTS only through a new rung-3 `evidence` thought — never by surviving a summary, a compaction, or a session boundary. A resumed session treats inherited BELIEFS as open questions wearing yesterday's confidence.
-- **Subagent → main chain.** A mini-verdict arrives as a _claim carrying its own assumptions_, not as evidence. Merge its assumption list into your ledger along with its conclusion; an unverified load-bearing assumption inside a subagent's verdict is now your unverified load-bearing assumption.
+- **Subagent → main chain.** A mini-verdict arrives as a _claim carrying its own assumptions_, not as evidence. Merge its assumption list into your ledger along with its conclusion; an unverified load-bearing assumption inside a subagent's verdict is now your unverified load-bearing assumption. Every spawn is pinned `model: 'opus'` or cheaper (CLAUDE.md model split; delegation discipline: "Running this inside Claude Code").
 - **Turn → turn.** Your own earlier outputs are the most seductive premises: models measurably favor their own generations even when humans rate them no better, and users quote your tentative suggestion back as "what we established." Re-cite your past self at the rung it earned _then_, not the confidence it acquired by sitting in the transcript.
 - **Source → source.** Two sources sharing one origin are one source. Citation networks demonstrably manufacture authority through bias, amplification, and the conversion of hypothesis into fact by citation alone — so before counting confirmations, check whether they are independent or an echo.
 - **Task artifacts.** Tickets, TODOs, issue titles, and code comments ship premises ("fix the race condition in X" presumes there is one). The Frame-phase premise audit applies to inherited artifacts exactly as it does to the user's question.
@@ -121,7 +115,7 @@ Produce hypotheses or options. **A single hypothesis is a red flag**: when only 
 
 ### 4. Ground — evidence beats cleverness
 
-You have tools, so use them inside the chain. When a thought makes a checkable claim — a file says X, the test fails this way, the config contains Y — check it _before_ writing the next thought, and record the result as an `evidence` thought (rung 3). This mid-task pause is not bureaucracy: giving an agent an explicit slot to process tool results _with guidance on what to think about_ produced a 54% relative improvement on a tool-heavy agent benchmark, while the same slot without guidance barely moved the needle — the labels and questions in this protocol are that guidance. Five speculative thoughts stacked on an unverified premise are worth less than one verified one.
+When a thought makes a checkable claim — a file says X, the test fails this way, the config contains Y — check it _before_ writing the next thought, and record the result as an `evidence` thought (rung 3). This mid-task pause is not bureaucracy: giving an agent an explicit slot to process tool results _with guidance on what to think about_ produced a 54% relative improvement on a tool-heavy agent benchmark, while the same slot without guidance barely moved the needle — the labels and questions in this protocol are that guidance. Five speculative thoughts stacked on an unverified premise are worth less than one verified one.
 
 Three disciplines keep this phase sharp:
 
@@ -143,8 +137,6 @@ Mandatory before any verdict, and built on the ladder: the gate is not "re-read 
 
 For irreversible or high-stakes verdicts, add an **unanchored second opinion** — the closest available analog to an authentic dissenter: hand a fresh-context subagent the evidence only — no chain, no favorite — and compare conclusions (see "Running this inside Claude Code"). Collect independent verdicts and compare; do not stage argument rounds between agents — convergence of independent paths is the well-evidenced mechanism, while conversational debate fails two independent 2025–26 evidence lines: conformity and error propagation in debate meta-evaluations, and teams averaging below their best member via integrative compromise. Divergence is a gate failure; find out why before proceeding.
 
-If the gate breaks your leading answer, that is the skill succeeding, not failing. Mark the revision and keep going.
-
 ### 6. Conclude
 
 Stop when the answer survives the gate, or when new thoughts stop changing the conclusion — never merely because the estimate ran out. Close with:
@@ -161,7 +153,7 @@ Calibrate against a known bias: verbalized confidence runs **systematically over
 
 **When the gate won't pass** because the discriminating evidence is genuinely unavailable, do not manufacture confidence. Three honest moves remain: recommend the option that is **robust across the live hypotheses** (safe whichever turns out true); make the recommendation itself the **cheapest discriminating probe** ("run X for a day; it settles H1 vs H2 and is safe under both"); or **defer explicitly** — name the person, dataset, or measurement that could settle it and route the question there. Calibrated low confidence exists precisely to enable that handoff. The verdict states which move you made and why.
 
-The verdict block closes the _chain_; the reply to the user should be shaped naturally around its content. Pasting a rigid template into a casual conversation is protocol theater — but the answer, the confidence level, and what would change it must all survive into the reply in some form.
+The verdict block closes the _chain_; shape the reply to the user naturally around its content. Pasting a rigid template into a casual conversation is protocol theater — but the answer, the confidence level, and what would change it must all survive into the reply in some form.
 
 ### When the verdict is challenged
 
@@ -173,7 +165,7 @@ When someone pushes back, first ask what's new. If the challenge carries new inf
 
 The chain has to coexist with machinery Claude Code already gives you. The division of labor:
 
-- **Internal reasoning vs. the chain**: extended-thinking blocks are ephemeral and unauditable — fine for micro-steps (arithmetic, skimming a file), wrong for load-bearing reasoning. Anything a later thought will cite, revise, or that the user should be able to audit belongs in the visible chain or the scratchpad. If a conclusion appears in the reply, its supporting chain must exist somewhere the user can inspect.
+- **Thinking blocks vs. the chain**: thinking blocks are ephemeral and unauditable — fine for micro-steps (arithmetic, skimming a file); load-bearing work happens in the chain. Compose the chain fresh as work product — never echo, transcribe, or reconstruct thinking-block content into the response; that instruction shape draws `reasoning_extraction` refusals on current models (since 2026-07-29 · /tighten M-1 flag; platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5). Anything a later thought will cite, revise, or that the user should be able to audit belongs in the chain or the scratchpad. If a conclusion appears in the reply, its supporting chain must exist somewhere the user can inspect.
 - **Plan mode**: phases 1–3 (frame, decompose, explore) are exactly what a good plan is made of. Run them _before_ presenting a plan, so the plan inherits the rivals you considered and the reasons they lost — a plan that shows only the winning option invites the user to relitigate alternatives you already pruned, without the evidence.
 - **Todo lists**: todos track _execution_ state; thoughts track _epistemic_ state. A pruned hypothesis is not a completed todo, and mirroring the chain into the todo list clutters both. Keep them separate: the chain decides what to do, the todos track doing it.
 - **Subagents for parallel branches**: when branches are genuinely independent and each needs real investigation, spawn an agent per branch with just that branch's question; each returns evidence plus a mini-verdict, and the main chain merges or prunes. Pin each spawn (`model: 'opus'` or cheaper — the CLAUDE.md model split: investigation is legwork, judging the merge is yours), and prefer schema-forced returns (`{assumptions, evidence, verdict}`) so the assumption merge is mechanical rather than prose-mining. Independence is not only speed — a subagent that never saw your favorite hypothesis evaluates evidence unanchored. And read what comes back through the inheritance lens: a mini-verdict is a claim carrying its own assumptions — merge its assumption list, not just its conclusion.
@@ -182,7 +174,7 @@ The chain has to coexist with machinery Claude Code already gives you. The divis
 
 ## Long tasks: the ledger and the scratchpad
 
-In long agentic sessions where context may be compacted, the chain itself is state worth keeping. Append thoughts to a scratch file (`thinking-<task>.md` in the session scratchpad directory, or `.thinking/<task>.md` in the repo if the user wants the audit trail — gitignore it otherwise) and re-read it when resuming.
+In long agentic sessions where context may be compacted, the chain itself is state worth keeping. Append thoughts to the scratchpad (`thinking-<task>.md` in the session scratchpad directory, or `.thinking/<task>.md` in the repo if the user wants the audit trail — gitignore it otherwise) and re-read it when resuming.
 
 For Deep-tier problems, keep a compact **epistemic ledger** at the top of the scratchpad and update it as evidence lands:
 
@@ -203,93 +195,18 @@ When ground truth eventually arrives — the fix worked or didn't, the decision 
 
 ## Anti-patterns
 
-- **Padding** thoughts to reach the estimate. Density over count — and past the point of new information, more thinking measurably hurts.
-- **Ritual challenge**: a `challenge` thought that gestures at doubt without naming a specific way the answer could be wrong. Performed dissent doesn't just fail — it measurably entrenches the favorite. If the gate never draws blood across many uses, it isn't being run honestly.
+- **Ritual challenge**: a `challenge` thought that gestures at doubt without naming a specific way the answer could be wrong. If the gate never draws blood across many uses, it isn't being run honestly.
 - **Rung-1 laundering**: presenting introspective re-reading as if it were verification. "I double-checked my reasoning" is not a check.
-- **Confirmation shopping**: gathering only evidence that can support, never kill. Pre-registered kill conditions exist to block exactly this.
-- **Leading the witness**: yes/no verification questions ("the index is missing, right?") that invite agreement with the draft. Ask open questions.
+- **Confirmation shopping**: gathering only evidence that can support, never kill.
 - **Speculation stacking**: building thought 6 on thought 3's guess when one command would have settled it.
 - **Hidden revisions**: quietly switching answers instead of writing `revise → #N`.
 - **Branch hoarding**: leaving alternatives open so no conclusion is ever wrong.
-- **Thrashing**: abandoning a live hypothesis without naming its killer, or relitigating a settled one without new evidence.
-- **Pressure response**: flipping a verdict because someone pushed back without new information — models do this nearly half the time under a bare "are you sure?" — or refusing to revisit when they bring real evidence. Same failure, opposite costumes: confidence tracking something other than evidence.
 - **Confidence theater**: a "high" label or a precise-sounding number that the weakest link doesn't back.
 - **Protocol theater**: running all six phases on a question that needed one sentence.
 
-## Compact worked example
+## Worked examples
 
-> _Task: "Our nightly ETL job started taking 4 hours instead of 40 minutes. Figure out why."_
-
-```
-Thought 1/7 [frame]: Diagnosis-type. Success = identify the responsible
-change. Known: started ~last week. Assumed (unverified): input volume
-is stable. Restated without inherited suspects: "the job got 6x slower;
-find the mechanism."
-
-Thought 2/7 [decompose]: Differential: (a) data volume/shape changed,
-(b) code or query changed, (c) infrastructure changed. Order by cost
-to verify: (a) row counts, (b) git log, (c) change log.
-
-Thought 3/7 [evidence]: Row counts flat, ±2% week over week. (a) pruned
-— and the frame's assumption is now verified at rung 3, not assumed.
-
-Thought 4/7 [evidence]: git log: one merge 8 days ago — "switch orders
-join to include returns table."
-
-Thought 5/7 [hypothesis]: New join lacks an index on returns.order_id,
-forcing a scan per batch.
-Kill condition: EXPLAIN shows an index scan on returns.
-
-Thought 6/7 [challenge]: Ran the kill test — EXPLAIN shows seq scan,
-40M rows, no index (rung 3). Hypothesis survives its own kill
-condition. Negative space: if (c) infra were the cause, the change log
-would show a deploy or instance event in the window — it shows none.
-Pruned on absence of expected evidence, which I looked for, not just
-failed to see.
-
-Thought 7/7 [verdict]:
-Verdict: the returns-table join added 8 days ago triggers a sequential
-scan; add an index on returns.order_id.
-Confidence: high (~90%) — mechanism confirmed at rung 3, rivals pruned
-on direct evidence.
-Would change my mind: prod having the index when staging doesn't.
-Open questions: whether the join also needs a date filter as returns
-grows.
-```
-
-Note what made this work: the differential was enumerated before evidence arrived, the hypothesis carried its kill condition from birth, the challenge ran that test rather than performing doubt, and the infra rival was pruned by _looking for_ its expected traces and finding none.
-
-The same spine handles decisions, compressed to show the shape:
-
-> _Task: "Should we move our job queue from Redis to Postgres SKIP LOCKED?"_
-
-```
-Thought 1/6 [frame]: Decision-type, one-way-door-ish (migration is
-costly to reverse) → Standard depth despite small system. Criteria:
-ops simplicity (2-person team), throughput headroom, job durability.
-Thought 2/6 [hypothesis]: A: stay on Redis. B: Postgres SKIP LOCKED
-(kill: benchmarks under 2x measured peak). C: managed queue — added
-so B isn't judged only against the incumbent.
-Thought 3/6 [evidence]: Metrics show 11 jobs/s peak, not the 50 the
-user cited (a growth guess — confirmed by asking, rung 3). SKIP
-LOCKED benchmarks >1k jobs/s on this instance class. B's kill
-condition not met.
-Thought 4/6 [challenge]: Premortem on B: queue-table bloat under
-churn; long transactions starving workers — documented, mitigable.
-Premortem on A: persistence misconfig loses jobs; incident log shows
-it already happened once.
-Thought 5/6 [challenge]: Steelman C: least ops of all. Pruned on a
-constraint, not a vibe: team explicitly avoids new cloud
-dependencies (asked).
-Thought 6/6 [verdict]:
-Verdict: migrate to Postgres SKIP LOCKED.
-Confidence: medium-high (~75%) — throughput verified; bloat
-mitigation unverified on this workload. Mechanism certain, fix
-partly a bet — saying both.
-Would change my mind: projections showing sustained >500 jobs/s, or
-heavy large-payload churn.
-Open questions: autovacuum tuning for the queue table.
-```
+Two complete chains at Standard depth live in `references/examples.md` — a diagnosis (the ETL slowdown: differential → pre-registered kill conditions → negative-space prune) and a decision (the queue migration: option set widened past incumbent-vs-challenger → paired premortems → constraint prune). Read them when you want the shape demonstrated whole before running it.
 
 ## When stuck
 

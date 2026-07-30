@@ -20,13 +20,13 @@ Any script a `#!/bin/bash` or `sh` shebang runs inherits macOS's frozen 3.2 inte
 - **Trim a trailing char with `${var%?}` or `${var:0:$((${#var}-1))}`, not `${var:0:-1}`** (negative substring length, 4.2+).
 - **Wait on a specific PID, not `wait -n`** (4.3+).
 - **Pass values and echo results, not namerefs** (`declare -n`, 4.3+).
-- **Take time from `$(date +%s)`, not `$EPOCHSECONDS`/`$EPOCHREALTIME`** (5.0+) — these expand silently empty: no error, just a blank.
+- **Take time from `$(date +%s)`, not `$EPOCHSECONDS`/`$EPOCHREALTIME`** (5.0+) — these expand silently empty.
 
 Why: macOS ships bash 3.2.57 as `/bin/bash` and never updates it. Every failure above re-probed against 3.2.57. (verified 2026-07-19)
 
 ## Script conventions
 
-Conventions the `~/.claude` scripts follow — match them in scripts authored for this machine; a foreign repo's own convention wins. (since 2026-07-19 · mined from skills/_/scripts/_.sh + @routines/*.sh)
+Conventions the `~/.claude` scripts follow — match them in scripts authored for this machine; a foreign repo's own convention wins. (since 2026-07-19 · mined from `skills/*/scripts/*.sh` + `@routines/*.sh`)
 
 - **Open every script with `set -u`; guard optional vars with `${var:-}`.** Query/pipeline scripts (daemons included) add `-e -o pipefail`; lifecycle/hook/test scripts that must survive partial failure stay `-u`-only. Under `-e`, every expected-failure command carries an explicit guard (`|| true`, `|| die_json …`) — unguarded errexit dies before your error contract can fire.
 - **Pass data into jq with `--arg`/`--argjson` (or `gh api -f`/`-F`); the filter stays a single-quoted literal** — assembled only from literal pieces, never from runtime values, which break it on quotes, `$`, and newlines.
