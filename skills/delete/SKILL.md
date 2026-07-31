@@ -1,9 +1,9 @@
 ---
-name: delete-hard
-description: Erase the current conversation outright — no queue pointer, no buffer entry, no extraction, unrecoverable. Stops this session's background jobs, deletes every buffered copy, every live transcript and the pending sidecar, drops a no-route marker so the ending is not routed, then closes the session and erases the exit flush. The privacy ending; every other ending routes the conversation for triage. Triggers on "/delete hard", "/delete-hard", "hard delete this session", "erase this session".
+name: delete
+description: THE erase — wipe the current conversation outright, no queue pointer, no buffer entry, no extraction, unrecoverable. Stops this session's background jobs, deletes every buffered copy, every live transcript and the pending sidecar, drops a no-route marker so the ending is not routed, then closes the session and erases the exit flush. The privacy ending; every other ending leaves the conversation for triage. There is no softer delete — this verb is always the hard one. Triggers on "/delete", "delete this session", "hard delete this session", "erase this session".
 ---
 
-# Delete Hard → the conversation is erased
+# Delete → the conversation is erased
 
 Every other ending routes: the SessionEnd hook mints a `mode: triage` pointer and a 90-day
 buffer copy, and reconcile judges the conversation later. This one leaves nothing — for
@@ -35,7 +35,7 @@ conversation harder to recover, never easier.
 **Interactive session:**
 
 ```
-bash ~/.claude/skills/delete-hard/scripts/delete-session.sh "$CLAUDE_SCRATCHPAD_DIR"
+bash ~/.claude/skills/delete/scripts/delete-session.sh "$CLAUDE_SCRATCHPAD_DIR"
 ```
 
 (Omit the argument if `$CLAUDE_SCRATCHPAD_DIR` is unset — that just skips scratchpad

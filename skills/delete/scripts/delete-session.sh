@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# delete-session.sh — close THIS session after `/delete hard` has erased it, and make sure
+# delete-session.sh — close THIS session after `/delete` has erased it, and make sure
 # the erase survives the CLI's own exit. Used by nothing else: ending a session normally is
 # the SessionEnd router's job, and un-resumable-ness is no longer a goal (Claude Code keeps
 # its transcripts, `cleanupPeriodDays: 3650`).
@@ -15,7 +15,7 @@
 # after every in-session tool call has returned, so nothing in-session can prevent it. The
 # watcher outlives the CLI, waits for the pid to die, and erases whatever regrew.
 #
-# Nothing is ever archived, copied, or buffered here. `/delete hard` is the ending that
+# Nothing is ever archived, copied, or buffered here. `/delete` is the ending that
 # leaves nothing.
 set -u
 
