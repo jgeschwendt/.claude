@@ -1,12 +1,22 @@
 # ~/.claude
 
-The versioned home of Claude Code, synced across machines: the config that shapes every session, plus the machine-local data those sessions accrete.
+What shapes a Claude Code session is tracked and synced; what sessions accrete stays gitignored.
 
 ## Tracked
 
-- `CLAUDE.md` — global instructions: the Golden Rule, house rules, memory contract
-- `rules/` — house coding standards, referenced from CLAUDE.md
-- `skills/` — personal skills (lean, self-contained; the work fleet lives elsewhere)
-- `hooks/` — `memory-recall` (SessionStart bank injection), `format`, `drain`
-- `settings.json`, `statusline.js`, `themes/` — harness config
-- `save` — the daily save: amend today's commit if it exists, else a fresh `update: MM/DD/YY`, then force-push main
+<!-- curated, not exhaustive: hooks/drain.js and plugins/config.json are tracked but deliberately omitted -->
+
+```
+~/.claude
+├── hooks/
+│   ├── format.js          PostToolUse formatter
+│   └── memory-recall.js   SessionStart recall injection
+├── rules/                 house standards for code and docs
+├── skills/                personal skills, lean and self-contained
+├── themes/                custom themes
+├── CLAUDE.md              global instructions: golden rule, house rules, memory contract
+├── save                   amend or cut today's sync: MM/DD/YY commit; force-push main
+├── settings.json          harness config — hook wiring, permissions
+├── settings.local.json    output-style override
+└── statusline.js
+```

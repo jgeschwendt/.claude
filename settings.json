@@ -394,7 +394,7 @@
     "typescript-lsp@claude-plugins-official": true,
     "vercel@claude-plugins-official": true
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "askUserQuestionTimeout": "never",
   "tui": "fullscreen",
   "voice": {
