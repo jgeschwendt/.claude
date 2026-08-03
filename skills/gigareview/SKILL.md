@@ -120,7 +120,7 @@ gate failure to resolve, not a footnote.
 
 **Success criteria**: The user can decide to rely on the work from this summary alone.
 
-**Rules** — whole-skill, not step 5. Ordered by what breaks worst when violated; order encodes meaning here, exempt from house alpha-sort (CLAUDE.md § Code):
+**Rules** — whole-skill, not step 5. Ordered by what breaks worst when violated; order encodes meaning here, exempt from house alpha-sort (CLAUDE.md § Rules):
 
 - Never soften a NO-GO — an unresolved CONFIRMED finding at the stated stakes blocks the GO.
 - Findings in artifacts you didn't build this session get reported, not silently fixed — an observed failure among them routes to /gigadebug.

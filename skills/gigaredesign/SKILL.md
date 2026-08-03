@@ -192,7 +192,7 @@ the report alone.
 ## Rules
 
 Ordered by what breaks worst when violated — order encodes meaning here,
-exempt from house alpha-sort (CLAUDE.md § Code).
+exempt from house alpha-sort (CLAUDE.md § Rules).
 
 - The external contract is the invariant. Internal tests pinning demolished
   structure are deleted WITH that structure and logged in the ledger.

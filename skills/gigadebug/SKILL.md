@@ -113,7 +113,7 @@ got encoded), residual doubts.
 ## Rules
 
 Ordered by what breaks worst when violated — order encodes meaning here,
-exempt from house alpha-sort (CLAUDE.md § Code).
+exempt from house alpha-sort (CLAUDE.md § Rules).
 
 - No fix without a repro; no CONFIRMED cause without observed
   discriminating evidence — plausible-and-unfalsified stays PLAUSIBLE and

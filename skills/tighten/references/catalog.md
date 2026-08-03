@@ -489,7 +489,7 @@ Position is the one channel that costs zero tokens. A buried rule is worse than 
 - **Procedure** — after reordering any instruction rule list, write the exemption into the artifact: an instruction list's order encodes meaning (difficulty ranking, routing precedence, pipeline stages) and is exempt from the house alpha-sort rule. An unstated exemption is forfeited — a future pass alpha-sorts the list and randomizes a variable that measurably matters. The absence of the note beside a deliberately ordered list is the finding.
 - **Pattern** — `rg -n 'order encodes meaning|exempt from alpha|ordered by|first match wins' <file>`
 - **Specimen** — Load-bearing note: a routing table introduced by "First match wins — rows are ordered most-specific first"; a rule list headed "Ordered by what breaks worst when violated… exempt from house alpha-sort". Counterfeit: a rule list alpha-sorted "for consistency" with no note either way, which reads to the next editor as arbitrary and to the model as a randomized difficulty sequence.
-- **Source** — `CLAUDE.md` § Code (alpha-sort where order is arbitrary, with the order-encodes-meaning exception); arXiv:2502.17204.
+- **Source** — `CLAUDE.md` § Rules (alpha-sort where order is arbitrary, with the order-encodes-meaning exception); arXiv:2502.17204.
 
 ---
 
@@ -552,7 +552,7 @@ The same asymmetry as U1, one grammatical layer down: a pronoun is a second name
 
 These run on every candidate rewrite, before the oracle. A rewrite failing a gate is rejected, not adjudicated.
 
-Line width and wrapping are the auto-formatter's domain (CLAUDE.md § Code: assume auto-formatting) — never a tighten verdict, never a §G rejection (since 2026-07-30 · gigasweep run asked; run-5 stamp reflows were the same question).
+Line width and wrapping are the auto-formatter's domain (CLAUDE.md § Rules: assume auto-formatting) — never a tighten verdict, never a §G rejection (since 2026-07-30 · gigasweep run asked; run-5 stamp reflows were the same question).
 
 ### G1 · Compression artifacts
 

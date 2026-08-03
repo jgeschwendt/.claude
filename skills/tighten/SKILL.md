@@ -256,7 +256,7 @@ Apply the committed cut-set. Run rung 2 over the batch. Run rung 3 wherever the 
 
 ## Rules
 
-Ordered by what breaks worst when violated — order encodes meaning here, exempt from house alpha-sort (CLAUDE.md § Code).
+Ordered by what breaks worst when violated — order encodes meaning here, exempt from house alpha-sort (CLAUDE.md § Rules).
 
 - Reject any rewrite that introduces a sentence fragment, a new abbreviation, an arrow chain, or jargon absent from the target, and any rewrite that flattens a deliberate catalyst — a metaphor or a stated stance standing in for a procedure. Non-metaphorical vagueness ("be careful") still gets flattened (`references/catalog.md` §G).
 - Resolve a conflict between two surviving rules in the text — when the conflict is inside a rewrite this run authors. A conflict found in the TARGET's pre-existing rules FLAGs per § The invariant; this bullet never licenses repairing one (reconciled 2026-07-30 · seq-thinking references run). A priority declaration ("this rule overrides all others") is not a mechanism: instruction hierarchy is a training-time property (arXiv:2404.13208).

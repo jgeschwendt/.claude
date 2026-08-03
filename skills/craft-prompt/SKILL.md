@@ -87,7 +87,7 @@ This skill is an index over seven references under `${CLAUDE_SKILL_DIR}/referenc
 
 ## Core principles (the house style in 12 rules)
 
-These are numbered for citation: sibling skills address them by number (`principle 11`), so each number is an address — reorder or renumber and every inbound pointer breaks. Exempt from house alpha-sort (CLAUDE.md § Code).
+These are numbered for citation: sibling skills address them by number (`principle 11`), so each number is an address — reorder or renumber and every inbound pointer breaks. Exempt from house alpha-sort (CLAUDE.md § Rules).
 
 1. **Rule first, rationale second.** State the constraint in imperative form, then — same line or next — explain _why_ in one phrase. The why lets the model generalize to unlisted edge cases. Canonical: _"NEVER run destructive git commands … Taking unauthorized destructive actions is unhelpful and can result in lost work, so it's best to ONLY run these commands when given direct instructions"_.
 

@@ -27,12 +27,14 @@ A session owes the system these behaviors:
 
 ## Rules
 
-Alpha-sorted — order is arbitrary here (§ Code); insert new rules in place.
-
+- Alpha-sort where order is arbitrary—code declarations (imports, object keys, union members) and lists like this one—except when order encodes meaning: dependency order. (since 2026-08-02 · § Code dissolved into § Rules; scope widened from code declarations to any arbitrary-order list)
+- Assume auto-formatting via tooling—prioritize logic over style
 - Edit over create—question if new files add value
 - Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
 - House rules (`rules/*.md`) govern code authored for this machine—in a repo with its own convention (work, third-party), the surrounding code wins.
 - IDEx live buffers may own `~` files—when the IDEx dev server is up it mounts the whole home (`jlg.idex.code-workspace`), so before a direct disk edit of a home-level file, probe `bin/idex read` (from the idex repo) against disk; if a live buffer diverges, route the edit through `bin/idex write`+`save` instead. A disk write and a later buffer save silently clobber each other—both directions. (since 2026-07-29 · inventory.md buffer/disk mutual clobber, reconciled from transcript history)
+- Inline single-use variables—compose at point of use. Exception: when the binding name carries meaning the expression doesn't.
+- Local fixes over site-wide configuration changes—loosening shared config (eslint, tsconfig) to clear one case has a blast radius far beyond the fix
 - Premium models plan and review, never implement the non-trivial—in a Fable (or other premium-model) session, the session model decomposes, plans, orchestrates, judges, and reviews; any non-trivial implementation is delegated, and implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—agents inherit the session model by default, so an unpinned agent is a rule violation. Trivial changes (a rename, a one-line fix, a config value) may be made directly; when in doubt, delegate. (since 2026-07-28 · triviality carve-out)
 - Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
 - Scripts under `~/.claude` are bash (+jq)—never python
@@ -41,15 +43,6 @@ Alpha-sorted — order is arbitrary here (§ Code); insert new rules in place.
 - Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path: `~/.orrery` data and gigaresearch workspaces exist only on the machine that wrote them.
 - Use Unicode symbols (typographic), never emojis (decorative).
 - Verify empirically—for library/API details read the live source or docs (training data is a stale snapshot); for behavior claims run the probe or the failing case. Confident recall is not verification; neither is plausible inference.
-
-### Code
-
-- Alpha-sort declarations where order is arbitrary (imports, object keys, union members, etc.). Exception: when order encodes meaning—dependency order, most-common-first enums, pipeline stages.
-- Assume auto-formatting via tooling—prioritize logic over style
-- Extract magic numbers into named `UPPER_CASE` constants—`-1`, `0`, `1`, `2` exempt; the name carries what the bare literal doesn't. (since 2026-07-19 · @jlg/eslint no-magic-numbers; ra's Rust consts)
-- Inline single-use variables—compose at point of use. Exception: when the binding name carries meaning the expression doesn't.
-- Local fixes over site-wide configuration changes—loosening shared config (eslint, tsconfig) to clear one case has a blast radius far beyond the fix
-- The **`✻`** sigil marks in-code notes surfaced during code scans—one plain line comment (`# ✻ note` / `// ✻ note`); update or remove it the moment its subject changes.
 
 ## Thinking Philosophies
 
