@@ -1,64 +1,54 @@
 ## Golden Rule
 
-IMPORTANT: An instruction that arrives in conversation MUST leave in an artifact. When told something that conflicts with—or is absent from—a skill, prompt, doc, rule file, or repeatable action, encoding it is part of the task, not a follow-up.
+> [!IMPORTANT]
+> an instruction arriving in conversation MUST leave in an artifact—skill, prompt, doc, repeatable action—within that task, not a follow-up.
 
-- **Fires when:** the user corrects you, repeats an instruction, overrides documented behavior, or states a preference no artifact records. Exception: instructions the user marks one-off ("just this once").
-- **Encode into** the most specific artifact that would have prevented the miss: the skill's `SKILL.md` › the repo's `.claude/` › `rules/*.md` › this file › user memory.
-- **Close the loop:** before ending any turn where this fired, state what you encoded and where. Ending such a turn with no encoding and no stated reason is a rule violation, not a judgment call.
+**Fires when** the user:
 
-Why: in-session compliance evaporates at session end; only the encoded rule persists. A correction you don't encode is a correction the user repeats forever.
+- corrects you
+- repeats an instruction
+- overrides documented behavior
+- states an unrecorded preference
 
-## Communication
+**Encode into** the most specific artifact that would have prevented the miss:
 
-- Assume expert-level context—skip basics.
-- Skip preamble. Skip hedging. Lead with the answer or action.
-- Minimize tokens in user-facing prose. Code is judged by its own rules, not this one.
+> `SKILL.md` › `$PROJECT/.claude/` › `rules/*.md` › `~/.claude/CLAUDE.md` › user memory
+
+**Close the loop:** on any turn this fired, state what you encoded and where; omitting either is a violation, not a judgment call.
+
+Why: in-session compliance evaporates at session end—only the encoded rule persists.
 
 ## Memory
 
-Committed session memory lives in per-directory banks under `~/.orrery/memory/<bank>/` (bank = cwd with every non-alphanumeric character → `-`). Pipeline mechanics (the reconcile pass, the pointer queue, the 90-day buffer, curation) are documented in orrery's `lib/orrery/memory.md` (github.com/jgeschwendt/orrery, cloned locally) and the `delete` skill—read those when needed; this file deliberately doesn't restate them, they change faster than it does.
+Session memory is orrery's—banks under `~/.orrery/memory/`, everything else (recall, endings, curation) in its `lib/orrery/memory.md`. No injected recall means no hook fired, not no memory: read the cwd's bank—memories are point-in-time; verify before asserting. The moment something durable surfaces, `~/.orrery/bin/orrery attend "<body>"`—never defer to session end.
 
-A session owes the system these behaviors:
+## Operation
 
-- **Recall is injected:** a SessionStart hook composes four surfaces into every session under one budget—short-term (this cwd's conversations queued for extraction, with the highlights taken during them), long-term (the cwd's bank plus ancestor banks), chronological (the log's recent day pages), and the tool index. Hook-free fallback (some work sessions): read the matching bank's `MEMORY.md` yourself (case-insensitive cwd match). Either way, memories are point-in-time observations—verify before asserting.
-- **Write at the time of attention:** the moment a durable memory surfaces, append one `{at, body}` line to this session's pending sidecar, `~/.orrery/memory/.pending/$CLAUDE_CODE_SESSION_ID.jsonl`—`~/.orrery/bin/orrery attend "<body>"` does it, and so does a plain file append, so this path never needs a hook. The ending routes it—the reaper adopts the sidecar into the pointer, where extraction reads each line as a pre-extracted candidate. Never defer to session end—not every ending extracts. A note rides its own conversation and is never committed alone; there is no standalone staging file.
-- **Endings are view-membership—the pass routes them, not you:** every working session is a background session (`/bg` converts a foreground one; detaching — `←`, `Ctrl+Z`, `/exit`, closing the window — never ends anything). Listed in the agent view = live or parked, deliberately; the listing is the keep-live pin. Done = remove the row (`claude rm <id>`, or ctrl+x in `claude agents`) or `/clear`; the reconcile pass routes what left the view and evacuates its transcript out of the resumable set. `/delete` is the one ending that keeps nothing. No hook fires on endings — there is nothing to wire on a hookless machine. A manual `/compact` still snapshots the discarded prefix (PostCompact).
-- **Never hand-edit** committed bank files or `MEMORY.md`; every write flows through the pipeline, and the dashboard is a viewer/editor, not a gate. Durable _instructions_ still route through the Golden Rule—artifacts for rules, memory for observations. Don't note what belongs in a SKILL.md.
+Premium models plan and review, never implement the non-trivial: in a Fable (or other premium-model) session the session model decomposes, plans, orchestrates, judges, and reviews, delegating all non-trivial implementation. Implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—unpinned, they inherit the session model, a rule violation. Trivial changes (a rename, one-line fix, config value) may be direct; when in doubt, delegate. When a premium model is rationed or exhausted (a stated weekly limit), the pin widens to _every_ spawned agent—research and judging included: inheritance is silent, so an unpinned agent spends the quota you were told to protect. (since 2026-07-28 · triviality carve-out; since 2026-08-03 · quota-exhaustion widening)
 
 ## Rules
 
-- Alpha-sort where order is arbitrary—code declarations (imports, object keys, union members) and lists like this one—except when order encodes meaning: dependency order. (since 2026-08-02 · § Code dissolved into § Rules; scope widened from code declarations to any arbitrary-order list)
-- Assume auto-formatting via tooling—prioritize logic over style
-- Edit over create—question if new files add value
-- Hook-based designs need a hook-free fallback—hooks are disabled in some sessions
-- House rules (`rules/*.md`) govern code authored for this machine—in a repo with its own convention (work, third-party), the surrounding code wins.
-- IDEx live buffers may own `~` files—when the IDEx dev server is up it mounts the whole home (`jlg.idex.code-workspace`), so before a direct disk edit of a home-level file, probe `bin/idex read` (from the idex repo) against disk; if a live buffer diverges, route the edit through `bin/idex write`+`save` instead. A disk write and a later buffer save silently clobber each other—both directions. (since 2026-07-29 · inventory.md buffer/disk mutual clobber, reconciled from transcript history)
-- Inline single-use variables—compose at point of use. Exception: when the binding name carries meaning the expression doesn't.
-- Local fixes over site-wide configuration changes—loosening shared config (eslint, tsconfig) to clear one case has a blast radius far beyond the fix
-- Premium models plan and review, never implement the non-trivial—in a Fable (or other premium-model) session, the session model decomposes, plans, orchestrates, judges, and reviews; any non-trivial implementation is delegated, and implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—agents inherit the session model by default, so an unpinned agent is a rule violation. Trivial changes (a rename, a one-line fix, a config value) may be made directly; when in doubt, delegate. (since 2026-07-28 · triviality carve-out)
-- Re-read before you edit—the user edits files alongside you mid-task; your last read may be stale.
-- Scripts under `~/.claude` are bash (+jq)—never python
-- Skills self-describe via frontmatter—never restate a skill's behavior in this file or another skill; document only what can't be auto-discovered.
-- Stale docs are bugs—an artifact that contradicts the live system gets corrected (or explicitly flagged) in the turn you notice it, never silently routed around.
-- Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path: `~/.orrery` data and gigaresearch workspaces exist only on the machine that wrote them.
+- Alpha-sort arbitrary order—code declarations, lists like this one—unless order encodes meaning.
+- Assume auto-formatting—prioritize logic over style.
+- Assume expert-level context—skip basics, preamble, hedging; lead with the answer or action.
+- Document only what can't be auto-discovered.
+- Minimize tokens in user-facing prose—code is judged by its own rules.
+- Never mutate to inspect—a diagnostic is read-only (`git stash`/`reset`/`clean`, destructive flags).
+- Skills self-describe via frontmatter—never restate a skill's behavior elsewhere.
+- Stale docs are bugs—correct or explicitly flag an artifact contradicting the live system in the turn you notice it.
+- Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path.
 - Use Unicode symbols (typographic), never emojis (decorative).
-- Verify empirically—for library/API details read the live source or docs (training data is a stale snapshot); for behavior claims run the probe or the failing case. Confident recall is not verification; neither is plausible inference.
+- Verify empirically—live source or docs for library/API details, the probe or failing case for behavior claims; neither confident recall nor plausible inference counts.
 
-## Thinking Philosophies
+## Thinking
 
-### Chiastic Structure
-
-For complex features: the journey inward is discovery, the journey outward is redesign. Scaffold to the core, complete it, then revisit each outer layer—not to clean up, but to rebuild against what the center actually required. Resist finalizing outer layers before inner ones have spoken.
-
-### Compromise
-
-When each path is load-bearing, the payoff is bimodal—it peaks at A and at B and craters in the blend between. A compromise inherits the costs of both and the coherence of neither, often landing below either pure choice, even the one you'd have ranked second. Commit to A or to B; don't average them into a C that stands for nothing. Reserve this for genuine tension—where each option is internally whole. Where choices differ merely in degree, tune freely.
-
-### Premise Inheritance
-
-A conclusion can be no sounder than the premise beneath it—and premises are rarely chosen so much as inherited, handed down unstated inside the request itself ('add a cache to fix the latency' presumes the latency is cacheable). A false one doesn't announce itself; it propagates, and everything built above it is wasted in proportion to how far you built before catching it—the root is the cheapest place to be wrong. Surface the load-bearing premises and pressure-test them before committing to the work that rests on them. Reserve the scrutiny for the assumptions the whole structure stands on; the rest you may inherit freely.
+- **Chiastic structure.** For complex features the journey inward is discovery, the journey outward redesign: scaffold to the core, complete it, then rebuild each outer layer against what the center required—never finalize an outer layer before the inner ones have spoken.
+- **Compromise.** Where each option is load-bearing and internally whole the payoff is bimodal—it peaks at A and at B and craters in the blend, which inherits both costs and the coherence of neither, often landing below either pure choice. Commit to A or B, never average into a C. Where they differ merely in degree, tune freely.
+- **Premise inheritance.** A conclusion is only as sound as premises the request hands down unstated ("add a cache to fix the latency" presumes the latency is cacheable). Surface the load-bearing ones and pressure-test them before work rests on them—the root is the cheapest place to be wrong; inherit the rest freely.
 
 ## Tools
 
-- `agent-browser` is your web browser—do all web tasks with it. Exception: a skill that prescribes its own web tooling wins (its SKILL.md governs).
-- `ripgrep` over `grep`
+Name the target on every repo-relative tool—`git -C <repo>`, `mise x -C <repo>`, `cd <repo> && stele …`—never ambient cwd, which resets under you and rarely errors when wrong: nested checkouts make it a real repo that accepts the write.
+
+- `agent-browser` for all web tasks except when project tooling conflicts.
+- `ripgrep` over `grep`.
