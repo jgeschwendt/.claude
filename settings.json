@@ -1,31 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "cleanupPeriodDays": 3650,
+  "cleanupPeriodDays": 365,
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "fable[1m]",
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/memory-recall.js",
-            "timeout": 10,
-            "statusMessage": "recalling memories..."
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
@@ -36,200 +16,16 @@
             "statusMessage": "formatting..."
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
       }
     ],
-    "PostCompact": [
-      {
-        "matcher": "manual",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" snapshot || exit 0",
-            "timeout": 30,
-            "statusMessage": "routing the pre-compact conversation..."
-          }
-        ]
-      },
+    "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "ConfigChange": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "CwdChanged": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "DirectoryAdded": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Elicitation": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "ElicitationResult": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "FileChanged": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "InstructionsLoaded": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "MessageDisplay": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PermissionDenied": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolBatch": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
+            "command": "\"$HOME/.local/bin/sandman\" recall --hook",
+            "timeout": 10,
+            "statusMessage": "recalling memories..."
           }
         ]
       }
@@ -239,140 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Setup": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "TaskCreated": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "UserPromptExpansion": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "WorktreeCreate": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "WorktreeRemove": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -x \"$HOME/.orrery/bin/orrery\" ] && exec \"$HOME/.orrery/bin/orrery\" observe || exit 0",
-            "timeout": 5
+            "command": "\"$HOME/.local/bin/sandman\" take --hook"
           }
         ]
       }
@@ -399,7 +62,7 @@
     "enabled": true,
     "mode": "hold"
   },
-  "skipDangerousModePermissionPrompt": true,
+  "skipDangerousModePermissionPrompt": false,
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "editorMode": "normal",
@@ -413,5 +76,10 @@
   "defaultToAgentsView": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754086909438
+  },
+  "autoUploadSessions": false,
+  "remoteControlAtStartup": false,
+  "attribution": {
+    "sessionUrl": false
   }
 }

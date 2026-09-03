@@ -1,7 +1,0 @@
-{
-  "name": "ra",
-  "base": "light",
-  "overrides": {
-    "autoAccept": "rgb(175,135,200)"
-  }
-}

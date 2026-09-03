@@ -1,11 +1,6 @@
+# $HOME/.claude/.gitignore
 .archive/
 .vscode/
-
-@handoffs/
-@log/
-@memory/
-@research/
-@routines/
 
 backups/
 briefs/
@@ -13,6 +8,7 @@ cache/
 chrome/
 debug/
 downloads/
+feedback/
 file-history/
 ide/
 image-cache/
@@ -34,6 +30,7 @@ worktrees/
 
 daemon*
 
+.claude.json
 .last-cleanup
 .last-update-result.json
 gh-pr-status-cache.json
@@ -46,3 +43,6 @@ stats-cache.json
 
 *.log
 .DS_Store
+CLAUDE.local.md
+
+node_modules/

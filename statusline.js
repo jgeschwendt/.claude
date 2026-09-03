@@ -26,11 +26,8 @@
 // Debugging: each tick's payload is dumped to statusline.js.log (last tick wins); a thrown
 // error lands there too and the line simply goes blank for that tick.
 
-import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
-import { homedir, tmpdir } from "node:os";
-import { json } from "node:stream/consumers";
+const HOME = Bun.env.HOME ?? "";
+const TMP = (Bun.env.TMPDIR ?? "/tmp").replace(/\/$/, "");
 
 /**
  * @typedef {{
@@ -63,9 +60,9 @@ import { json } from "node:stream/consumers";
 const clamp = (/** @type {number} */ v, /** @type {number} */ lo, /** @type {number} */ hi) =>
   Math.min(hi, Math.max(lo, v));
 
-const readJSON = (/** @type {string} */ path) => {
+const readJSON = async (/** @type {string} */ path) => {
   try {
-    return JSON.parse(readFileSync(path, "utf8"));
+    return await Bun.file(path).json();
   } catch {
     return null;
   }
@@ -115,7 +112,7 @@ const LEGACY_200K_MODELS = new Set(["claude-opus-4-6", "claude-sonnet-4-6"]);
  * @param {string | undefined} projectDir
  * @param {any} globalState parsed ~/.claude.json
  */
-const autoCompactWindow = (model, windowSize, projectDir, globalState) => {
+const autoCompactWindow = async (model, windowSize, projectDir, globalState) => {
   // 1. Env override, inherited from the CLI process; clamped to [100k, 1M].
   const env = Number(process.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW);
   if (Number.isFinite(env) && env > 0) return clamp(Math.round(env), 100_000, 1_000_000);
@@ -126,9 +123,9 @@ const autoCompactWindow = (model, windowSize, projectDir, globalState) => {
     ...(projectDir
       ? [`${projectDir}/.claude/settings.local.json`, `${projectDir}/.claude/settings.json`]
       : []),
-    `${homedir()}/.claude/settings.json`,
+    `${HOME}/.claude/settings.json`,
   ]) {
-    const window = validWindow(readJSON(path)?.autoCompactWindow);
+    const window = validWindow((await readJSON(path))?.autoCompactWindow);
     if (window) return window;
   }
 
@@ -167,9 +164,9 @@ const autoCompactWindow = (model, windowSize, projectDir, globalState) => {
  * Tokens at which auto-compact fires: window − output reserve − 13k compaction reserve.
  * @param {StatusInput} data
  */
-const autoCompactThreshold = (data) => {
+const autoCompactThreshold = async (data) => {
   const windowSize = data.context_window?.context_window_size || 200_000;
-  const globalState = readJSON(`${homedir()}/.claude.json`) ?? {};
+  const globalState = (await readJSON(`${HOME}/.claude.json`)) ?? {};
 
   // Auto-compact off (env kill switches or `claude config set autoCompactEnabled false`) → the
   // app shows usage against the full window instead.
@@ -183,7 +180,7 @@ const autoCompactThreshold = (data) => {
 
   const window = Math.min(
     windowSize,
-    autoCompactWindow(
+    await autoCompactWindow(
       baseModelId(data.model.id ?? ""),
       windowSize,
       data.workspace?.project_dir,
@@ -218,12 +215,12 @@ const dur = (/** @type {number} */ seconds) => {
  * @param {string | undefined} sessionId
  * @param {number} tokens current total_input_tokens
  * @param {number} threshold tokens at which auto-compact fires
- * @returns {string} "≈40m" once a trend exists, else ""
+ * @returns {Promise<string>} "≈40m" once a trend exists, else ""
  */
-const etaToCompact = (sessionId, tokens, threshold) => {
+const etaToCompact = async (sessionId, tokens, threshold) => {
   if (!sessionId || !tokens) return "";
-  const path = `${tmpdir()}/claude-statusline-${sessionId}.json`;
-  const raw = readJSON(path)?.samples;
+  const path = `${TMP}/claude-statusline-${sessionId}.json`;
+  const raw = (await readJSON(path))?.samples;
   let samples = Array.isArray(raw)
     ? raw.filter((s) => typeof s?.at === "number" && typeof s?.tokens === "number")
     : [];
@@ -233,7 +230,7 @@ const etaToCompact = (sessionId, tokens, threshold) => {
   if (!samples.length || now - samples[samples.length - 1].at >= 15_000)
     samples = [...samples.slice(-39), { at: now, tokens }];
   try {
-    writeFileSync(path, JSON.stringify({ samples }));
+    await Bun.write(path, JSON.stringify({ samples }));
   } catch {}
   const span = (samples[samples.length - 1].at - samples[0].at) / 1000;
   if (span < 60) return "";
@@ -244,7 +241,12 @@ const etaToCompact = (sessionId, tokens, threshold) => {
   return eta < 6 * 3600 ? `≈${dur(eta)}` : "";
 };
 
-const sh = (/** @type {string} */ cmd) => execSync(cmd, { encoding: "utf8" }).trim();
+/** Run `argv`, returning trimmed stdout; throws on a non-zero exit. */
+const sh = (/** @type {string[]} */ argv) => {
+  const { exitCode, stdout } = Bun.spawnSync(argv, { stderr: "ignore" });
+  if (exitCode !== 0) throw new Error(`${argv[0]} exit=${exitCode}`);
+  return stdout.toString().trim();
+};
 
 /**
  * Columns of the controlling PTY. Claude Code pipes our stdout, so `process.stdout.columns` is undefined — walk up to
@@ -254,17 +256,17 @@ const columns = (/** @type {number} */ fallback = 80) => {
   const flag = process.platform === "darwin" ? "-f" : "-F";
   try {
     for (let pid = process.pid, i = 0; pid > 1 && i < 8; i++) {
-      const tty = sh(`ps -o tty= -p ${pid}`);
+      const tty = sh(["ps", "-o", "tty=", "-p", String(pid)]);
       if (tty && tty !== "??")
-        return Number(sh(`stty ${flag} /dev/${tty} size`).split(" ")[1]) || fallback;
-      pid = Number(sh(`ps -o ppid= -p ${pid}`));
+        return Number(sh(["stty", flag, `/dev/${tty}`, "size"]).split(" ")[1]) || fallback;
+      pid = Number(sh(["ps", "-o", "ppid=", "-p", String(pid)]));
     }
   } catch {}
   return fallback;
 };
 
 const log = (/** @type {string} */ message) =>
-  writeFile(`${import.meta.filename}.log`, `[${new Date().toISOString()}] ${message}\n`);
+  Bun.write(`${import.meta.filename}.log`, `[${new Date().toISOString()}] ${message}\n`);
 
 // ── Rendering ─────────────────────────────────────────────────────────────────────────────────
 const BOLD = "\x1b[1m";
@@ -283,16 +285,16 @@ const bar = (/** @type {number} */ p, /** @type {number} */ width) => {
 };
 
 try {
-  const data = /** @type {StatusInput} */ (await json(process.stdin));
+  const data = /** @type {StatusInput} */ (await Bun.stdin.json());
 
   const model = data.model.display_name;
   // total_input_tokens is the app's own numerator (input + cache_read + cache_creation).
   // Missing early in session / after /compact → 0.
   const tokens = data.context_window?.total_input_tokens || 0;
-  const threshold = autoCompactThreshold(data);
+  const threshold = await autoCompactThreshold(data);
   const pct = clamp(Math.round((tokens / threshold) * 100), 0, 100);
   // Record velocity every tick, but only surface the ETA once the bar is half full.
-  const trend = etaToCompact(data.session_id, tokens, threshold);
+  const trend = await etaToCompact(data.session_id, tokens, threshold);
   const eta = pct >= 50 ? trend : "";
   // Session spend so far (input + output priced together by the app); hidden until it rounds to a cent.
   const cost = data.cost?.total_cost_usd || 0;

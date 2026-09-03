@@ -1,13 +1,13 @@
 ---
 name: delete
-description: THE erase — wipe the current conversation outright, no queue pointer, no buffer entry, no extraction, unrecoverable. Stops this session's background jobs, deletes every buffered copy, every live transcript and the pending sidecar, drops a no-route marker so the ending is not routed, then closes the session and erases the exit flush. The privacy ending; every other ending leaves the conversation for triage. There is no softer delete — this verb is always the hard one. Triggers on "/delete", "delete this session", "hard delete this session", "erase this session".
+description: THE forget — wipe the current conversation outright, no pointer, no archive copy, no extraction, unrecoverable. Stops this session's background jobs, destroys the live transcript, its subagent files, anything already archived, and the short-term pointer, then closes the session and erases the exit flush. The privacy ending; every other ending is taken into the archive for dreaming. There is no softer delete — this verb is always the hard one. Triggers on "/delete", "delete this session", "hard delete this session", "erase this session".
 ---
 
 # Delete → the conversation is erased
 
-Every other ending routes: the SessionEnd hook mints a `mode: triage` pointer and a 90-day
-buffer copy, and reconcile judges the conversation later. This one leaves nothing — for
-material that should never have been written down.
+Every other ending is taken: the SessionEnd hook archives the transcript into
+`~/.sandman/archive/` and mints a pointer, and the dream pass extracts from it later.
+This one leaves nothing — for material that should never have been written down.
 
 Run the steps **in order** — this is live work only a running session can do.
 
@@ -20,15 +20,16 @@ say so and move on.
 ## 2. Erase the conversation
 
 ```
-~/.orrery/bin/orrery erase
+~/.local/bin/sandman forget "${CLAUDE_SESSION_ID:-$CLAUDE_CODE_SESSION_ID}"
 ```
 
-It drops the no-route marker first — that is what makes this session's SessionEnd skip
-routing instead of queueing a pointer for a transcript that no longer exists — then erases
-every buffer copy of this session (an earlier ending's, plus any manual-`/compact` snapshot,
-which the buffer holds under a derived `<sid>-compact-<stamp>` id), every live transcript for
-it, and the pending sidecar, widest reach first, so an interrupted run leaves the
-conversation harder to recover, never easier.
+It destroys every copy of this session — the live transcript, its subagent files,
+anything `take` already archived under `~/.sandman/archive/`, and the short-term
+pointer — widest reach first, so an interrupted run leaves the conversation harder to
+recover, never easier. Both id variables are read because only `CLAUDE_CODE_SESSION_ID`
+is set in a background job (observed 2026-08-25). Bank memories are untouched: a memory already committed was
+asked for. The SessionEnd hook's `take --hook` then finds nothing and exits quietly —
+no pointer is minted for a transcript that no longer exists.
 
 ## 3. End the session
 
@@ -43,27 +44,27 @@ cleaning.) The script cleans the scratchpad, resolves **this session's** CLI pro
 (ancestor-only, never a sibling), detaches a watcher that erases the transcript the CLI
 re-creates on its way out, and closes the CLI (Ctrl-C twice, escalating to SIGTERM).
 
-**Background agent** (`claude --bg`) — stop it by its short id, the first 8 characters of
-`$CLAUDE_CODE_SESSION_ID`:
+**Background agent** (`claude --bg`) — it has no TTY and cannot close itself with
+signals, so arm the watcher first, then stop the job by its short id (the first 8
+characters of `$CLAUDE_CODE_SESSION_ID`):
 
 ```
+bash ~/.claude/skills/delete/scripts/delete-session.sh --watch-only
 claude stop <short-id>
 ```
 
-The no-route marker is what keeps that ending from resurrecting the conversation as a
-queue pointer. (verified 2026-07-29 · live probe, Claude Code 2.1.220: `claude stop` fires
+Skipping `--watch-only` is what left the regrown transcript on disk (observed
+2026-08-25): the CLI's exit flush re-creates the `.jsonl` that `forget` destroyed, and
+`claude stop` alone never removes it. Nothing resurrects the conversation as a queue
+pointer — `take --hook` exits quietly on a session whose files `forget` already
+destroyed. (verified 2026-07-29 · live probe, Claude Code 2.1.220: `claude stop` fires
 `SessionEnd(reason=other)`.)
 
 ### Caveats — state them, don't hide them
 
 - **`~/.claude/history.jsonl` survives.** It keeps one line per prompt (cwd + the prompt
-  text) and is Claude Code's own file, not orrery's — nothing here touches it. A
+  text) and is Claude Code's own file, not sandman's — nothing here touches it. A
   hard-deleted conversation's PROMPTS live there until that file is filtered by hand.
-- **A pointer already appended is not retracted.** The queue is an append-only journal, so an
-  erase after an earlier routed ending — or after a manual `/compact` — leaves that pointer in
-  place; reconcile reports it `waiting`, then `lost` after 24 h, and spends nothing on it.
-  Extraction reads the buffer, and every copy this session owns is erased, so nothing is
-  extracted from that pointer either way.
 - **The exit is best-effort.** The signal is sent from inside a running tool call and the
   CLI may absorb the first interrupt as a turn-cancel. If the script reports "still
   running", tell the user to type `/exit` — the watcher erases the transcript however the

@@ -24,6 +24,10 @@ Any script a `#!/bin/bash` or `sh` shebang runs inherits macOS's frozen 3.2 inte
 
 Why: macOS ships bash 3.2.57 as `/bin/bash` and never updates it. Every failure above re-probed against 3.2.57. (verified 2026-07-19)
 
+## Locale
+
+- **Pin `LC_ALL=C` in any script whose glob/`case` patterns use character ranges** — under a UTF-8 locale `[a-z]` collates to admit uppercase, so guards like `[!a-z0-9-]` silently pass `AGENTS`. (since 2026-08-15 · routines/bin/routine)
+
 ## Script conventions
 
 Conventions the `~/.claude` scripts follow — match them in scripts authored for this machine; a foreign repo's own convention wins. (since 2026-07-19 · mined from `skills/*/scripts/*.sh` + `@routines/*.sh`)

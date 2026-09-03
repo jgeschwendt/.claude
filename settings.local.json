@@ -1,3 +1,8 @@
 {
-  "outputStyle": "Proactive"
+  "outputStyle": "Proactive",
+  "permissions": {
+    "allow": [
+      "Bash(git *)"
+    ]
+  }
 }

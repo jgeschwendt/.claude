@@ -1,7 +1,0 @@
-{
-  "name": "khonsu",
-  "base": "dark",
-  "overrides": {
-    "autoAccept": "rgb(175,135,200)"
-  }
-}

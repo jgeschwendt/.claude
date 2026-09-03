@@ -20,11 +20,11 @@ Why: in-session compliance evaporates at session end—only the encoded rule per
 
 ## Memory
 
-Session memory is orrery's—banks under `~/.orrery/memory/`, everything else (recall, endings, curation) in its `lib/orrery/memory.md`. No injected recall means no hook fired, not no memory: read the cwd's bank—memories are point-in-time; verify before asserting. The moment something durable surfaces, `~/.orrery/bin/orrery attend "<body>"`—never defer to session end.
+Session memory is sandman's (`~/.sandman`; recall is injected at session start). The moment something durable surfaces, `~/.local/bin/sandman remember "<body>"`—never defer to session end.
 
 ## Operation
 
-Premium models plan and review, never implement the non-trivial: in a Fable (or other premium-model) session the session model decomposes, plans, orchestrates, judges, and reviews, delegating all non-trivial implementation. Implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—unpinned, they inherit the session model, a rule violation. Trivial changes (a rename, one-line fix, config value) may be direct; when in doubt, delegate. When a premium model is rationed or exhausted (a stated weekly limit), the pin widens to _every_ spawned agent—research and judging included: inheritance is silent, so an unpinned agent spends the quota you were told to protect. (since 2026-07-28 · triviality carve-out; since 2026-08-03 · quota-exhaustion widening)
+Premium models plan and review, never implement the non-trivial: in a Fable (or other premium-model) session the session model decomposes, plans, orchestrates, judges, and reviews, delegating all non-trivial implementation. Implementation/mechanical subagents (Workflow stages, Agent spawns, headless `claude -p`) must pin `model` explicitly to opus or below—unpinned, they inherit the session model, a rule violation. Trivial changes (a rename, one-line fix, config value, a small edit the session has already fully specified — one function plus its tests) may be direct; when in doubt, delegate. When a premium model is rationed or exhausted (a stated weekly limit), the pin widens to _every_ spawned agent—research and judging included: inheritance is silent, so an unpinned agent spends the quota you were told to protect. (since 2026-07-28 · triviality carve-out; since 2026-08-03 · quota-exhaustion widening)
 
 ## Rules
 
@@ -33,7 +33,7 @@ Premium models plan and review, never implement the non-trivial: in a Fable (or 
 - Assume expert-level context—skip basics, preamble, hedging; lead with the answer or action.
 - Document only what can't be auto-discovered.
 - Minimize tokens in user-facing prose—code is judged by its own rules.
-- Never mutate to inspect—a diagnostic is read-only (`git stash`/`reset`/`clean`, destructive flags).
+- Never mutate to inspect—a diagnostic is read-only (`git stash`/`reset`/`clean`/`checkout --`/`restore`, destructive flags). Undo your own botched edit by re-editing, never by tree-discard: `git checkout -- <path>` throws away _every_ uncommitted change to the path, co-resident work included. (since 2026-08-31 · bridge scene: a subagent's checkout-- undo wiped another feature's uncommitted elements)
 - Skills self-describe via frontmatter—never restate a skill's behavior elsewhere.
 - Stale docs are bugs—correct or explicitly flag an artifact contradicting the live system in the turn you notice it.
 - Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path.
@@ -50,5 +50,5 @@ Premium models plan and review, never implement the non-trivial: in a Fable (or 
 
 Name the target on every repo-relative tool—`git -C <repo>`, `mise x -C <repo>`, `cd <repo> && stele …`—never ambient cwd, which resets under you and rarely errors when wrong: nested checkouts make it a real repo that accepts the write.
 
-- `agent-browser` for all web tasks except when project tooling conflicts.
+- `agent-browser` for autonomous web tasks except when project tooling conflicts; co-browsing ("open this so we can work together") means the user's real Chrome via claude-in-chrome, never an automation window—if the extension won't connect, `osascript 'open location'` gets the page in front of them while it's sorted. (since 2026-08-19 · headed agent-browser session rejected as "a test one")
 - `ripgrep` over `grep`.

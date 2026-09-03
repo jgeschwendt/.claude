@@ -1,0 +1,7 @@
+[
+  {
+    "command": "${CLAUDE_PLUGIN_ROOT}/scripts/watch-afk.sh",
+    "description": "**/afk** flag transitions (owner away/returned)",
+    "name": "afk"
+  }
+]

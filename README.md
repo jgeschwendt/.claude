@@ -9,11 +9,9 @@ What shapes a Claude Code session is tracked and synced; what sessions accrete s
 ```
 ~/.claude
 ├── hooks/
-│   ├── format.js          PostToolUse formatter
-│   └── memory-recall.js   SessionStart recall injection
+│   └── format.js          PostToolUse formatter
 ├── rules/                 house standards for code and docs
 ├── skills/                personal skills, lean and self-contained
-├── themes/                custom themes
 ├── CLAUDE.md              global instructions: golden rule, house rules, memory contract
 ├── save                   amend or cut today's sync: MM/DD/YY commit; force-push main
 ├── settings.json          harness config — hook wiring, permissions

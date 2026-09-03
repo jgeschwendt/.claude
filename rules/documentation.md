@@ -5,7 +5,7 @@ paths:
 
 # Documentation
 
-Out of scope: pipeline-owned markdown (`~/.orrery/memory/` banks, their `MEMORY.md`) — never hand-edited; route changes through the pipeline (CLAUDE.md § Memory).
+Out of scope: pipeline-owned markdown (`~/.sandman/memories/` banks, their `MEMORY.md`) — dream/reflect-derived files are never hand-edited; route changes through the pipeline (CLAUDE.md § Memory). A memory this session itself wrote via `remember` may be updated in place (bump `updated:`) rather than duplicated. (reconciled 2026-08-27 · `~/.orrery/memory/` no longer exists; sandman owns session memory)
 
 ## Present tense only
 
