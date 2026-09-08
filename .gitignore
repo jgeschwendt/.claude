@@ -46,3 +46,7 @@ stats-cache.json
 CLAUDE.local.md
 
 node_modules/
+
+# rust
+target/
+logs/

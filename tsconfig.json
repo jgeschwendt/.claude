@@ -1,4 +1,0 @@
-{
-  "compilerOptions": { "checkJs": true, "noEmit": true, "types": ["bun"] },
-  "include": ["hooks", "*.js"]
-}

@@ -1,0 +1,13 @@
+[tools]
+bun = "1.4.2"
+"npm:oxfmt" = "0.67.0"
+"npm:oxlint" = "1.82.0"
+rust = "1.97.1"
+
+[tasks.build]
+description = "Build the statusline and format-hook binaries into target/release/"
+run = "cargo build --release"
+
+[tasks.test]
+description = "Run the crate's unit and integration tests"
+run = "cargo test"

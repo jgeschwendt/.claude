@@ -66,17 +66,32 @@ if [ -n "$scratchpad" ] && [ -d "$scratchpad" ] && printf '%s' "$scratchpad" | g
 fi
 
 # ─── resolve THIS session's CLI process (ancestor only — never a sibling) ──────
+# A background worker titles itself (`claude bg-spare`), so only the first word of the title
+# is compared; the bare-path `claude daemon` and its `bg-pty-host` sit above the worker and
+# are never the session — refuse rather than walk on to them (a dispatcher armed on the
+# daemon's pid waited for a daemon restart, 2026-09-05).
 resolve_cli_pid() {
-  local pid comm
+  local pid comm args
   pid=$PPID
   while [ -n "$pid" ] && [ "$pid" -gt 1 ]; do
-    comm=$(ps -o comm= -p "$pid" 2>/dev/null | sed 's#.*/##' | tr -d ' ')
-    [ "$comm" = "claude" ] && { echo "$pid"; return 0; }
+    comm=$(ps -o comm= -p "$pid" 2>/dev/null | sed 's#.*/##; s/[[:space:]].*//')
+    if [ "$comm" = "claude" ]; then
+      args=$(ps -o args= -p "$pid" 2>/dev/null)
+      case " $args " in
+        *" daemon "* | *" bg-pty-host "*) return 1 ;;
+      esac
+      echo "$pid"
+      return 0
+    fi
     pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
   done
   return 1
 }
 cli_pid="$(resolve_cli_pid || true)"
+
+# A background worker holds a pty, so the TTY test below would not save it from the
+# interrupts; a live job (its `state.json` still present) is closed from outside.
+[ -f "${CLAUDE_JOBS_DIR:-$HOME/.claude/jobs}/${sid:0:8}/state.json" ] && watch_only=1
 
 if [ -z "$cli_pid" ]; then
   echo "  ✻ Could not identify this session's CLI process safely — nothing closed."

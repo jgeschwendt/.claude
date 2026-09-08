@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/format.js",
+            "command": "~/.claude/target/release/format",
             "statusMessage": "formatting..."
           }
         ]
@@ -26,6 +26,12 @@
             "command": "\"$HOME/.local/bin/sandman\" recall --hook",
             "timeout": 10,
             "statusMessage": "recalling memories..."
+          },
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/thread\" --hook",
+            "timeout": 10,
+            "statusMessage": "checking threads..."
           }
         ]
       }
@@ -39,6 +45,41 @@
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|agent_needs_input",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/thread\" --hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/thread\" --hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/thread\" --hook",
+            "timeout": 10,
+            "statusMessage": "checking threads..."
+          }
+        ]
+      }
     ]
   },
   "worktree": {
@@ -47,7 +88,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.js",
+    "command": "~/.claude/target/release/statusline",
     "padding": 0
   },
   "enabledPlugins": {

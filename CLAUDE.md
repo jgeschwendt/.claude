@@ -37,6 +37,7 @@ Premium models plan and review, never implement the non-trivial: in a Fable (or 
 - Skills self-describe via frontmatter—never restate a skill's behavior elsewhere.
 - Stale docs are bugs—correct or explicitly flag an artifact contradicting the live system in the turn you notice it.
 - Stamps cite portable provenance—a repo-relative file or the primary source (arXiv/URL), never a machine-local path.
+- Threads—out-of-session messaging is `~/.threads`, reached through the `threads` MCP tools inside a session or the `thread` CLI: a `needs input:`/`failed:` line in a turn's last message opens one (Stop hook) and threads waiting on you arrive as context at session start and every prompt; a decision that needs options or context is `thread open … --kind decision --option …` under the same key; when `thread wait` returns, answer set → act then `thread resolve`, otherwise reply (a table for a comparison, revise options as asked) and wait again.
 - Use Unicode symbols (typographic), never emojis (decorative).
 - Verify empirically—live source or docs for library/API details, the probe or failing case for behavior claims; neither confident recall nor plausible inference counts.
 

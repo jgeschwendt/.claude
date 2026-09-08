@@ -6,8 +6,9 @@ description: THE forget — wipe the current conversation outright, no pointer, 
 # Delete → the conversation is erased
 
 Every other ending is taken: the SessionEnd hook archives the transcript into
-`~/.sandman/archive/` and mints a pointer, and the dream pass extracts from it later.
+`~/.sandman/.archive/` and mints a pointer, and the dream pass extracts from it later.
 This one leaves nothing — for material that should never have been written down.
+The take ending has its own verb, `/dissolve` — end the conversation and keep it.
 
 Run the steps **in order** — this is live work only a running session can do.
 
@@ -24,7 +25,7 @@ say so and move on.
 ```
 
 It destroys every copy of this session — the live transcript, its subagent files,
-anything `take` already archived under `~/.sandman/archive/`, and the short-term
+anything `take` already archived under `~/.sandman/.archive/`, and the short-term
 pointer — widest reach first, so an interrupted run leaves the conversation harder to
 recover, never easier. Both id variables are read because only `CLAUDE_CODE_SESSION_ID`
 is set in a background job (observed 2026-08-25). Bank memories are untouched: a memory already committed was
